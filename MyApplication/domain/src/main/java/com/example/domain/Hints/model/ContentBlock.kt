@@ -1,16 +1,21 @@
 package com.example.domain.Hints.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 //контент статьи
+@Serializable
 sealed class ContentBlock {
+    @Serializable
+    @SerialName("paragraph")
     data class Paragraph(
         val text: String,
-        val style: TextStyle = TextStyle.Normal
+        val style: TextStyle = TextStyle.Normal,
+        val size: Int,
+        val area: TextArea = TextArea.Left
     ) : ContentBlock()
-
-    data class Heading(
-        val text: String,
-        val level: Int = 2
-    ) : ContentBlock()
+    @Serializable
+    @SerialName("image")
 
     data class Image(
         val imageId: Int,
@@ -20,4 +25,17 @@ sealed class ContentBlock {
     ) : ContentBlock()
 }
 
-enum class TextStyle { Normal, Bold, Italic, Quote }
+@Serializable
+enum class TextStyle {
+    @SerialName("normal") Normal,
+    @SerialName("bold") Bold,
+    @SerialName("italic") Italic,
+    @SerialName("underlined") Underlined
+}
+
+@Serializable
+enum class TextArea {
+    @SerialName("right") Right,
+    @SerialName("center") Center,
+    @SerialName("left") Left
+}

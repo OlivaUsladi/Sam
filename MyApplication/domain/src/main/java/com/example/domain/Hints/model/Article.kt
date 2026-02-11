@@ -1,6 +1,5 @@
 package com.example.domain.Hints.model
 
-import com.example.domain.Hints.model.Category
 import com.example.domain.User
 import java.time.LocalDateTime
 
