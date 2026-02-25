@@ -4,25 +4,588 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.data.Hints.converter.ConverterToJson
+import com.example.domain.Hints.model.Article
+import com.example.domain.Hints.model.Category
+import com.example.domain.User
 import com.example.myapplication.Hints.ui.theme.MyApplicationTheme
+import com.example.myapplication.R
 import java.io.File
+import java.nio.file.WatchEvent
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Greeting()
+            ListOfArticles()
+        }
+    }
+}
+
+@Composable
+fun ListOfArticles(){
+
+    val textState = rememberTextFieldState()
+
+    val brush = remember {
+        Brush.linearGradient(
+            colors = listOf(Color(0xFF2670CC), Color(0xFF26CCAD))
+        )
+    }
+
+    val imageUrls = listOf(
+        "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=500&auto=format",
+        "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&auto=format",
+        "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&auto=format",
+        "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=500&auto=format",
+        "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=500&auto=format"
+    )
+
+
+    val allArticles = remember {
+        listOf(
+            Article(
+                id = 1,
+                title = "Как управлять временем",
+                category = Category(
+                    id = 1,
+                    name = "Продуктивность",
+                    description = "Статьи об увеличении ритма жизни, чтобы больше успеть"
+                ),
+                mainWords = listOf("тайм-менеджмент", "планирование"),
+                author = "Анна Смирнова",
+                imageUrl = imageUrls[0],
+                createdAt = LocalDateTime.now().minusDays(2),
+                updatedAt = LocalDateTime.now().minusDays(1),
+                likesCount = 124,
+                isFavorite = false,
+                isLiked = false
+            ),
+            Article(
+                id = 2,
+                title = "Техники продуктивности",
+                category = Category(
+                    id = 1,
+                    name = "Продуктивность",
+                    description = "Статьи об увеличении ритма жизни, чтобы больше успеть"
+                ),
+                mainWords = listOf("pomodoro", "фокус"),
+                author = "Иван Петров",
+                imageUrl = imageUrls[1],
+                createdAt = LocalDateTime.now().minusDays(5),
+                updatedAt = LocalDateTime.now().minusDays(3),
+                likesCount = 89,
+                isFavorite = true,
+                isLiked = true
+            ),
+            Article(
+                id = 3,
+                title = "Медитация для начинающих",
+                category = Category(
+                    id = 2,
+                    name = "Здоровье",
+                    description = "Статьи о здоровом образе жизни"
+                ),
+                mainWords = listOf("mindfulness", "релаксация"),
+                author = "Елена Козлова",
+                imageUrl = imageUrls[2],
+                createdAt = LocalDateTime.now().minusWeeks(1),
+                updatedAt = LocalDateTime.now().minusDays(2),
+                likesCount = 256,
+                isFavorite = false,
+                isLiked = false
+            ),
+            Article(
+                id = 4,
+                title = "Здоровый сон и режим",
+                category = Category(
+                    id = 2,
+                    name = "Здоровье",
+                    description = "Статьи о здоровом образе жизни"
+                ),
+                mainWords = listOf("сон", "циркадные ритмы"),
+                author = "Михаил Васильев",
+                imageUrl = imageUrls[3],
+                createdAt = LocalDateTime.now().minusDays(10),
+                updatedAt = LocalDateTime.now().minusDays(8),
+                likesCount = 67,
+                isFavorite = false,
+                isLiked = false
+            ),
+            Article(
+                id = 5,
+                title = "Утренние ритуалы",
+                category = Category(
+                    id = 3,
+                    name = "Привычки",
+                    description = "Статьи о формировании полезных привычек"
+                ),
+                mainWords = listOf("утро", "рутина"),
+                author = "Ольга Новикова",
+                imageUrl = imageUrls[4],
+                createdAt = LocalDateTime.now().minusDays(3),
+                updatedAt = LocalDateTime.now().minusDays(2),
+                likesCount = 192,
+                isFavorite = true,
+                isLiked = false
+            )
+        )
+    }
+
+
+    //список названий статей
+    val searchTitles = remember { allArticles.map { it.title } }
+
+    //словарь id-isFavoutite
+    var favoriteStatus by remember { mutableStateOf(allArticles.associate { it.id to it.isFavorite }) }
+
+    //список названий для поисковой строки
+    var searchResults by remember { mutableStateOf(searchTitles) }
+
+    val dateFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy") }
+
+    //Функция поиска в поисковой строке
+    fun filterSearchResults(query: String) {
+        if (query.isBlank()) {
+            searchResults = searchTitles
+        } else {
+            searchResults = searchTitles.filter { article ->
+                article.contains(query, ignoreCase = true)
+            }
+        }
+    }
+
+    //Функция добавления в избранное
+    fun toggleFavorite(articleId: Int) {
+        //mutable словарь
+        favoriteStatus = favoriteStatus.toMutableMap().apply {
+            put(articleId, !(favoriteStatus[articleId] ?: false))
+        }
+    }
+
+
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFF000000))){
+        Spacer(modifier = Modifier.height(30.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+            Box(){
+                Image(painter = painterResource(R.drawable.img),
+                    contentDescription = "man icon",
+                    modifier = Modifier.size(30.dp))
+            }
+            Box() {
+                Column() {
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = "Самоорганизация",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            Box(){
+                Image(painter = painterResource(R.drawable.img_1),
+                    contentDescription = "blue ellipse",
+                    modifier = Modifier.size(30.dp))
+            }
+        }
+        HintsSearchBar(textFieldState = textState,
+            onSearch = { query ->
+                filterSearchResults(query)
+            },
+            searchResults = searchResults,
+            modifier = Modifier.fillMaxWidth())
+
+        Spacer(modifier = Modifier.height(10.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(brush = brush)
+                //.heightIn(min = 100.dp)
+                .clickable(onClick = {})
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.weight(7f)
+                ) {
+                    Text(
+                        text = "Темы",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                    Text(
+                        text = "Выбирайте нужное, открывайте новое",
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
+
+                Image(
+                    painter = painterResource(R.drawable.img_2),
+                    contentDescription = "arrow",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(50.dp))
+        LazyColumn() {
+            items(items = allArticles, key = {it.id}) { article ->
+                ArticleCard(
+                    article = article,
+                    isFavorite = favoriteStatus[article.id] ?: false,
+                    onFavoriteClick = { toggleFavorite(article.id) },
+                    dateFormatter = dateFormatter,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            //Переход на статью
+                        }
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HintsSearchBar(
+    textFieldState: TextFieldState,
+    onSearch: (String) -> Unit,
+    searchResults: List<String>,
+    modifier: Modifier = Modifier
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    val currentQuery = textFieldState.text.toString()
+
+    val brush = remember {
+        Brush.linearGradient(
+            colors = listOf(Color(0xFF2670CC), Color(0xFF26CCAD))
+        )
+    }
+
+    val semiTransparentBrush = remember {
+        Brush.linearGradient(
+            colors = listOf(
+                Color(0xFF2670CC).copy(alpha = 0.7f),
+                Color(0xFF26CCAD).copy(alpha = 0.7f)
+            )
+        )
+    }
+
+    //вот тут исправить логику закрытия режима
+    LaunchedEffect(currentQuery) {
+        if (currentQuery.isNotEmpty()) {
+            expanded = true
+        }
+    }
+
+    SearchBar(
+        modifier = Modifier
+            .semantics { traversalIndex = 0f },
+        colors = SearchBarDefaults.colors(
+            containerColor = Color.Black
+        ),
+        inputField = {
+            ExposedDropdownMenuBox(
+                expanded = false,
+                onExpandedChange = {}
+            ) {
+                TextField(
+                    value = currentQuery,
+                    onValueChange = { newQuery ->
+                        textFieldState.edit { replace(0, length, newQuery) }
+                        onSearch(newQuery)
+                        if (newQuery.isNotEmpty()) {
+                            expanded = true
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(Color.Black)
+                    ,
+                    placeholder = {
+                        Text(
+                            text = "Поиск",
+                            style = TextStyle(brush = brush)
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Поиск",
+                            tint = Color(0xFF2670CC)
+                        )
+                    },
+                    trailingIcon = {
+                        if (currentQuery.isNotEmpty()) {
+                            IconButton(
+                                onClick = {
+                                    textFieldState.edit { replace(0, length, "") }
+                                    onSearch("")
+                                    expanded = true
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Очистить",
+                                    tint = Color(0xFF26CCAD)
+                                )
+                            }
+                        }
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        cursorColor = Color.White
+                    ),
+                    textStyle = TextStyle(brush = brush),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Search
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            onSearch(currentQuery)
+                            expanded = true
+                        }
+                    ),
+                    shape = RoundedCornerShape(24.dp)
+                )
+            }
+        },
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+    ) {
+        if (currentQuery.isNotEmpty()) {
+            Column(Modifier
+                .background(semiTransparentBrush)
+                .verticalScroll(rememberScrollState())) {
+                if (searchResults.isEmpty()) {
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                "Ничего не найдено",
+                                color = Color.White
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ListItemDefaults.colors(
+                            containerColor = Color.Transparent
+                        )
+                    )
+                } else {
+                    searchResults.forEach { result ->
+                        ListItem(
+                            headlineContent = { Text(text =result, color = Color.White) },
+                            modifier = Modifier
+                                .clickable {
+                                    textFieldState.edit { replace(0, length, result) }
+                                    expanded = false
+                                    onSearch(result)
+                                }
+                                .fillMaxWidth(),
+                            colors = ListItemDefaults.colors(
+                                containerColor = Color.Transparent
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ArticleCard(
+    article: Article,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
+    dateFormatter: DateTimeFormatter,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .background(Color.White, RoundedCornerShape(16.dp))
+            .padding(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)
+                .clip(RoundedCornerShape(12.dp)),
+                //.background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            /*
+            if (!article.imageUrl.isNullOrEmpty()) {
+                //Здесь загрузка изображения
+            } else { */
+                Image(
+                    painter = painterResource(R.drawable.img_3),
+                    contentDescription = "No image",
+                    modifier = Modifier.fillMaxSize()
+                )
+            //}
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = article.title,
+            color = Color.Black,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 2
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = article.createdAt.format(dateFormatter),
+                color = Color.Gray,
+                fontSize = 12.sp
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        // Здесь постановка лайка
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (article.isLiked) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Лайки",
+                        tint = if (article.isLiked) Color.Red else Color.Gray,
+                        modifier = Modifier.size(16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Text(
+                        text = article.likesCount.toString(),
+                        color = Color.Gray,
+                        fontSize = 12.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                IconButton(
+                    onClick = onFavoriteClick,
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "В избранное",
+                        tint = if (isFavorite) Color.Red else Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
         }
     }
 }

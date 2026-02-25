@@ -9,7 +9,7 @@ data class Article (
     val title: String,
     val category: Category,
     val mainWords: List<String>,
-    val author: User?,
+    val author: String,
     val imageUrl: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
