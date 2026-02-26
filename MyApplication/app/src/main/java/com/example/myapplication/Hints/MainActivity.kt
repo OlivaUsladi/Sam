@@ -1,5 +1,6 @@
 package com.example.myapplication.Hints
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -217,8 +218,31 @@ fun ListOfArticles(){
 
     val dateFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy") }
 
-    //Функция поиска в поисковой строке
+    //отфильтрованные статьи
+    var displayedArticles by remember { mutableStateOf(allArticles) }
+
+    var showContent by remember { mutableStateOf(true) }
+
+
+    //---------------------------------------------------------
+    //Памятка: подсказки выводятся только по названию статьи, а поиск по mainwords через кнопку Enter
+    // или лупу
+    //---------------------------------------------------------
+
+    //Функция поиска в поисковой строке (с выдачей карточек)
     fun filterSearchResults(query: String) {
+        if (query.isBlank()) {
+            displayedArticles = allArticles
+        } else {
+            displayedArticles = allArticles.filter { article -> article.title.contains(query, ignoreCase = true)
+                    || article.mainWords.any {it.contains(query, ignoreCase = true)}
+            }
+        }
+        showContent = true
+    }
+
+    //Функция поиска в поисковой строке (с выдачей подсказок-названий)
+    fun getSuggestions(query: String): List<String> {
         if (query.isBlank()) {
             searchResults = searchTitles
         } else {
@@ -226,6 +250,7 @@ fun ListOfArticles(){
                 article.contains(query, ignoreCase = true)
             }
         }
+         return searchResults
     }
 
     //Функция добавления в избранное
@@ -264,83 +289,129 @@ fun ListOfArticles(){
                     modifier = Modifier.size(30.dp))
             }
         }
-        HintsSearchBar(textFieldState = textState,
-            onSearch = { query ->
-                filterSearchResults(query)
-            },
-            searchResults = searchResults,
-            modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.height(10.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(brush = brush)
-                //.heightIn(min = 100.dp)
-                .clickable(onClick = {})
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier.weight(7f)
-                ) {
-                    Text(
-                        text = "Темы",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                    Text(
-                        text = "Выбирайте нужное, открывайте новое",
-                        color = Color.White,
-                        fontSize = 14.sp
-                    )
-                }
 
-                Image(
-                    painter = painterResource(R.drawable.img_2),
-                    contentDescription = "arrow",
-                    modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.CenterVertically)
+        LazyColumn() {
+            item {
+                /*
+                HintsSearchBar(textFieldState = textState,
+                    onQueryChange = { newQuery ->
+                        textState.edit { replace(0, length, newQuery) }
+                        getSuggestions(newQuery)
+                    },
+                    onSearch = { newQuery ->
+                        filterSearchResults(newQuery)
+                    },
+                    suggestions = searchResults,
+                    onSuggestionClick = { suggestion ->
+                        textState.edit { replace(0, length, suggestion) }
+                    },
+                    modifier = Modifier.fillMaxWidth())
+                 */
+                CustomSearchBar(
+                    onQueryChange = { newQuery ->
+                        getSuggestions(newQuery)
+                        showContent = searchResults.isEmpty()
+                    },
+                    onSearch = { searchQuery ->
+                        filterSearchResults(searchQuery)
+                    },
+                    suggestions = searchResults,
+                    onSuggestionClick = { suggestion ->
+                        filterSearchResults(suggestion)
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
-        }
-        Spacer(modifier = Modifier.height(50.dp))
-        LazyColumn() {
-            items(items = allArticles, key = {it.id}) { article ->
-                ArticleCard(
-                    article = article,
-                    isFavorite = favoriteStatus[article.id] ?: false,
-                    onFavoriteClick = { toggleFavorite(article.id) },
-                    dateFormatter = dateFormatter,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            //Переход на статью
+            if (showContent) {
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(brush = brush)
+                            //.heightIn(min = 100.dp)
+                            .clickable(onClick = {})
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(
+                                modifier = Modifier.weight(7f)
+                            ) {
+                                Text(
+                                    text = "Темы",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp
+                                )
+                                Text(
+                                    text = "Выбирайте нужное, открывайте новое",
+                                    color = Color.White,
+                                    fontSize = 14.sp
+                                )
+                            }
+
+                            Image(
+                                painter = painterResource(R.drawable.img_2),
+                                contentDescription = "arrow",
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .align(Alignment.CenterVertically)
+                            )
                         }
-                )
-                Spacer(modifier = Modifier.height(5.dp))
+                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
+
+                items(items = displayedArticles, key = { it.id }) { article ->
+                    ArticleCard(
+                        article = article,
+                        isFavorite = favoriteStatus[article.id] ?: false,
+                        onFavoriteClick = { toggleFavorite(article.id) },
+                        dateFormatter = dateFormatter,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                //Переход на статью
+                            }
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                }
+                item {
+                    Spacer(modifier = Modifier.height(30.dp))
+                }
             }
         }
     }
 }
 
 
+//НА ДОРАБОТКЕ
+//-------------------------------------------------------------------------
+//Экспериментальный SearchBar имеет проблемы с height. Попробовать доделать? Вылетает при попытке ввести что-то  поисковую строку
+//-------------------------------------------------------------------------
+
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HintsSearchBar(
     textFieldState: TextFieldState,
+    onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
-    searchResults: List<String>,
+    suggestions: List<String>,
+    onSuggestionClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
@@ -353,20 +424,9 @@ fun HintsSearchBar(
         )
     }
 
-    val semiTransparentBrush = remember {
-        Brush.linearGradient(
-            colors = listOf(
-                Color(0xFF2670CC).copy(alpha = 0.7f),
-                Color(0xFF26CCAD).copy(alpha = 0.7f)
-            )
-        )
-    }
 
-    //вот тут исправить логику закрытия режима
-    LaunchedEffect(currentQuery) {
-        if (currentQuery.isNotEmpty()) {
-            expanded = true
-        }
+    LaunchedEffect(currentQuery, suggestions) {
+        expanded = currentQuery.isNotEmpty() && suggestions.isNotEmpty()
     }
 
     SearchBar(
@@ -382,19 +442,12 @@ fun HintsSearchBar(
             ) {
                 TextField(
                     value = currentQuery,
-                    onValueChange = { newQuery ->
-                        textFieldState.edit { replace(0, length, newQuery) }
-                        onSearch(newQuery)
-                        if (newQuery.isNotEmpty()) {
-                            expanded = true
-                        }
-                    },
+                    onValueChange = onQueryChange,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .clip(RoundedCornerShape(24.dp))
-                        .background(Color.Black)
-                    ,
+                        .background(Color.Black),
                     placeholder = {
                         Text(
                             text = "Поиск",
@@ -402,19 +455,24 @@ fun HintsSearchBar(
                         )
                     },
                     leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Поиск",
-                            tint = Color(0xFF2670CC)
-                        )
+                        IconButton(onClick = {
+                            onSearch(currentQuery)
+                            expanded = false
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Поиск",
+                                tint = Color(0xFF2670CC)
+                            )
+                        }
                     },
                     trailingIcon = {
                         if (currentQuery.isNotEmpty()) {
                             IconButton(
                                 onClick = {
-                                    textFieldState.edit { replace(0, length, "") }
+                                    onQueryChange("")
                                     onSearch("")
-                                    expanded = true
+                                    expanded = false
                                 }
                             ) {
                                 Icon(
@@ -441,7 +499,7 @@ fun HintsSearchBar(
                     keyboardActions = KeyboardActions(
                         onSearch = {
                             onSearch(currentQuery)
-                            expanded = true
+                            expanded = false
                         }
                     ),
                     shape = RoundedCornerShape(24.dp)
@@ -451,45 +509,179 @@ fun HintsSearchBar(
         expanded = expanded,
         onExpandedChange = { expanded = it },
     ) {
-        if (currentQuery.isNotEmpty()) {
-            Column(Modifier
-                .background(semiTransparentBrush)
-                .verticalScroll(rememberScrollState())) {
-                if (searchResults.isEmpty()) {
+        if (suggestions.isNotEmpty()) {
+            Column(
+                Modifier
+                    .background(brush)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                suggestions.forEach { suggestion ->
                     ListItem(
                         headlineContent = {
                             Text(
-                                "Ничего не найдено",
-                                color = Color.White
+                                text = suggestion,
+                                color = Color.White,
+                                style = TextStyle(brush = brush)
                             )
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .clickable {
+                                onSuggestionClick(suggestion)
+                                expanded = false
+                            }
+                            .fillMaxWidth(),
                         colors = ListItemDefaults.colors(
                             containerColor = Color.Transparent
                         )
                     )
-                } else {
-                    searchResults.forEach { result ->
+                }
+            }
+        }
+    }
+}
+*/
+
+
+//-----------------------------------------------------------------------------
+//Кастомный SearchBar без MaterialTheme3, без встроенного SearchBar
+//Оставить, если будет работать не хуже встроенного
+//------------------------------------------------------------------------------
+@Composable
+fun CustomSearchBar(
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    suggestions: List<String>,
+    onSuggestionClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var query by rememberSaveable { mutableStateOf("") }
+    var showSuggestions by rememberSaveable { mutableStateOf(false) }
+
+    val brush = remember {
+        Brush.linearGradient(
+            colors = listOf(Color(0xFF2670CC), Color(0xFF26CCAD))
+        )
+    }
+
+    Column(modifier = modifier) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            TextField(
+                value = query,
+                onValueChange = { newValue ->
+                    query = newValue
+                    onQueryChange(newValue)
+                    showSuggestions = newValue.isNotEmpty() && suggestions.isNotEmpty()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color.Black),
+                placeholder = {
+                    Text(
+                        text = "Поиск",
+                        style = TextStyle(brush = brush)
+                    )
+                },
+                leadingIcon = {
+                    IconButton(
+                        onClick = {
+                            onSearch(query)
+                            showSuggestions = false
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Поиск",
+                            tint = Color(0xFF2670CC)
+                        )
+                    }
+                },
+                trailingIcon = {
+                    if (query.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                query = ""
+                                onQueryChange("")
+                                onSearch("")
+                                showSuggestions = false
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Очистить",
+                                tint = Color(0xFF26CCAD)
+                            )
+                        }
+                    }
+                },
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = Color.White
+                ),
+                textStyle = TextStyle(brush = brush),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        onSearch(query)
+                        showSuggestions = false
+                    }
+                ),
+                shape = RoundedCornerShape(24.dp),
+                singleLine = true
+            )
+        }
+
+        if (showSuggestions && suggestions.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(brush, RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(12.dp))
+                ) {
+                    suggestions.forEachIndexed { index, suggestion ->
                         ListItem(
-                            headlineContent = { Text(text =result, color = Color.White) },
+                            headlineContent = {
+                                Text(
+                                    text = suggestion,
+                                    color = Color.White,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Normal
+                                )
+                            },
                             modifier = Modifier
                                 .clickable {
-                                    textFieldState.edit { replace(0, length, result) }
-                                    expanded = false
-                                    onSearch(result)
+                                    query = suggestion
+                                    onSuggestionClick(suggestion)
+                                    showSuggestions = false
                                 }
                                 .fillMaxWidth(),
                             colors = ListItemDefaults.colors(
                                 containerColor = Color.Transparent
                             )
                         )
+
                     }
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun ArticleCard(
