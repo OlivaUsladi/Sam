@@ -75,6 +75,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.example.data.Hints.converter.ConverterToJson
 import com.example.domain.Hints.model.Article
 import com.example.domain.Hints.model.Category
@@ -91,13 +94,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ListOfArticles()
+            val navController = rememberNavController()
+            HintsNavHost(navController = navController)
         }
     }
 }
 
 @Composable
-fun ListOfArticles(){
+fun ListOfArticles(navController: NavController){
 
     val textState = rememberTextFieldState()
 
@@ -336,7 +340,9 @@ fun ListOfArticles(){
                             .clip(RoundedCornerShape(12.dp))
                             .background(brush = brush)
                             //.heightIn(min = 100.dp)
-                            .clickable(onClick = {})
+                            .clickable(onClick = {
+                                //Переход на страницу тем
+                            })
                     ) {
                         Row(
                             modifier = Modifier
@@ -384,7 +390,8 @@ fun ListOfArticles(){
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                //Переход на статью
+                                val articleId = article.id
+                                navController.navigate(Routes.Article.route + "/$articleId")
                             }
                     )
                     Spacer(modifier = Modifier.height(5.dp))
