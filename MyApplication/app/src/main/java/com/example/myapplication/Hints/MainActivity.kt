@@ -116,7 +116,8 @@ fun ListOfArticles(navController: NavController){
         "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&auto=format",
         "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&auto=format",
         "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=500&auto=format",
-        "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=500&auto=format"
+        "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=500&auto=format",
+        "blablabla"
     )
 
 
@@ -206,7 +207,24 @@ fun ListOfArticles(navController: NavController){
                 likesCount = 192,
                 isFavorite = true,
                 isLiked = false
-            )
+            ),
+            Article(
+                id = 6,
+                title = "Как прикрепиться в поликлинике",
+                category = Category(
+                    id = 4,
+                    name = "Организация",
+                    description = "Статьи о том, какие документы, куда, зачем предоставлять"
+                ),
+                mainWords = listOf("здоровье", "документы", "поликлиника", "больница"),
+                author = "Александра Майснер",
+                imageUrl = imageUrls[5],
+                createdAt = LocalDateTime.now().minusDays(21),
+                updatedAt = LocalDateTime.now().minusDays(13),
+                likesCount = 888,
+                isFavorite = false,
+                isLiked = false
+            ),
         )
     }
 
