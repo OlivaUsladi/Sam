@@ -61,6 +61,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -78,6 +79,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.example.data.Hints.converter.ConverterToJson
 import com.example.domain.Hints.model.Article
 import com.example.domain.Hints.model.Category
@@ -112,12 +114,12 @@ fun ListOfArticles(navController: NavController){
     }
 
     val imageUrls = listOf(
-        "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=500&auto=format",
-        "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&auto=format",
-        "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&auto=format",
-        "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=500&auto=format",
-        "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=500&auto=format",
-        "blablabla"
+        "https://i.ibb.co/bjy899VJ/aerial-view-business-data-analysis-graph.jpg",
+        "https://i.ibb.co/zTjB1k12/brunette-woman-sitting-desk-surrounded-with-gadgets-papers.jpg",
+        "https://i.ibb.co/274TSKSf/close-up-person-meditating-home.jpg",
+        "https://i.ibb.co/Ld1K3vgj/tea-book-relax.jpg",
+        "https://i.ibb.co/gMNnL2Yp/ceramic-mug-with-coffee-silver-dollar-gum-leaves.jpg",
+        "https://i.ibb.co/YF85HrRg/doctor-doing-their-work-pediatrics-office.jpg"
     )
 
 
@@ -729,16 +731,23 @@ fun ArticleCard(
                 //.background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-            /*
             if (!article.imageUrl.isNullOrEmpty()) {
-                //Здесь загрузка изображения
-            } else { */
+               AsyncImage(
+                    model = article.imageUrl,
+                    contentDescription = "Обложка для карточки",
+                    error = painterResource(R.drawable.img_3),
+                    placeholder = painterResource(R.drawable.loading),
+                    modifier = Modifier.fillMaxSize()
+                        .clip(RoundedCornerShape(12.dp)),
+                   contentScale = ContentScale.Crop
+                )
+            } else {
                 Image(
                     painter = painterResource(R.drawable.img_3),
                     contentDescription = "No image",
                     modifier = Modifier.fillMaxSize()
                 )
-            //}
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
