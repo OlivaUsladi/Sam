@@ -35,8 +35,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -45,6 +43,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -97,7 +96,24 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
-            HintsNavHost(navController = navController)
+            Surface() {
+                Scaffold (
+                    topBar = { HintsTopAppBar(navController =
+                        navController)},
+                    bottomBar = {
+                        /*BottomNavigationBar(navController =
+                            navController)
+
+                         */
+                    },
+                    content = {
+                            paddingValues ->
+                        Box(modifier = Modifier.padding(paddingValues)) {
+                            HintsNavHost(navController = navController)
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -289,50 +305,10 @@ fun ListOfArticles(navController: NavController){
     Column(modifier = Modifier
         .fillMaxSize()
         .background(Color(0xFF000000))){
-        Spacer(modifier = Modifier.height(30.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
-            Box(){
-                Image(painter = painterResource(R.drawable.img),
-                    contentDescription = "man icon",
-                    modifier = Modifier.size(30.dp))
-            }
-            Box() {
-                Column() {
-                    Spacer(modifier = Modifier.height(5.dp))
-                    Text(
-                        text = "Самоорганизация",
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-            Box(){
-                Image(painter = painterResource(R.drawable.img_1),
-                    contentDescription = "blue ellipse",
-                    modifier = Modifier.size(30.dp))
-            }
-        }
-
 
         LazyColumn() {
             item {
-                /*
-                HintsSearchBar(textFieldState = textState,
-                    onQueryChange = { newQuery ->
-                        textState.edit { replace(0, length, newQuery) }
-                        getSuggestions(newQuery)
-                    },
-                    onSearch = { newQuery ->
-                        filterSearchResults(newQuery)
-                    },
-                    suggestions = searchResults,
-                    onSuggestionClick = { suggestion ->
-                        textState.edit { replace(0, length, suggestion) }
-                    },
-                    modifier = Modifier.fillMaxWidth())
-                 */
-                CustomSearchBar(
+                HintsSearchBar(
                     onQueryChange = { newQuery ->
                         getSuggestions(newQuery)
                         showContent = searchResults.isEmpty()
@@ -424,157 +400,8 @@ fun ListOfArticles(navController: NavController){
     }
 }
 
-
-//НА ДОРАБОТКЕ
-//-------------------------------------------------------------------------
-//Экспериментальный SearchBar имеет проблемы с height. Попробовать доделать? Вылетает при попытке ввести что-то  поисковую строку
-//-------------------------------------------------------------------------
-
-/*
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HintsSearchBar(
-    textFieldState: TextFieldState,
-    onQueryChange: (String) -> Unit,
-    onSearch: (String) -> Unit,
-    suggestions: List<String>,
-    onSuggestionClick: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-    val currentQuery = textFieldState.text.toString()
-
-    val brush = remember {
-        Brush.linearGradient(
-            colors = listOf(Color(0xFF2670CC), Color(0xFF26CCAD))
-        )
-    }
-
-
-    LaunchedEffect(currentQuery, suggestions) {
-        expanded = currentQuery.isNotEmpty() && suggestions.isNotEmpty()
-    }
-
-    SearchBar(
-        modifier = Modifier
-            .semantics { traversalIndex = 0f },
-        colors = SearchBarDefaults.colors(
-            containerColor = Color.Black
-        ),
-        inputField = {
-            ExposedDropdownMenuBox(
-                expanded = false,
-                onExpandedChange = {}
-            ) {
-                TextField(
-                    value = currentQuery,
-                    onValueChange = onQueryChange,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(Color.Black),
-                    placeholder = {
-                        Text(
-                            text = "Поиск",
-                            style = TextStyle(brush = brush)
-                        )
-                    },
-                    leadingIcon = {
-                        IconButton(onClick = {
-                            onSearch(currentQuery)
-                            expanded = false
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Поиск",
-                                tint = Color(0xFF2670CC)
-                            )
-                        }
-                    },
-                    trailingIcon = {
-                        if (currentQuery.isNotEmpty()) {
-                            IconButton(
-                                onClick = {
-                                    onQueryChange("")
-                                    onSearch("")
-                                    expanded = false
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = "Очистить",
-                                    tint = Color(0xFF26CCAD)
-                                )
-                            }
-                        }
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = Color.White
-                    ),
-                    textStyle = TextStyle(brush = brush),
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Search
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            onSearch(currentQuery)
-                            expanded = false
-                        }
-                    ),
-                    shape = RoundedCornerShape(24.dp)
-                )
-            }
-        },
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-    ) {
-        if (suggestions.isNotEmpty()) {
-            Column(
-                Modifier
-                    .background(brush)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                suggestions.forEach { suggestion ->
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                text = suggestion,
-                                color = Color.White,
-                                style = TextStyle(brush = brush)
-                            )
-                        },
-                        modifier = Modifier
-                            .clickable {
-                                onSuggestionClick(suggestion)
-                                expanded = false
-                            }
-                            .fillMaxWidth(),
-                        colors = ListItemDefaults.colors(
-                            containerColor = Color.Transparent
-                        )
-                    )
-                }
-            }
-        }
-    }
-}
-*/
-
-
-//-----------------------------------------------------------------------------
-//Кастомный SearchBar без MaterialTheme3, без встроенного SearchBar
-//Оставить, если будет работать не хуже встроенного
-//------------------------------------------------------------------------------
-@Composable
-fun CustomSearchBar(
     onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
     suggestions: List<String>,

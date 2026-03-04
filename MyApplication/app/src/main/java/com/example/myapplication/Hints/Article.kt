@@ -1,7 +1,9 @@
 package com.example.myapplication.Hints
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,26 +20,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
+import coil3.compose.AsyncImage
 import com.example.data.Hints.converter.ConverterToJson
 import com.example.domain.Hints.model.ArticleContent
 import com.example.domain.Hints.model.ContentBlock
 import com.example.domain.Hints.model.TextArea
 import com.example.domain.Hints.model.TextStyle
 
-
-//2. Разобраться с Image где хранить и как доставать
 //3. Добавить в статью Image
 
 @Composable
 fun ArticleScreen(id: Int){
     Column (modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
-        Spacer(modifier = Modifier.height(100.dp))
         val context = LocalContext.current
         val converterToJson = ConverterToJson()
 
@@ -362,6 +367,20 @@ fun ArticleScreen(id: Int){
         val article = allArticleContent.filter { it.articleId == id }
         val articleContent = article.firstOrNull()
 
+        //+******************************************************************
+        //Вот тут должна доставаться urlimage из Artcle по id, когда будет БД
+        val imageUrls = listOf(
+            "https://i.ibb.co/bjy899VJ/aerial-view-business-data-analysis-graph.jpg",
+            "https://i.ibb.co/zTjB1k12/brunette-woman-sitting-desk-surrounded-with-gadgets-papers.jpg",
+            "https://i.ibb.co/274TSKSf/close-up-person-meditating-home.jpg",
+            "https://i.ibb.co/Ld1K3vgj/tea-book-relax.jpg",
+            "https://i.ibb.co/gMNnL2Yp/ceramic-mug-with-coffee-silver-dollar-gum-leaves.jpg",
+            "https://i.ibb.co/YF85HrRg/doctor-doing-their-work-pediatrics-office.jpg"
+        )
+
+        //В AsyncImage исправить model
+        //*******************************************************************
+
         if (articleContent == null) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -382,6 +401,35 @@ fun ArticleScreen(id: Int){
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
+                item{
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(160.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                            Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()){
+                                //Вот тут категория из БД Article по id доставать дату создания/обновления
+                                Text(text="Тема", fontSize = 16.sp, color = Color.Gray)
+                                //Вот тут из БД Article по id доставать дату создания/обновления
+                                Text(text="01.01.2025", fontSize = 16.sp, color = Color.Gray)
+                            }
+                            AsyncImage(
+                                model = imageUrls[id - 1], contentDescription = "Картинка для верха статьи",
+                                error = painterResource(R.drawable.img_3),
+                                placeholder = painterResource(R.drawable.loading),
+                                modifier = Modifier.fillMaxSize()
+                                    .clip(RoundedCornerShape(12.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
                 items(articleContent!!.blocks) { block ->
                     when (block) {
                         is ContentBlock.Paragraph -> {
@@ -395,7 +443,7 @@ fun ArticleScreen(id: Int){
                 }
 
                 item {
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
             }
         }
