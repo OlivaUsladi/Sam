@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -402,28 +403,46 @@ fun ArticleScreen(id: Int){
                     .padding(horizontal = 16.dp)
             ) {
                 item{
-                    Spacer(modifier = Modifier.height(100.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
                 item {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(160.dp)
+                            //.height(160.dp)
                             .clip(RoundedCornerShape(12.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                            Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()){
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 5.dp, end = 5.dp)
+                            ) {
                                 //Вот тут категория из БД Article по id доставать дату создания/обновления
-                                Text(text="Тема", fontSize = 16.sp, color = Color.Gray)
+                                Text(
+                                    text = "Продуктивность",
+                                    fontSize = 16.sp,
+                                    color = Color.Gray,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth(0.5f)
+                                )
+
                                 //Вот тут из БД Article по id доставать дату создания/обновления
-                                Text(text="01.01.2025", fontSize = 16.sp, color = Color.Gray)
+                                Text(
+                                    text = "01.01.2025",
+                                    fontSize = 16.sp,
+                                    color = Color.Gray,
+                                    modifier = Modifier
+                                        .align(Alignment.Bottom)
+                                )
                             }
                             AsyncImage(
                                 model = imageUrls[id - 1], contentDescription = "Картинка для верха статьи",
                                 error = painterResource(R.drawable.img_3),
                                 placeholder = painterResource(R.drawable.loading),
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier.fillMaxWidth().height(140.dp)
                                     .clip(RoundedCornerShape(12.dp)),
                                 contentScale = ContentScale.Crop
                             )
@@ -437,7 +456,7 @@ fun ArticleScreen(id: Int){
                         }
 
                         is ContentBlock.Image -> {
-                            // Доделать image
+                            ImageBlock(block)
                         }
                     }
                 }
@@ -507,6 +526,31 @@ fun ParagraphBlock(paragraph: ContentBlock.Paragraph) {
             textAlign = textAlign,
             color = Color.Black,
             modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun ImageBlock(image: ContentBlock.Image) {
+
+    val width = image.width ?: 300
+    val height = image.height ?: 300
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AsyncImage(
+            model = image.url,
+            contentDescription = "Изображение к статье",
+            error = painterResource(R.drawable.img_3),
+            placeholder = painterResource(R.drawable.loading),
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(width.toFloat() / height.toFloat())
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Fit
         )
     }
 }

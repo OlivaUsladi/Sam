@@ -253,6 +253,9 @@ fun ListOfArticles(navController: NavController){
     //словарь id-isFavoutite
     var favoriteStatus by remember { mutableStateOf(allArticles.associate { it.id to it.isFavorite }) }
 
+    //словарь id-isLiked
+    var likeStatus by remember { mutableStateOf(allArticles.associate { it.id to it.isLiked }) }
+
     //список названий для поисковой строки
     var searchResults by remember { mutableStateOf(searchTitles) }
 
@@ -291,6 +294,14 @@ fun ListOfArticles(navController: NavController){
             }
         }
          return searchResults
+    }
+
+    //Функция добавления лайка
+    fun toggleLike(articleId: Int) {
+        //mutable словарь
+        likeStatus = likeStatus.toMutableMap().apply {
+            put(articleId, !(likeStatus[articleId] ?: false))
+        }
     }
 
     //Функция добавления в избранное
@@ -381,7 +392,9 @@ fun ListOfArticles(navController: NavController){
                     ArticleCard(
                         article = article,
                         isFavorite = favoriteStatus[article.id] ?: false,
+                        isLiked = likeStatus[article.id]?:false,
                         onFavoriteClick = { toggleFavorite(article.id) },
+                        onLikeClick = {toggleLike(article.id)},
                         dateFormatter = dateFormatter,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -541,7 +554,9 @@ fun HintsSearchBar(
 fun ArticleCard(
     article: Article,
     isFavorite: Boolean,
+    isLiked: Boolean,
     onFavoriteClick: () -> Unit,
+    onLikeClick: () -> Unit,
     dateFormatter: DateTimeFormatter,
     modifier: Modifier = Modifier
 ) {
@@ -605,18 +620,16 @@ fun ArticleCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        // Здесь постановка лайка
-                    }
+                    modifier = Modifier.clickable{onLikeClick()}
                 ) {
                     Icon(
-                        imageVector = if (article.isLiked) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = "Лайки",
-                        tint = if (article.isLiked) Color.Red else Color.Gray,
-                        modifier = Modifier.size(16.dp)
+                        tint = if (isLiked) Color.Red else Color.Gray,
+                        modifier = Modifier.size( if (isLiked) 24.dp else 20.dp)
                     )
 
-                    Spacer(modifier = Modifier.width(4.dp))
+                    //Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
                         text = article.likesCount.toString(),
@@ -632,7 +645,10 @@ fun ArticleCard(
                     modifier = Modifier.size(24.dp)
                 ) {
                     Icon(
-                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        painter = painterResource(
+                            id = if (isFavorite) R.drawable.bookmark_filled
+                            else R.drawable.bookmark
+                        ),
                         contentDescription = "В избранное",
                         tint = if (isFavorite) Color.Red else Color.Gray,
                         modifier = Modifier.size(20.dp)
