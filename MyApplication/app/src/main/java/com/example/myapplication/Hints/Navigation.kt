@@ -9,6 +9,8 @@ sealed class Routes(val route: String) {
 
     object Home : Routes("home")
     object Article : Routes("article")
+    object Category: Routes("category")
+    object CategoryArticles : Routes("categoryArticles")
     object Favourite : Routes("favourite")
 }
 
@@ -22,6 +24,18 @@ fun HintsNavHost(navController: NavHostController) {
             val articleIdStr = stackEntry.arguments?.getString("articleId")?:"0"
             val articleId = articleIdStr.toInt()?:0
             ArticleScreen(articleId)
+        }
+        composable (Routes.Category.route) {
+            CategoriesScreen(navController)
+        }
+        composable(Routes.CategoryArticles.route + "/{categoryId}/{categoryName}") { stackEntry ->
+            val categoryId = stackEntry.arguments?.getString("categoryId")?.toIntOrNull() ?: 1
+            val categoryName = stackEntry.arguments?.getString("categoryName") ?: "Категория"
+            CategoryArticlesScreen(
+                navController = navController,
+                categoryId = categoryId,
+                categoryName = categoryName
+            )
         }
         composable(Routes.Favourite.route) {
             //Страница избранных статей

@@ -1,10 +1,5 @@
 package com.example.myapplication.Hints
 
-import android.annotation.SuppressLint
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,39 +11,27 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Shapes
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,75 +42,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
-import com.example.data.Hints.converter.ConverterToJson
 import com.example.domain.Hints.model.Article
 import com.example.domain.Hints.model.Category
-import com.example.domain.User
-import com.example.myapplication.Hints.ui.theme.MyApplicationTheme
 import com.example.myapplication.R
-import java.io.File
-import java.nio.file.WatchEvent
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            val navController = rememberNavController()
-            Surface() {
-                Scaffold (
-                    topBar = { HintsTopAppBar(navController =
-                        navController)},
-                    bottomBar = {
-                        /*BottomNavigationBar(navController =
-                            navController)
-
-                         */
-                    },
-                    content = {
-                            paddingValues ->
-                        Box(modifier = Modifier.padding(paddingValues)) {
-                            HintsNavHost(navController = navController)
-                        }
-                    }
-                )
-            }
-        }
-    }
-}
-
 @Composable
-fun ListOfArticles(navController: NavController){
-
+fun CategoryArticlesScreen(
+    navController: NavController,
+    categoryId: Int,
+    categoryName: String
+) {
     val textState = rememberTextFieldState()
-
-    val brush = remember {
-        Brush.linearGradient(
-            colors = listOf(Color(0xFF2670CC), Color(0xFF26CCAD))
-        )
-    }
 
     val imageUrls = listOf(
         "https://i.ibb.co/bjy899VJ/aerial-view-business-data-analysis-graph.jpg",
@@ -137,7 +72,6 @@ fun ListOfArticles(navController: NavController){
         "https://i.ibb.co/gMNnL2Yp/ceramic-mug-with-coffee-silver-dollar-gum-leaves.jpg",
         "https://i.ibb.co/YF85HrRg/doctor-doing-their-work-pediatrics-office.jpg"
     )
-
 
     val allArticles = remember {
         listOf(
@@ -152,8 +86,8 @@ fun ListOfArticles(navController: NavController){
                 mainWords = listOf("тайм-менеджмент", "планирование"),
                 author = "Анна Смирнова",
                 imageUrl = imageUrls[0],
-                createdAt = LocalDateTime.now().minusDays(2),
-                updatedAt = LocalDateTime.now().minusDays(1),
+                createdAt = java.time.LocalDateTime.now().minusDays(2),
+                updatedAt = java.time.LocalDateTime.now().minusDays(1),
                 likesCount = 124,
                 isFavorite = false,
                 isLiked = false
@@ -169,8 +103,8 @@ fun ListOfArticles(navController: NavController){
                 mainWords = listOf("pomodoro", "фокус"),
                 author = "Иван Петров",
                 imageUrl = imageUrls[1],
-                createdAt = LocalDateTime.now().minusDays(5),
-                updatedAt = LocalDateTime.now().minusDays(3),
+                createdAt = java.time.LocalDateTime.now().minusDays(5),
+                updatedAt = java.time.LocalDateTime.now().minusDays(3),
                 likesCount = 89,
                 isFavorite = true,
                 isLiked = true
@@ -186,8 +120,8 @@ fun ListOfArticles(navController: NavController){
                 mainWords = listOf("mindfulness", "релаксация"),
                 author = "Елена Козлова",
                 imageUrl = imageUrls[2],
-                createdAt = LocalDateTime.now().minusWeeks(1),
-                updatedAt = LocalDateTime.now().minusDays(2),
+                createdAt = java.time.LocalDateTime.now().minusWeeks(1),
+                updatedAt = java.time.LocalDateTime.now().minusDays(2),
                 likesCount = 256,
                 isFavorite = false,
                 isLiked = false
@@ -203,8 +137,8 @@ fun ListOfArticles(navController: NavController){
                 mainWords = listOf("сон", "циркадные ритмы"),
                 author = "Михаил Васильев",
                 imageUrl = imageUrls[3],
-                createdAt = LocalDateTime.now().minusDays(10),
-                updatedAt = LocalDateTime.now().minusDays(8),
+                createdAt = java.time.LocalDateTime.now().minusDays(10),
+                updatedAt = java.time.LocalDateTime.now().minusDays(8),
                 likesCount = 67,
                 isFavorite = false,
                 isLiked = false
@@ -220,8 +154,8 @@ fun ListOfArticles(navController: NavController){
                 mainWords = listOf("утро", "рутина"),
                 author = "Ольга Новикова",
                 imageUrl = imageUrls[4],
-                createdAt = LocalDateTime.now().minusDays(3),
-                updatedAt = LocalDateTime.now().minusDays(2),
+                createdAt = java.time.LocalDateTime.now().minusDays(3),
+                updatedAt = java.time.LocalDateTime.now().minusDays(2),
                 likesCount = 192,
                 isFavorite = true,
                 isLiked = false
@@ -237,8 +171,8 @@ fun ListOfArticles(navController: NavController){
                 mainWords = listOf("здоровье", "документы", "поликлиника", "больница"),
                 author = "Александра Майснер",
                 imageUrl = imageUrls[5],
-                createdAt = LocalDateTime.now().minusDays(21),
-                updatedAt = LocalDateTime.now().minusDays(13),
+                createdAt = java.time.LocalDateTime.now().minusDays(21),
+                updatedAt = java.time.LocalDateTime.now().minusDays(13),
                 likesCount = 888,
                 isFavorite = false,
                 isLiked = false
@@ -246,80 +180,100 @@ fun ListOfArticles(navController: NavController){
         )
     }
 
+    // Фильтр статей по категории
+    val categoryArticles = remember(categoryId) {
+        allArticles.filter { it.category.id == categoryId }
+    }
 
-    //список названий статей
-    val searchTitles = remember { allArticles.map { it.title } }
+    // Список названий статей для поиска
+    val searchTitles = remember { categoryArticles.map { it.title } }
 
-    //словарь id-isFavoutite
-    var favoriteStatus by remember { mutableStateOf(allArticles.associate { it.id to it.isFavorite }) }
+    // Словари
+    var favoriteStatus by remember { mutableStateOf(categoryArticles.associate { it.id to it.isFavorite }) }
+    var likeStatus by remember { mutableStateOf(categoryArticles.associate { it.id to it.isLiked }) }
 
-    //словарь id-isLiked
-    var likeStatus by remember { mutableStateOf(allArticles.associate { it.id to it.isLiked }) }
-
-    //список названий для поисковой строки
     var searchResults by remember { mutableStateOf(searchTitles) }
+    var displayedArticles by remember { mutableStateOf(categoryArticles) }
+    var showContent by remember { mutableStateOf(true) }
 
     val dateFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy") }
 
-    //отфильтрованные статьи
-    var displayedArticles by remember { mutableStateOf(allArticles) }
-
-    var showContent by remember { mutableStateOf(true) }
-
-
-    //---------------------------------------------------------
-    //Памятка: подсказки выводятся только по названию статьи, а поиск по mainwords через кнопку Enter
-    // или лупу
-    //---------------------------------------------------------
-
-    //Функция поиска в поисковой строке (с выдачей карточек)
+    //Фильтрация статей (название или основные слова)
     fun filterSearchResults(query: String) {
         if (query.isBlank()) {
-            displayedArticles = allArticles
+            displayedArticles = categoryArticles
         } else {
-            displayedArticles = allArticles.filter { article -> article.title.contains(query, ignoreCase = true)
-                    || article.mainWords.any {it.contains(query, ignoreCase = true)}
+            displayedArticles = categoryArticles.filter { article ->
+                article.title.contains(query, ignoreCase = true) ||
+                        article.mainWords.any { it.contains(query, ignoreCase = true) }
             }
         }
         showContent = true
     }
 
-    //Функция поиска в поисковой строке (с выдачей подсказок-названий)
+    //Подсказки при вводе (название)
     fun getSuggestions(query: String): List<String> {
         if (query.isBlank()) {
             searchResults = searchTitles
         } else {
-            searchResults = searchTitles.filter { article ->
-                article.contains(query, ignoreCase = true)
+            searchResults = searchTitles.filter { title ->
+                title.contains(query, ignoreCase = true)
             }
         }
-         return searchResults
+        return searchResults
     }
 
-    //Функция добавления лайка
+    //Постановка лайка
     fun toggleLike(articleId: Int) {
-        //mutable словарь
         likeStatus = likeStatus.toMutableMap().apply {
             put(articleId, !(likeStatus[articleId] ?: false))
         }
     }
 
-    //Функция добавления в избранное
+    //Добавление в избранное
     fun toggleFavorite(articleId: Int) {
-        //mutable словарь
         favoriteStatus = favoriteStatus.toMutableMap().apply {
             put(articleId, !(favoriteStatus[articleId] ?: false))
         }
     }
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF000000))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, top = 10.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .clickable {
+                        navController.navigateUp()
+                    }
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.arrow_back),
+                    contentDescription = "Назад",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color(0xFF000000))){
+            Text(
+                text = categoryName,
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .align(Alignment.CenterVertically)
+            )
+        }
 
-        LazyColumn() {
+        LazyColumn {
             item {
-                HintsSearchBar(
+                CategorySearchBar(
                     onQueryChange = { newQuery ->
                         getSuggestions(newQuery)
                         showContent = searchResults.isEmpty()
@@ -334,77 +288,29 @@ fun ListOfArticles(navController: NavController){
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+
             if (showContent) {
                 item {
                     Spacer(modifier = Modifier.height(10.dp))
-                }
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(brush = brush)
-                            //.heightIn(min = 100.dp)
-                            .clickable(onClick = {
-                                navController.navigate(Routes.Category.route)
-                            })
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(
-                                modifier = Modifier.weight(7f)
-                            ) {
-                                Text(
-                                    text = "Темы",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp
-                                )
-                                Text(
-                                    text = "Выбирайте нужное, открывайте новое",
-                                    color = Color.White,
-                                    fontSize = 14.sp
-                                )
-                            }
-
-                            Image(
-                                painter = painterResource(R.drawable.img_2),
-                                contentDescription = "arrow",
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .align(Alignment.CenterVertically)
-                            )
-                        }
-                    }
-                }
-                item {
-                    Spacer(modifier = Modifier.height(50.dp))
                 }
 
                 items(items = displayedArticles, key = { it.id }) { article ->
                     ArticleCard(
                         article = article,
                         isFavorite = favoriteStatus[article.id] ?: false,
-                        isLiked = likeStatus[article.id]?:false,
+                        isLiked = likeStatus[article.id] ?: false,
                         onFavoriteClick = { toggleFavorite(article.id) },
-                        onLikeClick = {toggleLike(article.id)},
+                        onLikeClick = { toggleLike(article.id) },
                         dateFormatter = dateFormatter,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                val articleId = article.id
-                                navController.navigate(Routes.Article.route + "/$articleId")
+                                navController.navigate("article/${article.id}")
                             }
                     )
                     Spacer(modifier = Modifier.height(5.dp))
                 }
+
                 item {
                     Spacer(modifier = Modifier.height(30.dp))
                 }
@@ -414,7 +320,7 @@ fun ListOfArticles(navController: NavController){
 }
 
 @Composable
-fun HintsSearchBar(
+fun CategorySearchBar(
     onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
     suggestions: List<String>,
@@ -449,7 +355,7 @@ fun HintsSearchBar(
                     .background(Color.Black),
                 placeholder = {
                     Text(
-                        text = "Поиск",
+                        text = "Поиск по категории",
                         style = TextStyle(brush = brush)
                     )
                 },
@@ -495,7 +401,7 @@ fun HintsSearchBar(
                     cursorColor = Color.White
                 ),
                 textStyle = TextStyle(brush = brush),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
                     onSearch = {
                         onSearch(query)
@@ -512,12 +418,12 @@ fun HintsSearchBar(
 
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .background(brush, RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp))
                 ) {
@@ -542,139 +448,9 @@ fun HintsSearchBar(
                                 containerColor = Color.Transparent
                             )
                         )
-
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-fun ArticleCard(
-    article: Article,
-    isFavorite: Boolean,
-    isLiked: Boolean,
-    onFavoriteClick: () -> Unit,
-    onLikeClick: () -> Unit,
-    dateFormatter: DateTimeFormatter,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .background(Color.White, RoundedCornerShape(16.dp))
-            .padding(12.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .clip(RoundedCornerShape(12.dp)),
-                //.background(Color.LightGray),
-            contentAlignment = Alignment.Center
-        ) {
-            if (!article.imageUrl.isNullOrEmpty()) {
-               AsyncImage(
-                    model = article.imageUrl,
-                    contentDescription = "Обложка для карточки",
-                    error = painterResource(R.drawable.img_3),
-                    placeholder = painterResource(R.drawable.loading),
-                    modifier = Modifier.fillMaxSize()
-                        .clip(RoundedCornerShape(12.dp)),
-                   contentScale = ContentScale.Crop
-                )
-            } else {
-                Image(
-                    painter = painterResource(R.drawable.img_3),
-                    contentDescription = "No image",
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = article.title,
-            color = Color.Black,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 2
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = article.createdAt.format(dateFormatter),
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable{onLikeClick()}
-                ) {
-                    Icon(
-                        imageVector = if (isLiked) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Лайки",
-                        tint = if (isLiked) Color.Red else Color.Gray,
-                        modifier = Modifier.size( if (isLiked) 24.dp else 20.dp)
-                    )
-
-                    //Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(
-                        text = article.likesCount.toString(),
-                        color = Color.Gray,
-                        fontSize = 12.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                IconButton(
-                    onClick = onFavoriteClick,
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            id = if (isFavorite) R.drawable.bookmark_filled
-                            else R.drawable.bookmark
-                        ),
-                        contentDescription = "В избранное",
-                        tint = if (isFavorite) Color.Red else Color.Gray,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun Greeting() {
-    //----------------------------------------------------------
-    //Функция чтения файла и передачи в конвертер для преобразования текстового файла в json
-    val context = LocalContext.current
-    val converterToJson = ConverterToJson()
-
-    LaunchedEffect(Unit) {
-        val content = context.assets.open("Статья прикрепление к поликлинике.txt")
-            .bufferedReader().use { it.readText() }
-
-        val blocks = converterToJson.convertFromTXT(content)
-        val json = converterToJson.convertBlocksToJson(blocks)
-        println(json)
-    }
-    //-------------------------------------------------------------
-
-    Text("work work")
 }
