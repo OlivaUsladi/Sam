@@ -38,7 +38,7 @@ fun HintsNavHost(navController: NavHostController) {
             )
         }
         composable(Routes.Favourite.route) {
-            //Страница избранных статей
+            FavouriteArticlesScreen(navController)
         }
     }
 }

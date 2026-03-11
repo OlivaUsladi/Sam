@@ -8,13 +8,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -26,15 +31,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.google.android.material.bottomappbar.BottomAppBar
 import kotlinx.coroutines.launch
 
 @Composable
@@ -45,14 +55,22 @@ fun HintsTopAppBar(navController: NavController) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    val brush = remember {
+        Brush.linearGradient(
+            colors = listOf(Color(0xFF2670CC), Color(0xFF26CCAD))
+        )
+    }
+
     //val intentrec = Intent(context, Recipes::class.java)
 
     Box(Modifier.fillMaxWidth().height(if (drawerState.isOpen) 250.dp else 90.dp)) {
-        //Вот здесь под стиль сделать
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                ModalDrawerSheet{
+                ModalDrawerSheet (modifier = Modifier
+                    .fillMaxWidth(0.8f).clip(RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp))
+                    .background(brush),
+                    drawerContainerColor = Color.Transparent){
                     items.forEach { item ->
                         TextButton(
                             onClick = {
@@ -64,7 +82,7 @@ fun HintsTopAppBar(navController: NavController) {
                                     //"Финансовый менеджер" -> context.startActivity(intenttips)
                                 }
                             },
-                        ) { Text(item, fontSize = 22.sp) }
+                        ) { Text(item, fontSize = 22.sp, color = Color.White) }
                     }
                 }
 
@@ -114,4 +132,54 @@ fun HintsTopAppBar(navController: NavController) {
 
     }
 
+}
+
+
+@Composable
+fun HintsBottomAppBar(navController: NavController) {
+    BottomAppBar(
+        containerColor = Color.White,
+        contentColor = Color.LightGray,
+        modifier = Modifier.height(80.dp)
+    ) {
+        val selectedButton = remember { mutableStateOf(0) }
+        Column( modifier = Modifier
+            .weight(1f)
+            .fillMaxSize()
+            .clickable(onClick = {
+                selectedButton.value = 0
+                navController.navigate(Routes.Home.route)
+            }),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+            Icon(painter = painterResource(R.drawable.hints), contentDescription = "Меню",
+                modifier = Modifier.size(if  (selectedButton.value==0) 22.dp else 18.dp),
+                tint = if  (selectedButton.value==0) Color.Black else Color.LightGray)
+            Text(text="Лента",
+                fontSize = if (selectedButton.value==0) 12.sp else 10.sp,
+                color = if (selectedButton.value==0) Color.Black else Color.LightGray,
+                fontWeight = if (selectedButton.value==0) FontWeight.Bold else FontWeight.Normal)
+        }
+        Spacer(Modifier.weight(1f, true))
+        Column(modifier = Modifier
+            .weight(1f)
+            .fillMaxSize()
+            .clickable(onClick = {
+                selectedButton.value =1
+                navController.navigate(Routes.Favourite.route)
+            }),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+            Icon(
+                painter = painterResource(R.drawable.favourite),
+                contentDescription = "О приложении",
+                modifier = Modifier.size(if  (selectedButton.value==1) 22.dp else 18.dp),
+                tint = if  (selectedButton.value==1) Color.Black else Color.LightGray
+            )
+            Text(text="Избранное",
+                fontSize = if (selectedButton.value==1) 12.sp else 10.sp,
+                color = if (selectedButton.value==1) Color.Black else Color.LightGray,
+                fontWeight = if (selectedButton.value==1) FontWeight.Bold else FontWeight.Normal)
+        }
+    }
 }

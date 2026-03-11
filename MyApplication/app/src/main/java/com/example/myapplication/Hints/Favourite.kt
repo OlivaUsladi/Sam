@@ -13,12 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
@@ -47,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -54,16 +52,11 @@ import coil3.compose.AsyncImage
 import com.example.domain.Hints.model.Article
 import com.example.domain.Hints.model.Category
 import com.example.myapplication.R
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun CategoryArticlesScreen(
-    navController: NavController,
-    categoryId: Int,
-    categoryName: String
-) {
-    val textState = rememberTextFieldState()
-
+fun FavouriteArticlesScreen(navController: NavController) {
     val imageUrls = listOf(
         "https://i.ibb.co/bjy899VJ/aerial-view-business-data-analysis-graph.jpg",
         "https://i.ibb.co/zTjB1k12/brunette-woman-sitting-desk-surrounded-with-gadgets-papers.jpg",
@@ -73,25 +66,9 @@ fun CategoryArticlesScreen(
         "https://i.ibb.co/YF85HrRg/doctor-doing-their-work-pediatrics-office.jpg"
     )
 
-    val allArticles = remember {
+
+    val favouriteArticles = remember {
         listOf(
-            Article(
-                id = 1,
-                title = "Как управлять временем",
-                category = Category(
-                    id = 1,
-                    name = "Продуктивность",
-                    description = "Статьи об увеличении ритма жизни, чтобы больше успеть"
-                ),
-                mainWords = listOf("тайм-менеджмент", "планирование"),
-                author = "Анна Смирнова",
-                imageUrl = imageUrls[0],
-                createdAt = java.time.LocalDateTime.now().minusDays(2),
-                updatedAt = java.time.LocalDateTime.now().minusDays(1),
-                likesCount = 124,
-                isFavorite = false,
-                isLiked = false
-            ),
             Article(
                 id = 2,
                 title = "Техники продуктивности",
@@ -103,45 +80,11 @@ fun CategoryArticlesScreen(
                 mainWords = listOf("pomodoro", "фокус"),
                 author = "Иван Петров",
                 imageUrl = imageUrls[1],
-                createdAt = java.time.LocalDateTime.now().minusDays(5),
-                updatedAt = java.time.LocalDateTime.now().minusDays(3),
+                createdAt = LocalDateTime.now().minusDays(5),
+                updatedAt = LocalDateTime.now().minusDays(3),
                 likesCount = 89,
                 isFavorite = true,
                 isLiked = true
-            ),
-            Article(
-                id = 3,
-                title = "Медитация для начинающих",
-                category = Category(
-                    id = 2,
-                    name = "Здоровье",
-                    description = "Статьи о здоровом образе жизни"
-                ),
-                mainWords = listOf("mindfulness", "релаксация"),
-                author = "Елена Козлова",
-                imageUrl = imageUrls[2],
-                createdAt = java.time.LocalDateTime.now().minusWeeks(1),
-                updatedAt = java.time.LocalDateTime.now().minusDays(2),
-                likesCount = 256,
-                isFavorite = false,
-                isLiked = false
-            ),
-            Article(
-                id = 4,
-                title = "Здоровый сон и режим",
-                category = Category(
-                    id = 2,
-                    name = "Здоровье",
-                    description = "Статьи о здоровом образе жизни"
-                ),
-                mainWords = listOf("сон", "циркадные ритмы"),
-                author = "Михаил Васильев",
-                imageUrl = imageUrls[3],
-                createdAt = java.time.LocalDateTime.now().minusDays(10),
-                updatedAt = java.time.LocalDateTime.now().minusDays(8),
-                likesCount = 67,
-                isFavorite = false,
-                isLiked = false
             ),
             Article(
                 id = 5,
@@ -154,56 +97,35 @@ fun CategoryArticlesScreen(
                 mainWords = listOf("утро", "рутина"),
                 author = "Ольга Новикова",
                 imageUrl = imageUrls[4],
-                createdAt = java.time.LocalDateTime.now().minusDays(3),
-                updatedAt = java.time.LocalDateTime.now().minusDays(2),
+                createdAt = LocalDateTime.now().minusDays(3),
+                updatedAt = LocalDateTime.now().minusDays(2),
                 likesCount = 192,
                 isFavorite = true,
                 isLiked = false
-            ),
-            Article(
-                id = 6,
-                title = "Как прикрепиться в поликлинике",
-                category = Category(
-                    id = 4,
-                    name = "Организация",
-                    description = "Статьи о том, какие документы, куда, зачем предоставлять"
-                ),
-                mainWords = listOf("здоровье", "документы", "поликлиника", "больница"),
-                author = "Александра Майснер",
-                imageUrl = imageUrls[5],
-                createdAt = java.time.LocalDateTime.now().minusDays(21),
-                updatedAt = java.time.LocalDateTime.now().minusDays(13),
-                likesCount = 888,
-                isFavorite = false,
-                isLiked = false
-            ),
+            )
         )
     }
 
-    // Фильтр статей по категории
-    val categoryArticles = remember(categoryId) {
-        allArticles.filter { it.category.id == categoryId }
-    }
-
     // Список названий статей для поиска
-    val searchTitles = remember { categoryArticles.map { it.title } }
+    val searchTitles = remember { favouriteArticles.map { it.title } }
 
-    // Словари
-    var favoriteStatus by remember { mutableStateOf(categoryArticles.associate { it.id to it.isFavorite }) }
-    var likeStatus by remember { mutableStateOf(categoryArticles.associate { it.id to it.isLiked }) }
+    // Словари для состояний
+    var favoriteStatus by remember { mutableStateOf(favouriteArticles.associate { it.id to it.isFavorite }) }
+    var likeStatus by remember { mutableStateOf(favouriteArticles.associate { it.id to it.isLiked }) }
 
+    // Результаты поиска и отображаемые статьи
     var searchResults by remember { mutableStateOf(searchTitles) }
-    var displayedArticles by remember { mutableStateOf(categoryArticles) }
+    var displayedArticles by remember { mutableStateOf(favouriteArticles) }
     var showContent by remember { mutableStateOf(true) }
 
     val dateFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy") }
 
-    //Фильтрация статей (название или основные слова)
+    // Функция поиска в поисковой строке (с выдачей карточек)
     fun filterSearchResults(query: String) {
         if (query.isBlank()) {
-            displayedArticles = categoryArticles
+            displayedArticles = favouriteArticles
         } else {
-            displayedArticles = categoryArticles.filter { article ->
+            displayedArticles = favouriteArticles.filter { article ->
                 article.title.contains(query, ignoreCase = true) ||
                         article.mainWords.any { it.contains(query, ignoreCase = true) }
             }
@@ -211,7 +133,7 @@ fun CategoryArticlesScreen(
         showContent = true
     }
 
-    //Подсказки при вводе (название)
+    // Функция поиска в поисковой строке (с выдачей подсказок)
     fun getSuggestions(query: String): List<String> {
         if (query.isBlank()) {
             searchResults = searchTitles
@@ -223,18 +145,22 @@ fun CategoryArticlesScreen(
         return searchResults
     }
 
-    //Постановка лайка
+    // Функция добавления лайка
     fun toggleLike(articleId: Int) {
         likeStatus = likeStatus.toMutableMap().apply {
             put(articleId, !(likeStatus[articleId] ?: false))
         }
     }
 
-    //Добавление в избранное
+    // Функция удаления из избранного
     fun toggleFavorite(articleId: Int) {
         favoriteStatus = favoriteStatus.toMutableMap().apply {
             put(articleId, !(favoriteStatus[articleId] ?: false))
         }
+
+        //Удаление из избранного
+        //запрос к БД в будущем
+        displayedArticles = displayedArticles.filter { it.id != articleId }
     }
 
     Column(
@@ -247,21 +173,8 @@ fun CategoryArticlesScreen(
                 .fillMaxWidth()
                 .padding(start = 10.dp, top = 10.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        navController.navigateUp()
-                    }
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.arrow_back),
-                    contentDescription = "Назад",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
             Text(
-                text = categoryName,
+                text = "Избранное",
                 color = Color.White,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
@@ -290,29 +203,68 @@ fun CategoryArticlesScreen(
             }
 
             if (showContent) {
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-
-                items(items = displayedArticles, key = { it.id }) { article ->
-                    ArticleCard(
-                        article = article,
-                        isFavorite = favoriteStatus[article.id] ?: false,
-                        isLiked = likeStatus[article.id] ?: false,
-                        onFavoriteClick = { toggleFavorite(article.id) },
-                        onLikeClick = { toggleLike(article.id) },
-                        dateFormatter = dateFormatter,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                navController.navigate("article/${article.id}")
+                if (displayedArticles.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp)
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.bookmark),
+                                    contentDescription = null,
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(64.dp)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "В избранном пока пусто",
+                                    color = Color.Gray,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Добавляйте статьи в избранное,\nчтобы они появлялись здесь",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp,
+                                    textAlign = TextAlign.Center
+                                )
                             }
-                    )
-                    Spacer(modifier = Modifier.height(5.dp))
-                }
+                        }
+                    }
+                } else {
+                    item {
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
 
-                item {
-                    Spacer(modifier = Modifier.height(30.dp))
+                    items(items = displayedArticles, key = { it.id }) { article ->
+                        ArticleCard(
+                            article = article,
+                            isFavorite = favoriteStatus[article.id] ?: true,
+                            isLiked = likeStatus[article.id] ?: false,
+                            onFavoriteClick = {
+                                toggleFavorite(article.id)
+                            },
+                            onLikeClick = { toggleLike(article.id) },
+                            dateFormatter = dateFormatter,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    navController.navigate("article/${article.id}")
+                                }
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(30.dp))
+                    }
                 }
             }
         }

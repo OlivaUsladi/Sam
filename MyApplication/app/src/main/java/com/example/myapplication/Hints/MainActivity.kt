@@ -101,10 +101,7 @@ class MainActivity : ComponentActivity() {
                     topBar = { HintsTopAppBar(navController =
                         navController)},
                     bottomBar = {
-                        /*BottomNavigationBar(navController =
-                            navController)
-
-                         */
+                        HintsBottomAppBar(navController)
                     },
                     content = {
                             paddingValues ->
@@ -413,142 +410,7 @@ fun ListOfArticles(navController: NavController){
     }
 }
 
-@Composable
-fun HintsSearchBar(
-    onQueryChange: (String) -> Unit,
-    onSearch: (String) -> Unit,
-    suggestions: List<String>,
-    onSuggestionClick: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var showSuggestions by rememberSaveable { mutableStateOf(false) }
 
-    val brush = remember {
-        Brush.linearGradient(
-            colors = listOf(Color(0xFF2670CC), Color(0xFF26CCAD))
-        )
-    }
-
-    Column(modifier = modifier) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            TextField(
-                value = query,
-                onValueChange = { newValue ->
-                    query = newValue
-                    onQueryChange(newValue)
-                    showSuggestions = newValue.isNotEmpty() && suggestions.isNotEmpty()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(Color.Black),
-                placeholder = {
-                    Text(
-                        text = "Поиск",
-                        style = TextStyle(brush = brush)
-                    )
-                },
-                leadingIcon = {
-                    IconButton(
-                        onClick = {
-                            onSearch(query)
-                            showSuggestions = false
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Поиск",
-                            tint = Color(0xFF2670CC)
-                        )
-                    }
-                },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(
-                            onClick = {
-                                query = ""
-                                onQueryChange("")
-                                onSearch("")
-                                showSuggestions = false
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Очистить",
-                                tint = Color(0xFF26CCAD)
-                            )
-                        }
-                    }
-                },
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Color.White
-                ),
-                textStyle = TextStyle(brush = brush),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        onSearch(query)
-                        showSuggestions = false
-                    }
-                ),
-                shape = RoundedCornerShape(24.dp),
-                singleLine = true
-            )
-        }
-
-        if (showSuggestions && suggestions.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(brush, RoundedCornerShape(12.dp))
-                        .clip(RoundedCornerShape(12.dp))
-                ) {
-                    suggestions.forEachIndexed { index, suggestion ->
-                        ListItem(
-                            headlineContent = {
-                                Text(
-                                    text = suggestion,
-                                    color = Color.White,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Normal
-                                )
-                            },
-                            modifier = Modifier
-                                .clickable {
-                                    query = suggestion
-                                    onSuggestionClick(suggestion)
-                                    showSuggestions = false
-                                }
-                                .fillMaxWidth(),
-                            colors = ListItemDefaults.colors(
-                                containerColor = Color.Transparent
-                            )
-                        )
-
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun ArticleCard(
