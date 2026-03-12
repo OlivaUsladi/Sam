@@ -1,4 +1,4 @@
-package com.example.myapplication.Hints
+package com.example.myapplication.Hints.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,15 +40,15 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun HintsSearchBar(
+    query: String,
     onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
     suggestions: List<String>,
+    showSuggestions: Boolean,
     onSuggestionClick: (String) -> Unit,
+    onClearClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var showSuggestions by rememberSaveable { mutableStateOf(false) }
-
     val brush = remember {
         Brush.linearGradient(
             colors = listOf(Color(0xFF2670CC), Color(0xFF26CCAD))
@@ -63,11 +63,7 @@ fun HintsSearchBar(
         ) {
             TextField(
                 value = query,
-                onValueChange = { newValue ->
-                    query = newValue
-                    onQueryChange(newValue)
-                    showSuggestions = newValue.isNotEmpty() && suggestions.isNotEmpty()
-                },
+                onValueChange = onQueryChange,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(24.dp))
@@ -80,10 +76,7 @@ fun HintsSearchBar(
                 },
                 leadingIcon = {
                     IconButton(
-                        onClick = {
-                            onSearch(query)
-                            showSuggestions = false
-                        }
+                        onClick = { onSearch(query) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -95,12 +88,7 @@ fun HintsSearchBar(
                 trailingIcon = {
                     if (query.isNotEmpty()) {
                         IconButton(
-                            onClick = {
-                                query = ""
-                                onQueryChange("")
-                                onSearch("")
-                                showSuggestions = false
-                            }
+                            onClick = onClearClick
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
@@ -122,10 +110,7 @@ fun HintsSearchBar(
                 textStyle = TextStyle(brush = brush),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
-                    onSearch = {
-                        onSearch(query)
-                        showSuggestions = false
-                    }
+                    onSearch = { onSearch(query) }
                 ),
                 shape = RoundedCornerShape(24.dp),
                 singleLine = true
@@ -137,16 +122,16 @@ fun HintsSearchBar(
 
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .background(brush, RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp))
                 ) {
-                    suggestions.forEachIndexed { index, suggestion ->
+                    suggestions.forEach { suggestion ->
                         ListItem(
                             headlineContent = {
                                 Text(
@@ -157,17 +142,12 @@ fun HintsSearchBar(
                                 )
                             },
                             modifier = Modifier
-                                .clickable {
-                                    query = suggestion
-                                    onSuggestionClick(suggestion)
-                                    showSuggestions = false
-                                }
+                                .clickable { onSuggestionClick(suggestion) }
                                 .fillMaxWidth(),
                             colors = ListItemDefaults.colors(
                                 containerColor = Color.Transparent
                             )
                         )
-
                     }
                 }
             }

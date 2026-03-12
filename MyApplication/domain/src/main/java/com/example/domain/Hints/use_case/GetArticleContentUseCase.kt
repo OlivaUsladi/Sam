@@ -8,7 +8,7 @@ class GetArticleContentUseCase (
     private val articleRepository: ArticleRepository
     )
     {
-        suspend fun execute(articleId: Int): ArticleContent {
+        suspend operator fun invoke(articleId: Int): ArticleContent {
             return articleRepository.getArticleContent(articleId)
         }
 }

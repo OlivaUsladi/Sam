@@ -1,56 +1,98 @@
-package com.example.myapplication.Hints
+package com.example.data.Hints.datasource.local
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.myapplication.R
-import coil3.compose.AsyncImage
-import com.example.data.Hints.converter.ConverterToJson
-import com.example.domain.Hints.model.ArticleContent
+import com.example.data.Hints.model.*
 import com.example.domain.Hints.model.ContentBlock
 import com.example.domain.Hints.model.TextArea
 import com.example.domain.Hints.model.TextStyle
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.time.LocalDateTime
 
-//3. Добавить в статью Image
+class ArticleLocalDataSourceImpl : ArticleLocalDataSource {
 
-@Composable
-fun ArticleScreen(id: Int){
-    Column (modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
-        val context = LocalContext.current
-        val converterToJson = ConverterToJson()
+    private val categories = listOf(
+        CategoryEntity(1, "Продуктивность", "Статьи об увеличении ритма жизни"),
+        CategoryEntity(2, "Здоровье", "Статьи о здоровом образе жизни"),
+        CategoryEntity(3, "Привычки", "Статьи о формировании полезных привычек"),
+        CategoryEntity(4, "Организация", "Статьи о документах"),
+        CategoryEntity(5, "ЖКХ", "Статьи о коммунальных услугах")
+    )
 
-        var allArticleContent = remember { mutableStateListOf<ArticleContent>() }
+    private val imageUrls = listOf(
+        "https://i.ibb.co/bjy899VJ/aerial-view-business-data-analysis-graph.jpg",
+        "https://i.ibb.co/zTjB1k12/brunette-woman-sitting-desk-surrounded-with-gadgets-papers.jpg",
+        "https://i.ibb.co/274TSKSf/close-up-person-meditating-home.jpg",
+        "https://i.ibb.co/Ld1K3vgj/tea-book-relax.jpg",
+        "https://i.ibb.co/gMNnL2Yp/ceramic-mug-with-coffee-silver-dollar-gum-leaves.jpg",
+        "https://i.ibb.co/YF85HrRg/doctor-doing-their-work-pediatrics-office.jpg"
+    )
 
-        allArticleContent.add(ArticleContent(
+    private val articles = listOf(
+        ArticleEntity(
+            id = 1,
+            title = "Как управлять временем",
+            categoryId = 1,
+            mainWords = listOf("тайм-менеджмент", "планирование"),
+            author = "Анна Смирнова",
+            imageUrl = imageUrls[0],
+            createdAt = LocalDateTime.now().minusDays(2),
+            updatedAt = LocalDateTime.now().minusDays(1)
+        ),
+        ArticleEntity(
+            id = 2,
+            title = "Техники продуктивности",
+            categoryId = 1,
+            mainWords = listOf("pomodoro", "фокус"),
+            author = "Иван Петров",
+            imageUrl = imageUrls[1],
+            createdAt = LocalDateTime.now().minusDays(5),
+            updatedAt = LocalDateTime.now().minusDays(3)
+        ),
+        ArticleEntity(
+            id = 3,
+            title = "Медитация для начинающих",
+            categoryId = 2,
+            mainWords = listOf("mindfulness", "релаксация"),
+            author = "Елена Козлова",
+            imageUrl = imageUrls[2],
+            createdAt = LocalDateTime.now().minusWeeks(1),
+            updatedAt = LocalDateTime.now().minusDays(2)
+        ),
+        ArticleEntity(
+            id = 4,
+            title = "Здоровый сон и режим",
+            categoryId = 2,
+            mainWords = listOf("сон", "циркадные ритмы"),
+            author = "Михаил Васильев",
+            imageUrl = imageUrls[3],
+            createdAt = LocalDateTime.now().minusDays(10),
+            updatedAt = LocalDateTime.now().minusDays(8)
+        ),
+        ArticleEntity(
+            id = 5,
+            title = "Утренние ритуалы",
+            categoryId = 3,
+            mainWords = listOf("утро", "рутина"),
+            author = "Ольга Новикова",
+            imageUrl = imageUrls[4],
+            createdAt = LocalDateTime.now().minusDays(3),
+            updatedAt = LocalDateTime.now().minusDays(2)
+        ),
+        ArticleEntity(
+            id = 6,
+            title = "Как прикрепиться в поликлинике",
+            categoryId = 4,
+            mainWords = listOf("здоровье", "документы", "поликлиника", "больница"),
+            author = "Александра Майснер",
+            imageUrl = imageUrls[5],
+            createdAt = LocalDateTime.now().minusDays(21),
+            updatedAt = LocalDateTime.now().minusDays(13)
+        )
+    )
+
+    private val articleContents = listOf(
+        ArticleContentEntity(
             articleId = 1,
-            checklistId = 1,
             blocks = listOf(
                 ContentBlock.Paragraph(
                     text = "Как управлять временем",
@@ -112,12 +154,11 @@ fun ArticleScreen(id: Int){
                     size = 14,
                     area = TextArea.Left
                 )
-            )
-        ))
-
-        allArticleContent.add(ArticleContent(
+            ),
+            checklistId = 1
+        ),
+        ArticleContentEntity(
             articleId = 2,
-            checklistId = 2,
             blocks = listOf(
                 ContentBlock.Paragraph(
                     text = "Техники продуктивности",
@@ -167,12 +208,11 @@ fun ArticleScreen(id: Int){
                     size = 14,
                     area = TextArea.Left
                 )
-            )
-        ))
-
-        allArticleContent.add(ArticleContent(
+            ),
+            checklistId = 2
+        ),
+        ArticleContentEntity(
             articleId = 3,
-            checklistId = 3,
             blocks = listOf(
                 ContentBlock.Paragraph(
                     text = "Медитация для начинающих",
@@ -222,12 +262,11 @@ fun ArticleScreen(id: Int){
                     size = 14,
                     area = TextArea.Left
                 )
-            )
-        ))
-
-        allArticleContent.add(ArticleContent(
+            ),
+            checklistId = 3
+        ),
+        ArticleContentEntity(
             articleId = 4,
-            checklistId = 4,
             blocks = listOf(
                 ContentBlock.Paragraph(
                     text = "Здоровый сон и режим",
@@ -283,12 +322,11 @@ fun ArticleScreen(id: Int){
                     size = 14,
                     area = TextArea.Left
                 )
-            )
-        ))
-
-        allArticleContent.add(ArticleContent(
+            ),
+            checklistId = 4
+        ),
+        ArticleContentEntity(
             articleId = 5,
-            checklistId = 5,
             blocks = listOf(
                 ContentBlock.Paragraph(
                     text = "Утренние ритуалы",
@@ -350,207 +388,117 @@ fun ArticleScreen(id: Int){
                     size = 14,
                     area = TextArea.Left
                 )
-            )
+            ),
+            checklistId = 5
+        )
+    )
+
+    private val checklists = listOf(
+        ChecklistEntity(id = 1, articleId = 1, items = listOf(
+            "Используйте матрицу Эйзенхауэра",
+            "Пробуйте метод Помодоро",
+            "Применяйте правило 2 минут",
+            "Планируйте день заранее"
+        )),
+        ChecklistEntity(id = 2, articleId = 2, items = listOf(
+            "Работайте по Pomodoro",
+            "Фиксируйте все задачи в системе",
+            "Регулярно пересматривайте списки"
+        )),
+        ChecklistEntity(id = 3, articleId = 3, items = listOf(
+            "Начните с 5-10 минут в день",
+            "Сосредоточьтесь на дыхании",
+            "Попробуйте сканирование тела"
+        )),
+        ChecklistEntity(id = 4, articleId = 4, items = listOf(
+            "Спите 7-9 часов",
+            "Откажитесь от гаджетов за час до сна",
+            "Создайте ритуал отхода ко сну",
+            "Обеспечьте темноту и тишину"
+        )),
+        ChecklistEntity(id = 5, articleId = 5, items = listOf(
+            "Вставайте без телефона",
+            "Выпейте стакан воды",
+            "Сделайте легкую зарядку",
+            "Помедитируйте 5 минут",
+            "Запланируйте 3 главные задачи"
         ))
+    )
 
-        LaunchedEffect(Unit) {
-            val content = context.assets.open("Статья прикрепление к поликлинике.txt")
-                .bufferedReader().use { it.readText() }
+    private val favorites = mutableListOf<FavoriteEntity>()
+    private val likes = mutableListOf<LikeEntity>()
 
-            var blocks = converterToJson.convertFromTXT(content)
-            val json = converterToJson.convertBlocksToJson(blocks)
-            blocks = converterToJson.convertJsonToBlocks(json)
+    private val mutex = Mutex()
+    private var nextFavoriteId = 1
+    private var nextLikeId = 1
 
-            allArticleContent.add(ArticleContent(articleId = 6, blocks=blocks, checklistId = 6))
 
+
+    override suspend fun getArticles(): List<ArticleEntity> = articles
+
+    override suspend fun getArticleById(articleId: Int): ArticleEntity? =
+        articles.find { it.id == articleId }
+
+    override suspend fun getArticlesByCategory(categoryId: Int): List<ArticleEntity> =
+        articles.filter { it.categoryId == categoryId }
+
+    override suspend fun getCategories(): List<CategoryEntity> = categories
+
+    override suspend fun getArticleContent(articleId: Int): ArticleContentEntity? =
+        articleContents.find { it.articleId == articleId }
+
+    override suspend fun getChecklist(checklistId: Int): ChecklistEntity? =
+        checklists.find { it.id == checklistId }
+
+    override suspend fun getFavorites(userId: Int): List<FavoriteEntity> =
+        favorites.filter { it.userId == userId }
+
+    override suspend fun addFavorite(userId: Int, articleId: Int): FavoriteEntity = mutex.withLock {
+        if (favorites.any { it.userId == userId && it.articleId == articleId }) {
+            throw IllegalStateException("Already in favorites")
         }
-
-        val article = allArticleContent.filter { it.articleId == id }
-        val articleContent = article.firstOrNull()
-
-        //+******************************************************************
-        //Вот тут должна доставаться urlimage из Artcle по id, когда будет БД
-        val imageUrls = listOf(
-            "https://i.ibb.co/bjy899VJ/aerial-view-business-data-analysis-graph.jpg",
-            "https://i.ibb.co/zTjB1k12/brunette-woman-sitting-desk-surrounded-with-gadgets-papers.jpg",
-            "https://i.ibb.co/274TSKSf/close-up-person-meditating-home.jpg",
-            "https://i.ibb.co/Ld1K3vgj/tea-book-relax.jpg",
-            "https://i.ibb.co/gMNnL2Yp/ceramic-mug-with-coffee-silver-dollar-gum-leaves.jpg",
-            "https://i.ibb.co/YF85HrRg/doctor-doing-their-work-pediatrics-office.jpg"
+        val favorite = FavoriteEntity(
+            id = nextFavoriteId++,
+            userId = userId,
+            articleId = articleId
         )
+        favorites.add(favorite)
+        return favorite
+    }
 
-        //В AsyncImage исправить model
-        //*******************************************************************
+    override suspend fun removeFavorite(userId: Int, articleId: Int): Boolean = mutex.withLock {
+        favorites.removeAll { it.userId == userId && it.articleId == articleId }
+    }
 
-        if (articleContent == null) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Статья не найдена",
-                    fontSize = 18.sp,
-                    color = Color.Gray
-                )
-            }
+    override suspend fun isFavorite(userId: Int, articleId: Int): Boolean =
+        favorites.any { it.userId == userId && it.articleId == articleId }
+
+    override suspend fun getLikes(articleId: Int): List<LikeEntity> =
+        likes.filter { it.articleId == articleId }
+
+    override suspend fun getUserLikes(userId: Int): List<LikeEntity> =
+        likes.filter { it.userId == userId }
+
+    override suspend fun addLike(userId: Int, articleId: Int): LikeEntity = mutex.withLock {
+        if (likes.any { it.userId == userId && it.articleId == articleId }) {
+            throw IllegalStateException("Already liked")
         }
-
-        else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                item{
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            //.height(160.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 5.dp, end = 5.dp)
-                            ) {
-                                //Вот тут категория из БД Article по id доставать дату создания/обновления
-                                Text(
-                                    text = "Продуктивность",
-                                    fontSize = 16.sp,
-                                    color = Color.Gray,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxWidth(0.5f)
-                                )
-
-                                //Вот тут из БД Article по id доставать дату создания/обновления
-                                Text(
-                                    text = "01.01.2025",
-                                    fontSize = 16.sp,
-                                    color = Color.Gray,
-                                    modifier = Modifier
-                                        .align(Alignment.Bottom)
-                                )
-                            }
-                            AsyncImage(
-                                model = imageUrls[id - 1], contentDescription = "Картинка для верха статьи",
-                                error = painterResource(R.drawable.img_3),
-                                placeholder = painterResource(R.drawable.loading),
-                                modifier = Modifier.fillMaxWidth().height(140.dp)
-                                    .clip(RoundedCornerShape(12.dp)),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
-                }
-                items(articleContent!!.blocks) { block ->
-                    when (block) {
-                        is ContentBlock.Paragraph -> {
-                            ParagraphBlock(block)
-                        }
-
-                        is ContentBlock.Image -> {
-                            ImageBlock(block)
-                        }
-                    }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(40.dp))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ParagraphBlock(paragraph: ContentBlock.Paragraph) {
-
-    //Расположение
-    val textAlign = when (paragraph.area) {
-        TextArea.Left -> TextAlign.Left
-        TextArea.Center -> TextAlign.Center
-        TextArea.Right -> TextAlign.Right
-    }
-
-    //Тип шрифта (стиль)
-    val fontWeight = when (paragraph.style) {
-        TextStyle.Normal -> FontWeight.Normal
-        TextStyle.Bold -> FontWeight.Bold
-        TextStyle.Italic -> FontWeight.Normal
-        TextStyle.Underlined -> FontWeight.Normal
-    }
-
-    //до информация для Italic
-    val fontStyle = when (paragraph.style) {
-        TextStyle.Italic -> androidx.compose.ui.text.font.FontStyle.Italic
-        else -> androidx.compose.ui.text.font.FontStyle.Normal
-    }
-
-    //доп информация для подчёркивания
-    val textDecoration = when (paragraph.style) {
-        TextStyle.Underlined -> androidx.compose.ui.text.style.TextDecoration.Underline
-        else -> androidx.compose.ui.text.style.TextDecoration.None
-    }
-
-    //Верхний отступ
-    val topPadding = when {
-        paragraph.style == TextStyle.Bold && paragraph.size == 24 -> 16.dp
-        paragraph.style == TextStyle.Bold -> 24.dp
-        else -> 8.dp
-    }
-
-    //Нижний отступ
-    val bottomPadding = when {
-        paragraph.style == TextStyle.Bold && paragraph.size == 24 -> 8.dp
-        else -> 4.dp
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = topPadding, bottom = bottomPadding)
-    ) {
-        Text(
-            text = paragraph.text,
-            fontSize = paragraph.size.sp,
-            fontWeight = fontWeight,
-            fontStyle = fontStyle,
-            textDecoration = textDecoration,
-            textAlign = textAlign,
-            color = Color.Black,
-            modifier = Modifier.fillMaxWidth()
+        val like = LikeEntity(
+            id = nextLikeId++,
+            userId = userId,
+            articleId = articleId
         )
+        likes.add(like)
+        return like
     }
-}
 
-@Composable
-fun ImageBlock(image: ContentBlock.Image) {
-
-    val width = image.width ?: 300
-    val height = image.height ?: 300
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        AsyncImage(
-            model = image.url,
-            contentDescription = "Изображение к статье",
-            error = painterResource(R.drawable.img_3),
-            placeholder = painterResource(R.drawable.loading),
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(width.toFloat() / height.toFloat())
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Fit
-        )
+    override suspend fun removeLike(userId: Int, articleId: Int): Boolean = mutex.withLock {
+        likes.removeAll { it.userId == userId && it.articleId == articleId }
     }
+
+    override suspend fun isLiked(userId: Int, articleId: Int): Boolean =
+        likes.any { it.userId == userId && it.articleId == articleId }
+
+    override suspend fun getLikesCount(articleId: Int): Int =
+        likes.count { it.articleId == articleId }
 }

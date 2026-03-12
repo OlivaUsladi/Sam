@@ -42,5 +42,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
 
+    implementation("io.insert-koin:koin-core:3.5.6")
+
     implementation(project(":domain"))
 }
