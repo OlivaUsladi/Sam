@@ -62,6 +62,7 @@ fun HomeScreen(
                 }
             }
 
+            //сделать прикольную страничку вроде "Упс... что-то пошло не так"
             uiState.error != null -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),

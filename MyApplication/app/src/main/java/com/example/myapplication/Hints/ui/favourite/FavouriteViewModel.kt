@@ -139,7 +139,6 @@ class FavouriteViewModel(
             val userId = _uiState.value.userId
             removeFromFavoriteUseCase(userId, articleId)
 
-            // Удаляем из списка
             _uiState.update { state ->
                 val updatedArticles = state.articles.filter { it.id != articleId }
                 state.copy(articles = updatedArticles)

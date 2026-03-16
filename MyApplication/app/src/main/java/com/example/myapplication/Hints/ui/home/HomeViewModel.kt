@@ -75,7 +75,6 @@ class HomeViewModel(
 
                 allArticles = articles
 
-                // Обогащаем данными о лайках/избранном
                 val enrichedArticles = articles.map { article ->
                     article.copy(
                         isLiked = isArticleLiked(article.id),
@@ -166,7 +165,6 @@ class HomeViewModel(
                 addToFavoriteUseCase(userId, articleId)
             }
 
-            // Обновляем статью в списке
             _uiState.update { state ->
                 val updatedArticles = state.articles.map { article ->
                     if (article.id == articleId) {
