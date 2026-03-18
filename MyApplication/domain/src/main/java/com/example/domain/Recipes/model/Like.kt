@@ -1,4 +1,6 @@
 package com.example.domain.Recipes.model
 
-//class Like {
-//}
+data class Like (
+    val userId: Int,
+    val recipeId: Int
+)

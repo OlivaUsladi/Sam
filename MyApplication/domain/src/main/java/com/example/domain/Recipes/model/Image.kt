@@ -1,4 +1,7 @@
 package com.example.domain.Recipes.model
 
-//class Image {
-//}
+data class Image (
+    val id: Int,
+    val url: String,
+    val recipeId: Int
+)
