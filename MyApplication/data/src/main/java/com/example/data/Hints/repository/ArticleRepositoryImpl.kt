@@ -8,6 +8,7 @@ import com.example.domain.Hints.model.Favorite
 import com.example.domain.Hints.model.Like
 import com.example.domain.Hints.repository.ArticleRepository
 
+//В общем этот файл будем под БД и локальные БД переделывать
 class ArticleRepositoryImpl(
     private val localDataSource: ArticleLocalDataSource,
     private val userId: Int = 1

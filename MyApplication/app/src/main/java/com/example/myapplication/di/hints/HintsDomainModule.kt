@@ -1,10 +1,9 @@
-package com.example.myapplication.di
+package com.example.myapplication.di.hints
 
 import com.example.domain.Hints.use_case.*
 import org.koin.dsl.module
 
-val domainModule = module {
-
+val hintsDomainModule = module {
     factory { GetArticlesUseCase(get()) }
     factory { GetArticlesByCategoryUseCase(get()) }
     factory { GetArticleContentUseCase(get()) }
@@ -25,4 +24,6 @@ val domainModule = module {
 
 
     factory { GetCategoriesUseCase(get()) }
+
+
 }

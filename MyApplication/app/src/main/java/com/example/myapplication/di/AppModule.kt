@@ -5,8 +5,8 @@ import com.example.myapplication.Hints.ui.article.ArticleViewModel
 import com.example.myapplication.Hints.ui.category.CategoriesViewModel
 import com.example.myapplication.Hints.ui.categoryarticles.CategoryArticlesViewModel
 import com.example.myapplication.Hints.ui.favourite.FavouriteViewModel
+import com.example.myapplication.Recipes.ui.home.RecipeHomeViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val appModule = module {
@@ -61,4 +61,19 @@ val appModule = module {
         removeLikeUseCase = get(),
         getLikesCountUseCase = get()
     ) }
+
+    viewModel{
+        RecipeHomeViewModel(
+            getRecipesUseCase = get(),
+            searchRecipesUseCase = get(),
+            addToFavoritesUseCase = get(),
+            removeFromFavoritesUseCase = get(),
+            isRecipeFavoriteUseCase = get(),
+            addLikeUseCase = get(),
+            removeLikeUseCase = get(),
+            getLikesCountUseCase = get(),
+            isRecipeLikedUseCase = get()
+        )
+
+    }
 }

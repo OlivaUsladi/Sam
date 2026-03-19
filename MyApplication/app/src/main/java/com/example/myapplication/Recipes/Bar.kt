@@ -1,4 +1,4 @@
-package com.example.myapplication.Hints
+package com.example.myapplication.Recipes
 
 import android.content.Intent
 import androidx.compose.foundation.Image
@@ -38,13 +38,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.myapplication.Hints.navigation.Routes
+import com.example.myapplication.Hints.MainActivity
 import com.example.myapplication.R
-import com.example.myapplication.Recipes.RecipeActivity
+import com.example.myapplication.Recipes.navigation.Routes
 import kotlinx.coroutines.launch
 
 @Composable
-fun HintsTopAppBar(navController: NavController) {
+fun RecipeTopAppBar(navController: NavController) {
     val items = listOf("Самоорганизация", "Кулинария", "Финансовый менеджер")
     val selectedItem = remember { mutableStateOf(items[0]) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -53,11 +53,11 @@ fun HintsTopAppBar(navController: NavController) {
 
     val brush = remember {
         Brush.linearGradient(
-            colors = listOf(Color(0xFF2670CC), Color(0xFF26CCAD))
+            colors = listOf(Color(0xFFE4DB40), Color(0xFF3AC42A))
         )
     }
 
-    val intentRecipe = Intent(context, RecipeActivity::class.java)
+    val intentHints = Intent(context, MainActivity::class.java)
 
     Box(Modifier.fillMaxWidth().height(if (drawerState.isOpen) 250.dp else 90.dp)) {
         ModalNavigationDrawer(
@@ -73,8 +73,8 @@ fun HintsTopAppBar(navController: NavController) {
                                 scope.launch { drawerState.close() }
                                 selectedItem.value = item
                                 when (selectedItem.value){
-                                    "Самоорганизация" -> navController.navigate("home")
-                                    "Кулинария" -> context.startActivity(intentRecipe)
+                                    "Самоорганизация" -> context.startActivity(intentHints)
+                                    "Кулинария" -> navController.navigate("home")
                                     //"Финансовый менеджер" -> context.startActivity(intenttips)
                                 }
                             },
@@ -97,8 +97,8 @@ fun HintsTopAppBar(navController: NavController) {
                             scope.launch { drawerState.open() }
                         }) {
                             Image(
-                                painter = painterResource(R.drawable.img_1),
-                                contentDescription = "menu",
+                                painter = painterResource(R.drawable.img_4),
+                                contentDescription = "menu_recipe",
                                 modifier = Modifier.size(30.dp)
                             )
                         }
@@ -106,7 +106,7 @@ fun HintsTopAppBar(navController: NavController) {
                             Column() {
                                 Spacer(modifier = Modifier.height(5.dp))
                                 Text(
-                                    text = "Самоорганизация",
+                                    text = "Кулинария",
                                     color = Color.White,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold
@@ -132,7 +132,7 @@ fun HintsTopAppBar(navController: NavController) {
 
 
 @Composable
-fun HintsBottomAppBar(navController: NavController) {
+fun RecipeBottomAppBar(navController: NavController) {
     BottomAppBar(
         containerColor = Color.White,
         contentColor = Color.LightGray,
@@ -148,10 +148,10 @@ fun HintsBottomAppBar(navController: NavController) {
             }),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
-            Icon(painter = painterResource(R.drawable.hints), contentDescription = "Меню",
+            Icon(painter = painterResource(R.drawable.icon_food), contentDescription = "Меню",
                 modifier = Modifier.size(if  (selectedButton.value==0) 22.dp else 18.dp),
                 tint = if  (selectedButton.value==0) Color.Black else Color.LightGray)
-            Text(text="Лента",
+            Text(text="Рецепты",
                 fontSize = if (selectedButton.value==0) 12.sp else 10.sp,
                 color = if (selectedButton.value==0) Color.Black else Color.LightGray,
                 fontWeight = if (selectedButton.value==0) FontWeight.Bold else FontWeight.Normal)
@@ -167,8 +167,29 @@ fun HintsBottomAppBar(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
             Icon(
+                painter = painterResource(R.drawable.icon_list),
+                contentDescription = "Списки",
+                modifier = Modifier.size(if  (selectedButton.value==1) 22.dp else 18.dp),
+                tint = if  (selectedButton.value==1) Color.Black else Color.LightGray
+            )
+            Text(text="Списки",
+                fontSize = if (selectedButton.value==1) 12.sp else 10.sp,
+                color = if (selectedButton.value==1) Color.Black else Color.LightGray,
+                fontWeight = if (selectedButton.value==1) FontWeight.Bold else FontWeight.Normal)
+        }
+        Spacer(Modifier.weight(1f, true))
+        Column(modifier = Modifier
+            .weight(1f)
+            .fillMaxSize()
+            .clickable(onClick = {
+                selectedButton.value =1
+                navController.navigate(Routes.Favourite.route)
+            }),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+            Icon(
                 painter = painterResource(R.drawable.favourite),
-                contentDescription = "О приложении",
+                contentDescription = "Bookmark",
                 modifier = Modifier.size(if  (selectedButton.value==1) 22.dp else 18.dp),
                 tint = if  (selectedButton.value==1) Color.Black else Color.LightGray
             )
