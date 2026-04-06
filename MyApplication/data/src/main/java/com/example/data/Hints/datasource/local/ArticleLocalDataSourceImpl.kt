@@ -155,7 +155,7 @@ class ArticleLocalDataSourceImpl : ArticleLocalDataSource {
                     area = TextArea.Left
                 )
             ),
-            checklistId = 1
+            checklist = ""
         ),
         ArticleContentEntity(
             articleId = 2,
@@ -209,7 +209,7 @@ class ArticleLocalDataSourceImpl : ArticleLocalDataSource {
                     area = TextArea.Left
                 )
             ),
-            checklistId = 2
+            checklist = ""
         ),
         ArticleContentEntity(
             articleId = 3,
@@ -263,7 +263,7 @@ class ArticleLocalDataSourceImpl : ArticleLocalDataSource {
                     area = TextArea.Left
                 )
             ),
-            checklistId = 3
+            checklist = ""
         ),
         ArticleContentEntity(
             articleId = 4,
@@ -323,7 +323,7 @@ class ArticleLocalDataSourceImpl : ArticleLocalDataSource {
                     area = TextArea.Left
                 )
             ),
-            checklistId = 4
+            checklist = ""
         ),
         ArticleContentEntity(
             articleId = 5,
@@ -389,41 +389,10 @@ class ArticleLocalDataSourceImpl : ArticleLocalDataSource {
                     area = TextArea.Left
                 )
             ),
-            checklistId = 5
+            checklist = ""
         )
     )
 
-    private val checklists = listOf(
-        ChecklistEntity(id = 1, articleId = 1, items = listOf(
-            "Используйте матрицу Эйзенхауэра",
-            "Пробуйте метод Помодоро",
-            "Применяйте правило 2 минут",
-            "Планируйте день заранее"
-        )),
-        ChecklistEntity(id = 2, articleId = 2, items = listOf(
-            "Работайте по Pomodoro",
-            "Фиксируйте все задачи в системе",
-            "Регулярно пересматривайте списки"
-        )),
-        ChecklistEntity(id = 3, articleId = 3, items = listOf(
-            "Начните с 5-10 минут в день",
-            "Сосредоточьтесь на дыхании",
-            "Попробуйте сканирование тела"
-        )),
-        ChecklistEntity(id = 4, articleId = 4, items = listOf(
-            "Спите 7-9 часов",
-            "Откажитесь от гаджетов за час до сна",
-            "Создайте ритуал отхода ко сну",
-            "Обеспечьте темноту и тишину"
-        )),
-        ChecklistEntity(id = 5, articleId = 5, items = listOf(
-            "Вставайте без телефона",
-            "Выпейте стакан воды",
-            "Сделайте легкую зарядку",
-            "Помедитируйте 5 минут",
-            "Запланируйте 3 главные задачи"
-        ))
-    )
 
     private val favorites = mutableListOf<FavoriteEntity>()
     private val likes = mutableListOf<LikeEntity>()
@@ -447,8 +416,6 @@ class ArticleLocalDataSourceImpl : ArticleLocalDataSource {
     override suspend fun getArticleContent(articleId: Int): ArticleContentEntity? =
         articleContents.find { it.articleId == articleId }
 
-    override suspend fun getChecklist(checklistId: Int): ChecklistEntity? =
-        checklists.find { it.id == checklistId }
 
     override suspend fun getFavorites(userId: Int): List<FavoriteEntity> =
         favorites.filter { it.userId == userId }

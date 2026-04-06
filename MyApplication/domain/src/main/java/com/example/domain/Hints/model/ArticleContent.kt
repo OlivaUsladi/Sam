@@ -6,5 +6,5 @@ package com.example.domain.Hints.model
 data class ArticleContent(
     val articleId: Int,
     val blocks: List<ContentBlock>,
-    val checklistId: Int
+    val checklist: String
 )

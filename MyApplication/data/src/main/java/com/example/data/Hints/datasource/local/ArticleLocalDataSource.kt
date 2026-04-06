@@ -11,7 +11,6 @@ interface ArticleLocalDataSource {
 
     // Контент и чеклисты
     suspend fun getArticleContent(articleId: Int): ArticleContentEntity?
-    suspend fun getChecklist(checklistId: Int): ChecklistEntity?
 
     // Избранное
     suspend fun getFavorites(userId: Int): List<FavoriteEntity>

@@ -30,8 +30,67 @@ class RecipeLocalDataSourceImpl : RecipeLocalDataSource {
         GroceryEntity(8, "Специи", "Соль, перец, приправы")
     )
 
-    // Таблица рецептов (карточки)
-    //ДОБАВИТЬ НОРМАЛЬНЫЕ КАРТИНКИ
+
+    private val ingredientsCatalog = listOf(
+        IngredientEntity(1, "Говядина", "г"),
+        IngredientEntity(2, "Свекла", "г"),
+        IngredientEntity(3, "Картофель", "г"),
+        IngredientEntity(4, "Морковь", "г"),
+        IngredientEntity(5, "Капуста", "г"),
+        IngredientEntity(6, "Лук репчатый", "г"),
+        IngredientEntity(7, "Томатная паста", "ст.л."),
+        IngredientEntity(8, "Чеснок", "зубчик"),
+        IngredientEntity(9, "Укроп", "пучок"),
+        IngredientEntity(10, "Сметана", "г"),
+        IngredientEntity(11, "Куриное филе", "г"),
+        IngredientEntity(12, "Салат Айсберг", "г"),
+        IngredientEntity(13, "Помидоры черри", "г"),
+        IngredientEntity(14, "Сыр пармезан", "г"),
+        IngredientEntity(15, "Белый хлеб", "г"),
+        IngredientEntity(16, "Яйца куриные", "шт"),
+        IngredientEntity(17, "Соус Цезарь", "мл"),
+        IngredientEntity(18, "Оливковое масло", "ст.л."),
+        IngredientEntity(19, "Спагетти", "г"),
+        IngredientEntity(20, "Бекон", "г"),
+        IngredientEntity(21, "Сливки 20%", "мл"),
+        IngredientEntity(22, "Петрушка", "пучок"),
+        IngredientEntity(23, "Темный шоколад", "г"),
+        IngredientEntity(24, "Сливочное масло", "г"),
+        IngredientEntity(25, "Сахар", "г"),
+        IngredientEntity(26, "Мука пшеничная", "г"),
+        IngredientEntity(27, "Какао-порошок", "ст.л."),
+        IngredientEntity(28, "Грецкие орехи", "г"),
+        IngredientEntity(29, "Ванильный экстракт", "ч.л."),
+        IngredientEntity(30, "Тыква", "г"),
+        IngredientEntity(31, "Имбирь", "г"),
+        IngredientEntity(32, "Тыквенные семечки", "г"),
+        IngredientEntity(33, "Гречка", "г"),
+        IngredientEntity(34, "Свинина", "г"),
+        IngredientEntity(35, "Лавровый лист", "шт"),
+        IngredientEntity(36, "Дрожжи сухие", "г"),
+        IngredientEntity(37, "Вода", "мл"),
+        IngredientEntity(38, "Томатный соус", "г"),
+        IngredientEntity(39, "Моцарелла", "г"),
+        IngredientEntity(40, "Базилик", "пучок"),
+        IngredientEntity(41, "Колбаса вареная", "г"),
+        IngredientEntity(42, "Огурцы соленые", "г"),
+        IngredientEntity(43, "Горошек консервированный", "г"),
+        IngredientEntity(44, "Майонез", "г"),
+        IngredientEntity(45, "Молоко", "мл"),
+        IngredientEntity(46, "Мороженое пломбир", "г"),
+        IngredientEntity(47, "Сироп", "мл"),
+        IngredientEntity(48, "Взбитые сливки", "г"),
+        IngredientEntity(49, "Шоколадная крошка", "г"),
+        IngredientEntity(50, "Вишня", "шт"),
+        IngredientEntity(51, "Яблоки", "г"),
+        IngredientEntity(52, "Разрыхлитель", "г"),
+        IngredientEntity(53, "Корица", "ч.л."),
+        IngredientEntity(54, "Сахарная пудра", "ст.л."),
+        IngredientEntity(55, "Соль", "ч.л."),
+        IngredientEntity(56, "Перец черный", "ч.л."),
+        IngredientEntity(57, "Растительное масло", "ст.л.")
+    )
+
     private val recipes = listOf(
         RecipeEntity(
             id = 1,
@@ -145,815 +204,285 @@ class RecipeLocalDataSourceImpl : RecipeLocalDataSource {
         )
     )
 
-
-    // Связи рецептов с категориями
     private val recipeCategories = listOf(
-        // Борщ - Первые блюда
         RecipeCategoryCrossEntity(1, 1),
-        // Цезарь - Салаты
         RecipeCategoryCrossEntity(2, 3),
-        // Паста - Вторые блюда
         RecipeCategoryCrossEntity(3, 2),
-        // Брауни - Десерты
         RecipeCategoryCrossEntity(4, 4),
-        // Суп-пюре - Первые блюда
         RecipeCategoryCrossEntity(5, 1),
-        // Гречка - Вторые блюда
         RecipeCategoryCrossEntity(6, 2),
-        // Пицца - Вторые блюда и Выпечка
         RecipeCategoryCrossEntity(7, 2),
         RecipeCategoryCrossEntity(7, 6),
-        // Оливье - Салаты
         RecipeCategoryCrossEntity(8, 3),
-        // Коктейль - Напитки
         RecipeCategoryCrossEntity(9, 5),
-        // Пирог - Десерты и Выпечка
         RecipeCategoryCrossEntity(10, 4),
         RecipeCategoryCrossEntity(10, 6)
     )
 
-    // Связи рецептов с продуктами
     private val recipeGroceries = listOf(
-        // Суп-пюре
-        RecipeGroceryCrossEntity(5, 3), // Овощи
-        // Гречка
-        RecipeGroceryCrossEntity(6, 5), // Крупы
-        // Коктейль
-        RecipeGroceryCrossEntity(9, 6), // Молочные
-        // Пирог
-        RecipeGroceryCrossEntity(10, 4), // Фрукты
+        RecipeGroceryCrossEntity(5, 3),
+        RecipeGroceryCrossEntity(6, 5),
+        RecipeGroceryCrossEntity(9, 6),
+        RecipeGroceryCrossEntity(10, 4),
+    )
+
+    private val recipeIngredientsCrossRef = listOf(
+        RecipeIngredientCrossRef(1, 1, 500.0, "г"),
+        RecipeIngredientCrossRef(1, 2, 300.0, "г"),
+        RecipeIngredientCrossRef(1, 3, 400.0, "г"),
+        RecipeIngredientCrossRef(1, 4, 200.0, "г"),
+        RecipeIngredientCrossRef(1, 5, 300.0, "г"),
+        RecipeIngredientCrossRef(1, 6, 150.0, "г"),
+        RecipeIngredientCrossRef(1, 7, 2.0, "ст.л."),
+        RecipeIngredientCrossRef(1, 8, 3.0, "зубчик"),
+        RecipeIngredientCrossRef(1, 9, 1.0, "пучок"),
+        RecipeIngredientCrossRef(1, 10, 100.0, "г"),
+        RecipeIngredientCrossRef(1, 55, 10.0, "г"),
+        RecipeIngredientCrossRef(1, 56, 5.0, "г"),
+        RecipeIngredientCrossRef(2, 11, 400.0, "г"),
+        RecipeIngredientCrossRef(2, 12, 200.0, "г"),
+        RecipeIngredientCrossRef(2, 13, 150.0, "г"),
+        RecipeIngredientCrossRef(2, 14, 50.0, "г"),
+        RecipeIngredientCrossRef(2, 15, 100.0, "г"),
+        RecipeIngredientCrossRef(2, 16, 2.0, "шт"),
+        RecipeIngredientCrossRef(2, 17, 100.0, "мл"),
+        RecipeIngredientCrossRef(2, 8, 1.0, "зубчик"),
+        RecipeIngredientCrossRef(2, 18, 2.0, "ст.л."),
+        RecipeIngredientCrossRef(3, 19, 400.0, "г"),
+        RecipeIngredientCrossRef(3, 20, 200.0, "г"),
+        RecipeIngredientCrossRef(3, 16, 4.0, "шт"),
+        RecipeIngredientCrossRef(3, 14, 100.0, "г"),
+        RecipeIngredientCrossRef(3, 8, 2.0, "зубчик"),
+        RecipeIngredientCrossRef(3, 21, 100.0, "мл"),
+        RecipeIngredientCrossRef(3, 18, 2.0, "ст.л."),
+        RecipeIngredientCrossRef(3, 22, 1.0, "пучок"),
+        RecipeIngredientCrossRef(3, 55, 5.0, "г"),
+        RecipeIngredientCrossRef(3, 56, 5.0, "г"),
+        RecipeIngredientCrossRef(4, 23, 200.0, "г"),
+        RecipeIngredientCrossRef(4, 24, 150.0, "г"),
+        RecipeIngredientCrossRef(4, 25, 200.0, "г"),
+        RecipeIngredientCrossRef(4, 16, 3.0, "шт"),
+        RecipeIngredientCrossRef(4, 26, 100.0, "г"),
+        RecipeIngredientCrossRef(4, 27, 2.0, "ст.л."),
+        RecipeIngredientCrossRef(4, 28, 100.0, "г"),
+        RecipeIngredientCrossRef(4, 29, 1.0, "ч.л."),
+        RecipeIngredientCrossRef(5, 30, 500.0, "г"),
+        RecipeIngredientCrossRef(5, 3, 300.0, "г"),
+        RecipeIngredientCrossRef(5, 4, 200.0, "г"),
+        RecipeIngredientCrossRef(5, 6, 150.0, "г"),
+        RecipeIngredientCrossRef(5, 21, 200.0, "мл"),
+        RecipeIngredientCrossRef(5, 8, 2.0, "зубчик"),
+        RecipeIngredientCrossRef(5, 31, 20.0, "г"),
+        RecipeIngredientCrossRef(5, 18, 2.0, "ст.л."),
+        RecipeIngredientCrossRef(5, 32, 30.0, "г"),
+        RecipeIngredientCrossRef(5, 55, 8.0, "г"),
+        RecipeIngredientCrossRef(5, 56, 3.0, "г"),
+        RecipeIngredientCrossRef(6, 33, 300.0, "г"),
+        RecipeIngredientCrossRef(6, 34, 400.0, "г"),
+        RecipeIngredientCrossRef(6, 6, 200.0, "г"),
+        RecipeIngredientCrossRef(6, 4, 200.0, "г"),
+        RecipeIngredientCrossRef(6, 8, 3.0, "зубчик"),
+        RecipeIngredientCrossRef(6, 7, 1.0, "ст.л."),
+        RecipeIngredientCrossRef(6, 57, 3.0, "ст.л."),
+        RecipeIngredientCrossRef(6, 35, 2.0, "шт"),
+        RecipeIngredientCrossRef(6, 22, 1.0, "пучок"),
+        RecipeIngredientCrossRef(6, 55, 10.0, "г"),
+        RecipeIngredientCrossRef(7, 26, 500.0, "г"),
+        RecipeIngredientCrossRef(7, 36, 7.0, "г"),
+        RecipeIngredientCrossRef(7, 37, 300.0, "мл"),
+        RecipeIngredientCrossRef(7, 18, 3.0, "ст.л."),
+        RecipeIngredientCrossRef(7, 55, 10.0, "г"),
+        RecipeIngredientCrossRef(7, 25, 5.0, "г"),
+        RecipeIngredientCrossRef(7, 38, 150.0, "г"),
+        RecipeIngredientCrossRef(7, 39, 250.0, "г"),
+        RecipeIngredientCrossRef(7, 40, 1.0, "пучок"),
+        RecipeIngredientCrossRef(8, 3, 400.0, "г"),
+        RecipeIngredientCrossRef(8, 4, 200.0, "г"),
+        RecipeIngredientCrossRef(8, 16, 4.0, "шт"),
+        RecipeIngredientCrossRef(8, 41, 300.0, "г"),
+        RecipeIngredientCrossRef(8, 42, 200.0, "г"),
+        RecipeIngredientCrossRef(8, 43, 200.0, "г"),
+        RecipeIngredientCrossRef(8, 44, 150.0, "г"),
+        RecipeIngredientCrossRef(8, 9, 1.0, "пучок"),
+        RecipeIngredientCrossRef(8, 55, 10.0, "г"),
+        RecipeIngredientCrossRef(8, 56, 5.0, "г"),
+        RecipeIngredientCrossRef(9, 45, 300.0, "мл"),
+        RecipeIngredientCrossRef(9, 46, 200.0, "г"),
+        RecipeIngredientCrossRef(9, 47, 50.0, "мл"),
+        RecipeIngredientCrossRef(9, 48, 50.0, "г"),
+        RecipeIngredientCrossRef(9, 49, 20.0, "г"),
+        RecipeIngredientCrossRef(9, 50, 3.0, "шт"),
+        RecipeIngredientCrossRef(10, 26, 250.0, "г"),
+        RecipeIngredientCrossRef(10, 24, 150.0, "г"),
+        RecipeIngredientCrossRef(10, 25, 200.0, "г"),
+        RecipeIngredientCrossRef(10, 16, 3.0, "шт"),
+        RecipeIngredientCrossRef(10, 51, 500.0, "г"),
+        RecipeIngredientCrossRef(10, 52, 10.0, "г"),
+        RecipeIngredientCrossRef(10, 53, 1.0, "ч.л."),
+        RecipeIngredientCrossRef(10, 54, 2.0, "ст.л.")
     )
 
     private val recipeContents = listOf(
         RecipeContentEntity(
             recipeId = 1,
-            ingredients = listOf(
-                IngredientEntity(1, "Говядина", 500.0, "г", 1),
-                IngredientEntity(2, "Свекла", 300.0, "г", 1),
-                IngredientEntity(3, "Картофель", 400.0, "г", 1),
-                IngredientEntity(4, "Морковь", 200.0, "г", 1),
-                IngredientEntity(5, "Капуста", 300.0, "г", 1),
-                IngredientEntity(6, "Лук", 150.0, "г", 1),
-                IngredientEntity(7, "Томатная паста", 2.0, "ст.л.", 1),
-                IngredientEntity(8, "Чеснок", 3.0, "зубчика", 1),
-                IngredientEntity(9, "Укроп", 1.0, "пучок", 1),
-                IngredientEntity(10, "Сметана", 100.0, "г", 1)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление борща",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Варим бульон",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Мясо залейте холодной водой (3 литра), доведите до кипения, снимите пену. Убавьте огонь и варите 1.5 часа. За 30 минут до готовности посолите.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Подготовка овощей",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Свеклу очистите и натрите на крупной терке. Морковь натрите, лук мелко нарежьте. Картофель нарежьте кубиками, капусту нашинкуйте.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Зажарка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "На сковороде разогрейте масло, обжарьте лук до прозрачности, добавьте морковь и свеклу. Тушите 5-7 минут, затем добавьте томатную пасту и еще 2 минуты.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 4: Сборка борща",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Из готового бульона выньте мясо, отделите от кости и нарежьте кусочками. В бульон положите картофель, через 10 минут - капусту. Варите еще 10 минут.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Добавьте зажарку и нарезанное мясо, варите 5-7 минут. В конце добавьте измельченный чеснок и зелень. Дайте настояться 20-30 минут.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление борща", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Варим бульон", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Мясо залейте холодной водой (3 литра), доведите до кипения, снимите пену. Убавьте огонь и варите 1.5 часа. За 30 минут до готовности посолите.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Подготовка овощей", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Свеклу очистите и натрите на крупной терке. Морковь натрите, лук мелко нарежьте. Картофель нарежьте кубиками, капусту нашинкуйте.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Зажарка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "На сковороде разогрейте масло, обжарьте лук до прозрачности, добавьте морковь и свеклу. Тушите 5-7 минут, затем добавьте томатную пасту и еще 2 минуты.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 4: Сборка борща", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Из готового бульона выньте мясо, отделите от кости и нарежьте кусочками. В бульон положите картофель, через 10 минут - капусту. Варите еще 10 минут.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Добавьте зажарку и нарезанное мясо, варите 5-7 минут. В конце добавьте измельченный чеснок и зелень. Дайте настояться 20-30 минут.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Для более насыщенного цвета добавьте в зажарку немного лимонного сока или уксуса. Борщ вкуснее на второй день. Подавайте со сметаной и пампушками."
         ),
-
         RecipeContentEntity(
             recipeId = 2,
-            ingredients = listOf(
-                IngredientEntity(11, "Куриное филе", 400.0, "г", 2),
-                IngredientEntity(12, "Салат Айсберг", 200.0, "г", 2),
-                IngredientEntity(13, "Помидоры черри", 150.0, "г", 2),
-                IngredientEntity(14, "Сыр пармезан", 50.0, "г", 2),
-                IngredientEntity(15, "Белый хлеб", 100.0, "г", 2),
-                IngredientEntity(16, "Яйца", 2.0, "шт", 2),
-                IngredientEntity(17, "Соус Цезарь", 100.0, "мл", 2),
-                IngredientEntity(18, "Чеснок", 1.0, "зубчик", 2),
-                IngredientEntity(19, "Оливковое масло", 2.0, "ст.л.", 2)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление салата Цезарь",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Подготовка курицы",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Куриное филе промойте, обсушите. Натрите солью, перцем и измельченным чесноком. Обжарьте на оливковом масле по 5-7 минут с каждой стороны до золотистой корочки. Остудите и нарежьте кубиками.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Гренки",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Хлеб нарежьте кубиками, подсушите на сковороде без масла или в духовке при 180°C 5-7 минут до золотистого цвета.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Яйца",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Яйца сварите вкрутую (10 минут после закипания). Остудите в холодной воде, очистите и нарежьте.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 4: Сборка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Салат порвите руками на небольшие кусочки. Помидоры черри разрежьте пополам. Сыр натрите на терке.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "В большой миске смешайте салат, курицу, яйца и помидоры. Заправьте соусом, перемешайте. Сверху посыпьте тертым сыром и гренками. Подавайте сразу.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление салата Цезарь", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Подготовка курицы", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Куриное филе промойте, обсушите. Натрите солью, перцем и измельченным чесноком. Обжарьте на оливковом масле по 5-7 минут с каждой стороны до золотистой корочки. Остудите и нарежьте кубиками.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Гренки", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Хлеб нарежьте кубиками, подсушите на сковороде без масла или в духовке при 180°C 5-7 минут до золотистого цвета.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Яйца", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Яйца сварите вкрутую (10 минут после закипания). Остудите в холодной воде, очистите и нарежьте.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 4: Сборка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Салат порвите руками на небольшие кусочки. Помидоры черри разрежьте пополам. Сыр натрите на терке.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "В большой миске смешайте салат, курицу, яйца и помидоры. Заправьте соусом, перемешайте. Сверху посыпьте тертым сыром и гренками. Подавайте сразу.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Гренки добавляйте непосредственно перед подачей, чтобы они оставались хрустящими. Соус можно приготовить самостоятельно: смешайте майонез, йогурт, чеснок, пармезан и анчоусы."
         ),
-
         RecipeContentEntity(
             recipeId = 3,
-            ingredients = listOf(
-                IngredientEntity(20, "Спагетти", 400.0, "г", 3),
-                IngredientEntity(21, "Бекон", 200.0, "г", 3),
-                IngredientEntity(22, "Яйца", 4.0, "шт", 3),
-                IngredientEntity(23, "Сыр пармезан", 100.0, "г", 3),
-                IngredientEntity(24, "Чеснок", 2.0, "зубчика", 3),
-                IngredientEntity(25, "Сливки 20%", 100.0, "мл", 3),
-                IngredientEntity(26, "Оливковое масло", 2.0, "ст.л.", 3),
-                IngredientEntity(27, "Петрушка", 1.0, "пучок", 3)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление пасты Карбонара",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Паста",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "В большой кастрюле вскипятите воду (1 литр на 100г пасты). Добавьте соль (10г на литр). Спагетти варите согласно инструкции до состояния al dente (слегка недоваренные). Сохраните 1 стакан воды от варки.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Бекон",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Бекон нарежьте полосками. На сковороде разогрейте оливковое масло, обжарьте бекон до хруста (5-7 минут). Добавьте измельченный чеснок, готовьте еще 1 минуту. Снимите с огня.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Соус",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "В миске взбейте яйца с тертым пармезаном и сливками. Добавьте черный перец. Тщательно перемешайте.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 4: Соединение",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Готовые спагетти переложите в сковороду с беконом (сковорода должна быть снята с огня). Хорошо перемешайте. Быстро влейте яичную смесь и активно перемешивайте, пока соус не загустеет. Если соус слишком густой, добавьте немного воды от варки пасты.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Подавайте сразу, посыпав дополнительным пармезаном, черным перцем и рубленой петрушкой.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление пасты Карбонара", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Паста", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "В большой кастрюле вскипятите воду (1 литр на 100г пасты). Добавьте соль (10г на литр). Спагетти варите согласно инструкции до состояния al dente (слегка недоваренные). Сохраните 1 стакан воды от варки.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Бекон", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Бекон нарежьте полосками. На сковороде разогрейте оливковое масло, обжарьте бекон до хруста (5-7 минут). Добавьте измельченный чеснок, готовьте еще 1 минуту. Снимите с огня.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Соус", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "В миске взбейте яйца с тертым пармезаном и сливками. Добавьте черный перец. Тщательно перемешайте.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 4: Соединение", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Готовые спагетти переложите в сковороду с беконом (сковорода должна быть снята с огня). Хорошо перемешайте. Быстро влейте яичную смесь и активно перемешивайте, пока соус не загустеет. Если соус слишком густой, добавьте немного воды от варки пасты.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Подавайте сразу, посыпав дополнительным пармезаном, черным перцем и рубленой петрушкой.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Не ставьте сковороду обратно на огонь после добавления яиц - яйца свернутся и соус испортится. В Италии в карбонару не добавляют сливки, но с ними соус получается более нежным."
         ),
-
         RecipeContentEntity(
             recipeId = 4,
-            ingredients = listOf(
-                IngredientEntity(28, "Темный шоколад", 200.0, "г", 4),
-                IngredientEntity(29, "Сливочное масло", 150.0, "г", 4),
-                IngredientEntity(30, "Сахар", 200.0, "г", 4),
-                IngredientEntity(31, "Яйца", 3.0, "шт", 4),
-                IngredientEntity(32, "Мука", 100.0, "г", 4),
-                IngredientEntity(33, "Какао-порошок", 2.0, "ст.л.", 4),
-                IngredientEntity(34, "Грецкие орехи", 100.0, "г", 4),
-                IngredientEntity(35, "Ванильный экстракт", 1.0, "ч.л.", 4)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление шоколадного брауни",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Шоколадная основа",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шоколад поломайте на кусочки, добавьте нарезанное кубиками масло. Растопите на водяной бане или в микроволновке (импульсами по 30 секунд, перемешивая). Остудите до комнатной температуры.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Яйца с сахаром",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Яйца взбейте с сахаром и ванильным экстрактом до пышной светлой массы (миксером 3-5 минут).",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Соединение",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "В яичную массу влейте остывший шоколад, аккуратно перемешайте лопаткой. Просейте муку и какао, снова перемешайте до однородности. Орехи порубите и вмешайте в тесто.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 4: Выпекание",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Форму 20х20 см застелите пергаментом. Вылейте тесто, разровняйте. Выпекайте при 180°C 25-30 минут. Важно не пересушить! Края должны пропечься, а середина оставаться слегка влажной.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Дайте полностью остыть в форме, затем нарежьте квадратиками. Подавайте с шариком ванильного мороженого.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление шоколадного брауни", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Шоколадная основа", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шоколад поломайте на кусочки, добавьте нарезанное кубиками масло. Растопите на водяной бане или в микроволновке (импульсами по 30 секунд, перемешивая). Остудите до комнатной температуры.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Яйца с сахаром", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Яйца взбейте с сахаром и ванильным экстрактом до пышной светлой массы (миксером 3-5 минут).", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Соединение", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "В яичную массу влейте остывший шоколад, аккуратно перемешайте лопаткой. Просейте муку и какао, снова перемешайте до однородности. Орехи порубите и вмешайте в тесто.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 4: Выпекание", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Форму 20х20 см застелите пергаментом. Вылейте тесто, разровняйте. Выпекайте при 180°C 25-30 минут. Важно не пересушить! Края должны пропечься, а середина оставаться слегка влажной.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Дайте полностью остыть в форме, затем нарежьте квадратиками. Подавайте с шариком ванильного мороженого.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Брауни должен оставаться слегка влажным внутри. Проверяйте зубочисткой - она должна выходить с влажными крошками, не сухая. Чем дольше выпекать, тем более сухим будет брауни."
         ),
-
         RecipeContentEntity(
             recipeId = 5,
-            ingredients = listOf(
-                IngredientEntity(36, "Тыква", 500.0, "г", 5),
-                IngredientEntity(37, "Картофель", 300.0, "г", 5),
-                IngredientEntity(38, "Морковь", 200.0, "г", 5),
-                IngredientEntity(39, "Лук", 150.0, "г", 5),
-                IngredientEntity(40, "Сливки 20%", 200.0, "мл", 5),
-                IngredientEntity(41, "Чеснок", 2.0, "зубчика", 5),
-                IngredientEntity(42, "Имбирь", 20.0, "г", 5),
-                IngredientEntity(43, "Оливковое масло", 2.0, "ст.л.", 5),
-                IngredientEntity(44, "Тыквенные семечки", 30.0, "г", 5)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление овощного супа-пюре",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Подготовка овощей",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Тыкву очистите от кожуры и семян, нарежьте кубиками. Картофель и морковь очистите, нарежьте кубиками. Лук и чеснок мелко нарежьте. Имбирь натрите на терке.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Обжарка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "В кастрюле с толстым дном разогрейте масло, обжарьте лук до прозрачности (3 минуты). Добавьте чеснок и имбирь, готовьте еще 1 минуту.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Варка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Добавьте морковь, тыкву и картофель. Залейте водой так, чтобы она покрывала овощи. Посолите, поперчите. Доведите до кипения, убавьте огонь и варите 20-25 минут до мягкости овощей.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 4: Пюрирование",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Снимите кастрюлю с огня. Погружным блендером измельчите суп до однородного состояния. Добавьте сливки, перемешайте. Если суп слишком густой, добавьте кипяток до желаемой консистенции.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Подавайте горячим, посыпав тыквенными семечками и полив тыквенным маслом.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление овощного супа-пюре", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Подготовка овощей", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Тыкву очистите от кожуры и семян, нарежьте кубиками. Картофель и морковь очистите, нарежьте кубиками. Лук и чеснок мелко нарежьте. Имбирь натрите на терке.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Обжарка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "В кастрюле с толстым дном разогрейте масло, обжарьте лук до прозрачности (3 минуты). Добавьте чеснок и имбирь, готовьте еще 1 минуту.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Варка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Добавьте морковь, тыкву и картофель. Залейте водой так, чтобы она покрывала овощи. Посолите, поперчите. Доведите до кипения, убавьте огонь и варите 20-25 минут до мягкости овощей.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 4: Пюрирование", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Снимите кастрюлю с огня. Погружным блендером измельчите суп до однородного состояния. Добавьте сливки, перемешайте. Если суп слишком густой, добавьте кипяток до желаемой консистенции.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Подавайте горячим, посыпав тыквенными семечками и полив тыквенным маслом.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Для более насыщенного вкуса часть воды можно заменить куриным бульоном. Имбирь добавляет пикантность - если не любите, можно не добавлять."
         ),
-
         RecipeContentEntity(
             recipeId = 6,
-            ingredients = listOf(
-                IngredientEntity(45, "Гречка", 300.0, "г", 6),
-                IngredientEntity(46, "Свинина", 400.0, "г", 6),
-                IngredientEntity(47, "Лук", 200.0, "г", 6),
-                IngredientEntity(48, "Морковь", 200.0, "г", 6),
-                IngredientEntity(49, "Чеснок", 3.0, "зубчика", 6),
-                IngredientEntity(50, "Томатная паста", 1.0, "ст.л.", 6),
-                IngredientEntity(51, "Растительное масло", 3.0, "ст.л.", 6),
-                IngredientEntity(52, "Лавровый лист", 2.0, "шт", 6),
-                IngredientEntity(53, "Зелень", 1.0, "пучок", 6)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление гречки по-купечески",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Подготовка мяса",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Свинину нарежьте небольшими кубиками. На сковороде разогрейте масло, обжарьте мясо до золотистой корочки (7-10 минут). Переложите в казан или глубокую сковороду.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Овощи",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Лук нарежьте кубиками, морковь натрите на крупной терке. На той же сковороде обжарьте лук до прозрачности, добавьте морковь и готовьте еще 5 минут. Добавьте томатную пасту, перемешайте.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Гречка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Гречку переберите, промойте холодной водой. Добавьте к мясу обжаренные овощи и гречку. Залейте горячей водой (2.5 стакана), посолите, добавьте лавровый лист.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 4: Тушение",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Доведите до кипения, убавьте огонь до минимума, накройте крышкой и тушите 20-25 минут до готовности гречки. В конце добавьте измельченный чеснок и зелень, перемешайте.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Дайте настояться под крышкой 10 минут перед подачей.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление гречки по-купечески", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Подготовка мяса", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Свинину нарежьте небольшими кубиками. На сковороде разогрейте масло, обжарьте мясо до золотистой корочки (7-10 минут). Переложите в казан или глубокую сковороду.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Овощи", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Лук нарежьте кубиками, морковь натрите на крупной терке. На той же сковороде обжарьте лук до прозрачности, добавьте морковь и готовьте еще 5 минут. Добавьте томатную пасту, перемешайте.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Гречка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Гречку переберите, промойте холодной водой. Добавьте к мясу обжаренные овощи и гречку. Залейте горячей водой (2.5 стакана), посолите, добавьте лавровый лист.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 4: Тушение", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Доведите до кипения, убавьте огонь до минимума, накройте крышкой и тушите 20-25 минут до готовности гречки. В конце добавьте измельченный чеснок и зелень, перемешайте.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Дайте настояться под крышкой 10 минут перед подачей.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Можно использовать любое мясо: говядину, курицу или смесь. Для более насыщенного вкуса добавьте грибы."
         ),
-
         RecipeContentEntity(
             recipeId = 7,
-            ingredients = listOf(
-                IngredientEntity(54, "Мука", 500.0, "г", 7),
-                IngredientEntity(55, "Дрожжи сухие", 7.0, "г", 7),
-                IngredientEntity(56, "Вода", 300.0, "мл", 7),
-                IngredientEntity(57, "Оливковое масло", 3.0, "ст.л.", 7),
-                IngredientEntity(58, "Соль", 10.0, "г", 7),
-                IngredientEntity(59, "Сахар", 5.0, "г", 7),
-                IngredientEntity(60, "Томатный соус", 150.0, "г", 7),
-                IngredientEntity(61, "Моцарелла", 250.0, "г", 7),
-                IngredientEntity(62, "Базилик", 1.0, "пучок", 7)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление пиццы Маргарита",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Тесто",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "В теплой воде (не выше 40°C) растворите дрожжи и сахар, оставьте на 10 минут. Муку просейте с солью. Влейте дрожжевую смесь и масло, замесите тесто. Месите 10 минут до гладкости.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Расстойка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Положите тесто в миску, накройте пленкой и оставьте в теплом месте на 1 час, пока тесто не увеличится вдвое.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Формовка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Тесто обомните, раскатайте в круг толщиной 5 мм. Переложите на противень, смазанный маслом. Сделайте бортики.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 4: Сборка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Смажьте основу томатным соусом. Моцареллу нарежьте ломтиками и разложите сверху. Посолите, поперчите.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 5: Выпекание",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Выпекайте при 250°C 10-12 минут до золотистого края. Готовую пиццу посыпьте свежими листьями базилика.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление пиццы Маргарита", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Тесто", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "В теплой воде (не выше 40°C) растворите дрожжи и сахар, оставьте на 10 минут. Муку просейте с солью. Влейте дрожжевую смесь и масло, замесите тесто. Месите 10 минут до гладкости.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Расстойка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Положите тесто в миску, накройте пленкой и оставьте в теплом месте на 1 час, пока тесто не увеличится вдвое.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Формовка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Тесто обомните, раскатайте в круг толщиной 5 мм. Переложите на противень, смазанный маслом. Сделайте бортики.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 4: Сборка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Смажьте основу томатным соусом. Моцареллу нарежьте ломтиками и разложите сверху. Посолите, поперчите.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 5: Выпекание", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Выпекайте при 250°C 10-12 минут до золотистого края. Готовую пиццу посыпьте свежими листьями базилика.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Для настоящей итальянской пиццы нужна очень высокая температура. Если есть камень для пиццы, используйте его."
         ),
-
         RecipeContentEntity(
             recipeId = 8,
-            ingredients = listOf(
-                IngredientEntity(63, "Картофель", 400.0, "г", 8),
-                IngredientEntity(64, "Морковь", 200.0, "г", 8),
-                IngredientEntity(65, "Яйца", 4.0, "шт", 8),
-                IngredientEntity(66, "Колбаса вареная", 300.0, "г", 8),
-                IngredientEntity(67, "Огурцы соленые", 200.0, "г", 8),
-                IngredientEntity(68, "Горошек консервированный", 200.0, "г", 8),
-                IngredientEntity(69, "Майонез", 150.0, "г", 8),
-                IngredientEntity(70, "Укроп", 1.0, "пучок", 8)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление салата Оливье",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Варка овощей",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Картофель и морковь вымойте, отварите в мундире до готовности (картофель 25-30 минут, морковь 20-25 минут). Остудите, очистите.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Яйца",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Яйца сварите вкрутую (10 минут после закипания). Остудите в холодной воде, очистите.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Нарезка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Все ингредиенты нарежьте мелкими кубиками одинакового размера (примерно 5-7 мм): картофель, морковь, колбасу, огурцы, яйца.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 4: Смешивание",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "В большой миске смешайте все нарезанные ингредиенты, добавьте горошек (слив жидкость). Посолите, поперчите по вкусу. Заправьте майонезом, хорошо перемешайте.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Перед подачей охладите в холодильнике минимум 1 час. Украсьте зеленью.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление салата Оливье", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Варка овощей", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Картофель и морковь вымойте, отварите в мундире до готовности (картофель 25-30 минут, морковь 20-25 минут). Остудите, очистите.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Яйца", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Яйца сварите вкрутую (10 минут после закипания). Остудите в холодной воде, очистите.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Нарезка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Все ингредиенты нарежьте мелкими кубиками одинакового размера (примерно 5-7 мм): картофель, морковь, колбасу, огурцы, яйца.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 4: Смешивание", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "В большой миске смешайте все нарезанные ингредиенты, добавьте горошек (слив жидкость). Посолите, поперчите по вкусу. Заправьте майонезом, хорошо перемешайте.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Перед подачей охладите в холодильнике минимум 1 час. Украсьте зеленью.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Для более нежного вкуса можно заменить колбасу отварным мясом или курицей. Лук в классическом Оливье не добавляют, но по желанию можно добавить зеленый лук."
         ),
-
         RecipeContentEntity(
             recipeId = 9,
-            ingredients = listOf(
-                IngredientEntity(71, "Молоко", 300.0, "мл", 9),
-                IngredientEntity(72, "Мороженое пломбир", 200.0, "г", 9),
-                IngredientEntity(73, "Сироп (любой)", 50.0, "мл", 9),
-                IngredientEntity(74, "Взбитые сливки", 50.0, "г", 9),
-                IngredientEntity(75, "Шоколадная крошка", 20.0, "г", 9),
-                IngredientEntity(76, "Вишня для украшения", 3.0, "шт", 9)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление молочного коктейля",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Подготовка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Молоко охладите. Мороженое достаньте из морозилки на 5-10 минут, чтобы оно немного подтаяло.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Смешивание",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "В чашу блендера налейте молоко, добавьте мороженое и сироп. Взбивайте на высокой скорости 1-2 минуты до образования пышной пены.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Подача",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Разлейте коктейль по высоким бокалам. Сверху украсьте взбитыми сливками, посыпьте шоколадной крошкой и украсьте вишней.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Подавайте сразу с трубочкой.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление молочного коктейля", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Подготовка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Молоко охладите. Мороженое достаньте из морозилки на 5-10 минут, чтобы оно немного подтаяло.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Смешивание", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "В чашу блендера налейте молоко, добавьте мороженое и сироп. Взбивайте на высокой скорости 1-2 минуты до образования пышной пены.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Подача", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Разлейте коктейль по высоким бокалам. Сверху украсьте взбитыми сливками, посыпьте шоколадной крошкой и украсьте вишней.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Подавайте сразу с трубочкой.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Пропорции можно менять по вкусу: больше мороженого - гуще и слаще коктейль. Для шоколадного коктейля добавьте какао или шоколадный сироп."
         ),
-
         RecipeContentEntity(
             recipeId = 10,
-            ingredients = listOf(
-                IngredientEntity(77, "Мука", 250.0, "г", 10),
-                IngredientEntity(78, "Сливочное масло", 150.0, "г", 10),
-                IngredientEntity(79, "Сахар", 200.0, "г", 10),
-                IngredientEntity(80, "Яйца", 3.0, "шт", 10),
-                IngredientEntity(81, "Яблоки", 500.0, "г", 10),
-                IngredientEntity(82, "Разрыхлитель", 10.0, "г", 10),
-                IngredientEntity(83, "Корица", 1.0, "ч.л.", 10),
-                IngredientEntity(84, "Сахарная пудра", 2.0, "ст.л.", 10)
-            ),
             cookingSteps = listOf(
-                ContentBlock.Paragraph(
-                    text = "Приготовление яблочного пирога",
-                    style = TextStyle.Bold,
-                    size = 24,
-                    area = TextArea.Center
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 1: Тесто",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Масло комнатной температуры взбейте с сахаром до пышности. По одному добавьте яйца, взбивая после каждого. Муку смешайте с разрыхлителем, просейте и добавьте в масляную смесь. Быстро замесите мягкое тесто.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 2: Яблоки",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Яблоки очистите от кожуры и сердцевины, нарежьте тонкими дольками. Смешайте с корицей.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 3: Сборка",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Форму (22-24 см) смажьте маслом и присыпьте мукой. Выложите тесто, разровняйте, сделайте бортики. Красиво выложите яблоки сверху, слегка вдавливая в тесто.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Шаг 4: Выпекание",
-                    style = TextStyle.Bold,
-                    size = 18,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Выпекайте при 180°C 40-50 минут до золотистого цвета. Готовность проверяйте деревянной шпажкой - она должна выходить сухой.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                ),
-                ContentBlock.Paragraph(
-                    text = "Остудите в форме 15 минут, затем переложите на решетку. Перед подачей посыпьте сахарной пудрой.",
-                    style = TextStyle.Normal,
-                    size = 16,
-                    area = TextArea.Left
-                )
+                ContentBlock.Paragraph(text = "Приготовление яблочного пирога", style = TextStyle.Bold, size = 24, area = TextArea.Center),
+                ContentBlock.Paragraph(text = "Шаг 1: Тесто", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Масло комнатной температуры взбейте с сахаром до пышности. По одному добавьте яйца, взбивая после каждого. Муку смешайте с разрыхлителем, просейте и добавьте в масляную смесь. Быстро замесите мягкое тесто.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 2: Яблоки", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Яблоки очистите от кожуры и сердцевины, нарежьте тонкими дольками. Смешайте с корицей.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 3: Сборка", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Форму (22-24 см) смажьте маслом и присыпьте мукой. Выложите тесто, разровняйте, сделайте бортики. Красиво выложите яблоки сверху, слегка вдавливая в тесто.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Шаг 4: Выпекание", style = TextStyle.Bold, size = 18, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Выпекайте при 180°C 40-50 минут до золотистого цвета. Готовность проверяйте деревянной шпажкой - она должна выходить сухой.", style = TextStyle.Normal, size = 16, area = TextArea.Left),
+                ContentBlock.Paragraph(text = "Остудите в форме 15 минут, затем переложите на решетку. Перед подачей посыпьте сахарной пудрой.", style = TextStyle.Normal, size = 16, area = TextArea.Left)
             ),
             tips = "Яблоки лучше брать кисло-сладкие сорта. В тесто можно добавить цедру лимона или ваниль для аромата."
         )
     )
-
 
     private val favorites = mutableListOf<FavoriteEntity>()
     private val likes = mutableListOf<LikeEntity>()
@@ -962,23 +491,18 @@ class RecipeLocalDataSourceImpl : RecipeLocalDataSource {
     private var nextFavoriteId = 1
     private var nextLikeId = 1
 
-
     override suspend fun getRecipes(): List<RecipeEntity> = recipes
 
     override suspend fun getRecipeById(recipeId: Int): RecipeEntity? =
         recipes.find { it.id == recipeId }
 
     override suspend fun getRecipesByCategory(categoryId: Int): List<RecipeEntity> {
-        val recipeIds = recipeCategories
-            .filter { it.categoryId == categoryId }
-            .map { it.recipeId }
+        val recipeIds = recipeCategories.filter { it.categoryId == categoryId }.map { it.recipeId }
         return recipes.filter { it.id in recipeIds }
     }
 
     override suspend fun getRecipesByGrocery(groceryId: Int): List<RecipeEntity> {
-        val recipeIds = recipeGroceries
-            .filter { it.groceryId == groceryId }
-            .map { it.recipeId }
+        val recipeIds = recipeGroceries.filter { it.groceryId == groceryId }.map { it.recipeId }
         return recipes.filter { it.id in recipeIds }
     }
 
@@ -990,11 +514,31 @@ class RecipeLocalDataSourceImpl : RecipeLocalDataSource {
 
     override suspend fun getCategories(): List<CategoryEntity> = categories
 
+    override suspend fun getCategoryById(categoryId: Int): CategoryEntity? =
+        categories.find { it.id == categoryId }
+
     override suspend fun getGroceries(): List<GroceryEntity> = groceries
+
+    override suspend fun getGroceryById(groceryId: Int): GroceryEntity? =
+        groceries.find { it.id == groceryId }
+
+    override suspend fun getAllRecipeCategoryCross(): List<RecipeCategoryCrossEntity> = recipeCategories
+
+    override suspend fun getAllRecipeGroceryCross(): List<RecipeGroceryCrossEntity> = recipeGroceries
+
+    override suspend fun getRecipeCategoryIds(recipeId: Int): List<Int> =
+        recipeCategories.filter { it.recipeId == recipeId }.map { it.categoryId }
+
+    override suspend fun getRecipeGroceryIds(recipeId: Int): List<Int> =
+        recipeGroceries.filter { it.recipeId == recipeId }.map { it.groceryId }
 
     override suspend fun getRecipeContent(recipeId: Int): RecipeContentEntity? =
         recipeContents.find { it.recipeId == recipeId }
 
+    override suspend fun getRecipeIngredientsCrossRef(recipeId: Int): List<RecipeIngredientCrossRef> =
+        recipeIngredientsCrossRef.filter { it.recipeId == recipeId }
+
+    override suspend fun getAllIngredients(): List<IngredientEntity> = ingredientsCatalog
 
     override suspend fun getFavorites(userId: Int): List<FavoriteEntity> =
         favorites.filter { it.userId == userId }
@@ -1068,32 +612,4 @@ class RecipeLocalDataSourceImpl : RecipeLocalDataSource {
 
     override suspend fun getLikesCount(recipeId: Int): Int =
         likes.count { it.recipeId == recipeId }
-
-    override suspend fun getCategoryById(categoryId: Int): CategoryEntity? =
-        categories.find { it.id == categoryId }
-
-    override suspend fun getGroceryById(groceryId: Int): GroceryEntity? =
-        groceries.find { it.id == groceryId }
-
-    override suspend fun getAllRecipeCategoryCross(): List<RecipeCategoryCrossEntity> =
-        recipeCategories
-
-    override suspend fun getAllRecipeGroceryCross(): List<RecipeGroceryCrossEntity> =
-        recipeGroceries
-
-    override suspend fun getRecipeCategoryIds(recipeId: Int): List<Int> =
-        recipeCategories
-            .filter { it.recipeId == recipeId }
-            .map { it.categoryId }
-
-    override suspend fun getRecipeGroceryIds(recipeId: Int): List<Int> =
-        recipeGroceries
-            .filter { it.recipeId == recipeId }
-            .map { it.groceryId }
-
-
-    override suspend fun getIngredientsForRecipe(recipeId: Int): List<IngredientEntity> =
-        recipeContents
-            .find { it.recipeId == recipeId }
-            ?.ingredients ?: emptyList()
 }

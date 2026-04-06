@@ -13,12 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.myapplication.Recipes.components.CategoryBanner
 import com.example.myapplication.Recipes.components.RecipeCard
 import com.example.myapplication.Recipes.components.RecipeSearchBar
+import com.example.myapplication.Recipes.components.GroceryBanner
 import com.example.myapplication.Recipes.navigation.Routes
 import org.koin.androidx.compose.koinViewModel
 
@@ -28,6 +31,7 @@ fun RecipeHomeScreen(
     viewModel: RecipeHomeViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
 
     val brush = remember {
         Brush.linearGradient(
@@ -38,18 +42,32 @@ fun RecipeHomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF000000))
+            .background(Color(0xFFF5F5F5))
     ) {
-        RecipeSearchBar(
-            query = uiState.searchQuery,
-            onQueryChange = { viewModel.onEvent(RecipeHomeEvent.SearchQueryChanged(it)) },
-            onSearch = { viewModel.onEvent(RecipeHomeEvent.Search(it)) },
-            suggestions = uiState.searchSuggestions,
-            showSuggestions = uiState.showSuggestions,
-            onSuggestionClick = { viewModel.onEvent(RecipeHomeEvent.Search(it)) },
-            onClearClick = { viewModel.onEvent(RecipeHomeEvent.ClearSearch) },
-            modifier = Modifier.fillMaxWidth()
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(brush)
+        ) {
+            Spacer(modifier = Modifier.height(15.dp))
+            RecipeSearchBar(
+                query = uiState.searchQuery,
+                onQueryChange = { viewModel.onEvent(RecipeHomeEvent.SearchQueryChanged(it)) },
+                onSearch = {
+                    focusManager.clearFocus()
+                    viewModel.onEvent(RecipeHomeEvent.Search(it))
+                },
+                suggestions = uiState.searchSuggestions,
+                showSuggestions = uiState.showSuggestions,
+                onSuggestionClick = {
+                    focusManager.clearFocus()
+                    viewModel.onEvent(RecipeHomeEvent.Search(it))
+                },
+                onClearClick = { viewModel.onEvent(RecipeHomeEvent.ClearSearch) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
         when {
             uiState.isLoading -> {
@@ -57,7 +75,7 @@ fun RecipeHomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Color.White)
+                    CircularProgressIndicator(color = Color(0xFFE4DB40))
                 }
             }
 
@@ -82,12 +100,26 @@ fun RecipeHomeScreen(
                         Spacer(modifier = Modifier.height(10.dp))
                     }
 
-
-                    //Вот тут продукты и категории
-
+                    item {
+                        GroceryBanner(
+                            onClick = { navController.navigate(Routes.Grocery.route) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                        )
+                    }
 
                     item {
-                        Spacer(modifier = Modifier.height(20.dp))
+                        CategoryBanner(
+                            onClick = { navController.navigate(Routes.Category.route) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                        )
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
 
                     items(

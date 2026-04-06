@@ -1,5 +1,6 @@
 package com.example.myapplication.Recipes.ui.home
 
+import android.util.Log
 import com.example.domain.Recipes.model.Recipe
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -105,8 +106,6 @@ class RecipeHomeViewModel(
                 val suggestions = allRecipes
                     .filter { it.title.contains(query, ignoreCase = true) }
                     .map { it.title }
-                    .distinct()
-                    .take(5)
 
                 state.copy(
                     searchQuery = query,

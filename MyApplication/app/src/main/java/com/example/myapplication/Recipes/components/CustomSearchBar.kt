@@ -1,5 +1,6 @@
 package com.example.myapplication.Recipes.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -94,8 +95,8 @@ fun RecipeSearchBar(
                     }
                 },
                 colors = TextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black,
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,

@@ -111,6 +111,7 @@ class HomeViewModel(
                 val suggestions = allArticles
                     .filter { it.title.contains(query, ignoreCase = true) }
                     .map { it.title }
+
                 state.copy(
                     searchQuery = query,
                     searchSuggestions = suggestions,

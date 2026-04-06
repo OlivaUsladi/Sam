@@ -56,9 +56,26 @@ class RecipeRepositoryImpl(
         )
     }
 
+    private suspend fun getRecipeIngredientsForRecipe(recipeId: Int): List<RecipeIngredient> {
+        val crossRefs = localDataSource.getRecipeIngredientsCrossRef(recipeId)
+        val allIngredients = localDataSource.getAllIngredients()
+
+        return crossRefs.mapNotNull { cross ->
+            val ingredient = allIngredients.find { it.id == cross.ingredientId }
+            ingredient?.let {
+                RecipeIngredient(
+                    ingredient = it.toDomain(),
+                    amount = cross.amount,
+                    unit = cross.unit
+                )
+            }
+        }
+    }
+
     override suspend fun getRecipeContent(recipeId: Int): RecipeContent? {
         val contentEntity = localDataSource.getRecipeContent(recipeId) ?: return null
-        return contentEntity.toDomain()
+        val ingredients = getRecipeIngredientsForRecipe(recipeId)
+        return contentEntity.toDomain(ingredients)
     }
 
     override suspend fun searchRecipes(query: String): List<Recipe> {
@@ -176,6 +193,7 @@ class RecipeRepositoryImpl(
         recipeId: Int?
     ): ShoppingList = ShoppingList(
         id = 0,
+        userId = userId,
         name = name,
         createdAt = LocalDateTime.now(),
         items = mutableListOf(),

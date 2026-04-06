@@ -29,12 +29,20 @@ fun RecipeNavHost(navController: NavHostController) {
         }
 
         composable("${Routes.Recipe.route}/{recipeId}") { backStackEntry ->
-            val articleId = backStackEntry.arguments?.getString("recipeId")?.toInt() ?: 0
+            val recipeId = backStackEntry.arguments?.getString("recipeId")?.toInt() ?: 0
             //Recipe(articleId = articleId)
+        }
+
+        composable(Routes.Grocery.route) {
+            //CategoriesScreen(navController)
         }
 
         composable(Routes.Category.route) {
             //CategoriesScreen(navController)
+        }
+
+        composable("${Routes.GroceryRecipes.route}/{groceryId}/{groceryName}") { backStackEntry ->
+
         }
 
         composable("${Routes.CategoryRecipes.route}/{categoryId}/{categoryName}") { backStackEntry ->

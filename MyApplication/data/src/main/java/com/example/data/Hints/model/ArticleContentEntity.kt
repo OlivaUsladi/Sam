@@ -6,13 +6,13 @@ import com.example.domain.Hints.model.ContentBlock
 data class ArticleContentEntity(
     val articleId: Int,
     val blocks: List<ContentBlock>,
-    val checklistId: Int
+    val checklist: String
 ) {
     fun toDomain(): ArticleContent {
         return ArticleContent(
             articleId = articleId,
             blocks = blocks,
-            checklistId = checklistId
+            checklist = checklist
         )
     }
 
@@ -21,7 +21,7 @@ data class ArticleContentEntity(
             return ArticleContentEntity(
                 articleId = content.articleId,
                 blocks = content.blocks,
-                checklistId = content.checklistId
+                checklist = content.checklist
             )
         }
     }
