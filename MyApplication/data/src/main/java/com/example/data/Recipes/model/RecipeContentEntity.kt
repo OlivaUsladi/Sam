@@ -1,19 +1,18 @@
 package com.example.data.Recipes.model
 
 import com.example.domain.Recipes.model.ContentBlock
-import com.example.domain.Recipes.model.Ingredient
 import com.example.domain.Recipes.model.RecipeContent
-import com.example.domain.Recipes.model.RecipeIngredient
+import com.example.domain.Recipes.model.GroceryItem
 
 data class RecipeContentEntity(
     val recipeId: Int,
     val cookingSteps: List<ContentBlock>,
     val tips: String?
 ) {
-    fun toDomain(ingredients: List<RecipeIngredient>): RecipeContent {
+    fun toDomain(groceryItems: List<GroceryItem>): RecipeContent {
         return RecipeContent(
             recipeId = recipeId,
-            ingredients = ingredients,
+            groceryItems = groceryItems,
             cookingSteps = cookingSteps,
             tips = tips
         )

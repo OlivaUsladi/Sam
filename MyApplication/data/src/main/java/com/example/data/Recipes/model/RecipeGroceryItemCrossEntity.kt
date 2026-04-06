@@ -1,8 +1,8 @@
 package com.example.data.Recipes.model
 
-data class RecipeIngredientCrossRef(
+data class RecipeGroceryItemCrossEntity(
     val recipeId: Int,
-    val ingredientId: Int,
+    val groceryItemId: Int,
     val amount: Double,
     val unit: String
 )

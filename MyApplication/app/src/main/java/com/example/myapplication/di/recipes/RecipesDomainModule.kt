@@ -13,6 +13,10 @@ val recipesDomainModule = module {
     factory { GetCategoriesUseCase(get()) }
     factory { GetGroceriesUseCase(get()) }
 
+    factory { GetGroceryItemsUseCase(get()) }
+    factory { GetRecipesByGroceryItemsUseCase(get()) }
+    factory { GetRecipesWithMissingItemsUseCase(get()) }
+
     factory { GetFavoriteRecipesUseCase(get()) }
     factory { AddToFavoritesUseCase(get()) }
     factory { RemoveFromFavoritesUseCase(get()) }

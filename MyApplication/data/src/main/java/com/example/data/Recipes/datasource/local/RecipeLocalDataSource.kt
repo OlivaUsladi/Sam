@@ -15,17 +15,16 @@ interface RecipeLocalDataSource {
     suspend fun getGroceries(): List<GroceryEntity>
     suspend fun getGroceryById(groceryId: Int): GroceryEntity?
 
-    suspend fun getAllRecipeCategoryCross(): List<RecipeCategoryCrossEntity>
-    suspend fun getAllRecipeGroceryCross(): List<RecipeGroceryCrossEntity>
+    suspend fun getGroceryItems(): List<GroceryItemEntity>
+    suspend fun getGroceryItemById(groceryItemId: Int): GroceryItemEntity?
+    suspend fun getRecipeGroceryItemIds(recipeId: Int): List<Int>
+    suspend fun getAllRecipeGroceryItemCross(): List<RecipeGroceryItemCrossEntity>
+    suspend fun getRecipeGroceryItemsCrossRef(recipeId: Int): List<RecipeGroceryItemCrossEntity>
 
     suspend fun getRecipeCategoryIds(recipeId: Int): List<Int>
     suspend fun getRecipeGroceryIds(recipeId: Int): List<Int>
 
     suspend fun getRecipeContent(recipeId: Int): RecipeContentEntity?
-
-
-    suspend fun getRecipeIngredientsCrossRef(recipeId: Int): List<RecipeIngredientCrossRef>
-    suspend fun getAllIngredients(): List<IngredientEntity>
 
     suspend fun getFavorites(userId: Int): List<FavoriteEntity>
     suspend fun addFavorite(userId: Int, recipeId: Int): FavoriteEntity
@@ -38,4 +37,8 @@ interface RecipeLocalDataSource {
     suspend fun removeLike(userId: Int, recipeId: Int): Boolean
     suspend fun isLiked(userId: Int, recipeId: Int): Boolean
     suspend fun getLikesCount(recipeId: Int): Int
+
+
+    suspend fun getRecipesByGroceryItems(groceryItemIds: List<Int>): List<RecipeEntity>
+    suspend fun getRecipesByExactGroceryItems(groceryItemIds: List<Int>): List<RecipeEntity>
 }

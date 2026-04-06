@@ -17,6 +17,7 @@ data class RecipeEntity(
     fun toDomain(
         categories: List<CategoryEntity> = emptyList(),
         groceries: List<GroceryEntity> = emptyList(),
+        groceryItems: List<GroceryItemEntity> = emptyList(),
         isFavorite: Boolean = false,
         isLiked: Boolean = false
     ): Recipe {
@@ -26,6 +27,7 @@ data class RecipeEntity(
             description = description,
             categories = categories.map { it.toDomain() },
             groceries = groceries.map { it.toDomain() },
+            groceryItems = groceryItems.map { it.toDomain() },
             author = author,
             previewImageUrl = previewImageUrl,
             cookingTimeMinutes = cookingTimeMinutes,
@@ -36,5 +38,4 @@ data class RecipeEntity(
             isLiked = isLiked
         )
     }
-
 }

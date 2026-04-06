@@ -6,6 +6,7 @@ import com.example.myapplication.Hints.ui.category.CategoriesViewModel
 import com.example.myapplication.Hints.ui.categoryarticles.CategoryArticlesViewModel
 import com.example.myapplication.Hints.ui.favourite.FavouriteViewModel
 import com.example.myapplication.Recipes.ui.home.RecipeHomeViewModel
+import com.example.myapplication.Recipes.ui.category.RecipeCategoriesViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -75,5 +76,11 @@ val appModule = module {
             isRecipeLikedUseCase = get()
         )
 
+    }
+
+    viewModel{
+        RecipeCategoriesViewModel(
+            getCategoriesUseCase = get()
+        )
     }
 }

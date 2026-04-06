@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.myapplication.Recipes.ui.category.CategoriesScreen
 import com.example.myapplication.Recipes.ui.home.RecipeHomeScreen
 
 
@@ -38,7 +39,7 @@ fun RecipeNavHost(navController: NavHostController) {
         }
 
         composable(Routes.Category.route) {
-            //CategoriesScreen(navController)
+            CategoriesScreen(navController)
         }
 
         composable("${Routes.GroceryRecipes.route}/{groceryId}/{groceryName}") { backStackEntry ->
