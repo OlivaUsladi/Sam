@@ -7,6 +7,7 @@ import com.example.myapplication.Hints.ui.categoryarticles.CategoryArticlesViewM
 import com.example.myapplication.Hints.ui.favourite.FavouriteViewModel
 import com.example.myapplication.Recipes.ui.home.RecipeHomeViewModel
 import com.example.myapplication.Recipes.ui.category.RecipeCategoriesViewModel
+import com.example.myapplication.Recipes.ui.grocery.GroceriesViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -81,6 +82,16 @@ val appModule = module {
     viewModel{
         RecipeCategoriesViewModel(
             getCategoriesUseCase = get()
+        )
+    }
+
+    viewModel{
+        GroceriesViewModel(
+            getGroceriesUseCase = get(),
+            getGroceryItemsUseCase = get(),
+            getRecipesByExactGroceryItemsUseCase = get(),
+            getRecipesWithMissingItemsUseCase = get(),
+            getRecipesByGroceryItemsUseCase = get()
         )
     }
 }

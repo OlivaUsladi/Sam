@@ -41,6 +41,7 @@ interface RecipeRepository {
     suspend fun getLikesCount(recipeId: Int): Int
 
 
+
     suspend fun getShoppingLists(userId: Int): List<ShoppingList>
     suspend fun getShoppingListById(listId: Int): ShoppingList?
     suspend fun createShoppingList(userId: Int, name: String, recipeId: Int? = null): ShoppingList

@@ -5,6 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.myapplication.Recipes.ui.category.CategoriesScreen
+import com.example.myapplication.Recipes.ui.grocery.GroceriesScreen
+import com.example.myapplication.Recipes.ui.groceryrecipes.GroceryRecipeScreen
 import com.example.myapplication.Recipes.ui.home.RecipeHomeScreen
 
 
@@ -35,11 +37,21 @@ fun RecipeNavHost(navController: NavHostController) {
         }
 
         composable(Routes.Grocery.route) {
-            //CategoriesScreen(navController)
+            GroceriesScreen(navController)
         }
 
         composable(Routes.Category.route) {
             CategoriesScreen(navController)
+        }
+
+        composable("${Routes.GroceryRecipes.route}/{selectedItems}/{onlyGroceries}") { backStackEntry ->
+            val selectedItems = backStackEntry.arguments?.getString("selectedItems") ?: ""
+            val onlyGroceries = backStackEntry.arguments?.getString("onlyGroceries") ?: "false"
+            GroceryRecipeScreen(
+                navController = navController,
+                selectedItemsStr = selectedItems,
+                onlyGroceriesStr = onlyGroceries
+            )
         }
 
         composable("${Routes.GroceryRecipes.route}/{groceryId}/{groceryName}") { backStackEntry ->

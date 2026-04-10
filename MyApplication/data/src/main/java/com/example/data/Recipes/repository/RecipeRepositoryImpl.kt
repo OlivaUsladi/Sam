@@ -11,7 +11,7 @@ class RecipeRepositoryImpl(
     private val userId: Int = 1
 ) : RecipeRepository {
 
-    // ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
+
 
     private suspend fun getCategoriesForRecipe(recipeId: Int): List<CategoryEntity> {
         val categoryIds = localDataSource.getRecipeCategoryIds(recipeId)
@@ -29,7 +29,7 @@ class RecipeRepositoryImpl(
     private suspend fun isRecipeLiked(recipeId: Int): Boolean =
         localDataSource.isLiked(userId, recipeId)
 
-    // ========== ОСНОВНЫЕ МЕТОДЫ ==========
+
 
     override suspend fun getRecipes(): List<Recipe> {
         val recipeEntities = localDataSource.getRecipes()
@@ -219,13 +219,15 @@ class RecipeRepositoryImpl(
 
     override suspend fun getRecipesWithMissingItems(groceryItemIds: List<Int>): List<Recipe> {
         if (groceryItemIds.isEmpty()) return emptyList()
+
         val allRecipes = getRecipes()
         return allRecipes.filter { recipe ->
-            recipe.groceryItems.any { it.id !in groceryItemIds }
+            val missingCount = recipe.groceryItems.count { it.id !in groceryItemIds }
+            missingCount in 1..2
         }
     }
 
-    // ========== ИЗБРАННОЕ ==========
+
 
     override suspend fun getFavoriteRecipes(userId: Int): List<Recipe> {
         val favorites = localDataSource.getFavorites(userId)
