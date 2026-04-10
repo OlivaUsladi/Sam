@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 data class GroceriesUiState(
     val groceries: List<Grocery> = emptyList(),
     val groceryItems: List<GroceryItem> = emptyList(),
+    val expandedCategories: Set<Int> = emptySet(),
     val selectedItems: Set<Int> = emptySet(),
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -28,7 +29,7 @@ data class GroceriesUiState(
 
 sealed class GroceriesEvent {
     data class ToggleGroceryItem(val itemId: Int) : GroceriesEvent()
-    //data object SearchRecipes : GroceriesEvent()
+    data class ToggleGrocery(val categoryId: Int) : GroceriesEvent()
     data object ClearSelection : GroceriesEvent()
     data object Reset : GroceriesEvent()
     data object SelectOnly: GroceriesEvent()
@@ -47,6 +48,7 @@ class GroceriesViewModel (
     fun onEvent(event: GroceriesEvent) {
         when (event) {
             is GroceriesEvent.ToggleGroceryItem -> toggleItem(event.itemId)
+            is GroceriesEvent.ToggleGrocery -> toggleGrocery(event.categoryId)
             GroceriesEvent.ClearSelection -> clearSelection()
             GroceriesEvent.Reset -> reset()
             GroceriesEvent.SelectOnly -> changeSearch()
@@ -98,6 +100,17 @@ class GroceriesViewModel (
             it.copy(
                 selectedItems = emptySet()
             )
+        }
+    }
+
+    private fun toggleGrocery(categoryId: Int) {
+        _uiState.update { state ->
+            val newExpanded = if (state.expandedCategories.contains(categoryId)) {
+                state.expandedCategories - categoryId
+            } else {
+                state.expandedCategories + categoryId
+            }
+            state.copy(expandedCategories = newExpanded)
         }
     }
 

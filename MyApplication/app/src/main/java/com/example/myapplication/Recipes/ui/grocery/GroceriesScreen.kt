@@ -1,6 +1,7 @@
 package com.example.myapplication.Recipes.ui.grocery
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,8 +31,6 @@ import com.example.myapplication.Recipes.navigation.Routes
 import org.koin.androidx.compose.koinViewModel
 
 
-//Set превратить в строку с разделителем /
-//убрать showResults
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GroceriesScreen(
@@ -48,7 +47,6 @@ fun GroceriesScreen(
 
     Scaffold(
         topBar = {
-            //сюда добавить чек-бокс
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RectangleShape,
@@ -120,13 +118,13 @@ fun GroceriesScreen(
         },
         bottomBar = {
             Button(
-                //onClick = { viewModel.onEvent(GroceriesEvent.SearchRecipes) },
                 onClick = {
                     //Возможно тут надо проверить uiState.selectedItems.isNotEmpty()
 
-                    val selectedItemsStr = uiState.selectedItems.joinToString("/")
+                    val selectedItemsStr = uiState.selectedItems.joinToString(",")
                     val onlyGroceriesStr = if (uiState.onlyGroceries) "true" else "false"
 
+                    Log.d("my message", "Переход на др страницу")
                     navController.navigate(
                         "${Routes.GroceryRecipes.route}/$selectedItemsStr/$onlyGroceriesStr"
                     )
@@ -186,24 +184,18 @@ fun GroceriesScreen(
                     }
                 }
 
-                //uiState.showResults -> {
-                    // Экран с результатами
-//                    ResultsScreen(
-//                        exactMatchRecipes = uiState.exactMatchRecipes,
-//                        recipesWithMissing = uiState.recipesWithMissing,
-//                        onBackClick = { viewModel.onEvent(GroceriesEvent.ClearSelection) },
-//                        navController = navController
-//                    )
-                //}
 
                 else -> {
-                    // Экран выбора продуктов
                     SelectionScreen(
                         groceries = uiState.groceries,
                         groceryItems = uiState.groceryItems,
                         selectedItems = uiState.selectedItems,
+                        expandedGroceries = uiState.expandedCategories,
                         onItemClick = { itemId ->
                             viewModel.onEvent(GroceriesEvent.ToggleGroceryItem(itemId))
+                        },
+                        onGroceryClick = { categoryId ->
+                            viewModel.onEvent(GroceriesEvent.ToggleGrocery(categoryId))
                         }
                     )
                 }
@@ -217,17 +209,11 @@ fun SelectionScreen(
     groceries: List<Grocery>,
     groceryItems: List<GroceryItem>,
     selectedItems: Set<Int>,
+    expandedGroceries: Set<Int>,
+    onGroceryClick: (Int) -> Unit,
     onItemClick: (Int) -> Unit
 ) {
-    val groceriesStates = remember { mutableStateMapOf<Int, Boolean>() }
 
-    LaunchedEffect(groceries) {
-        groceries.forEach { grocery ->
-            if (!groceriesStates.containsKey(grocery.id)) {
-                groceriesStates[grocery.id] = false
-            }
-        }
-    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -240,7 +226,8 @@ fun SelectionScreen(
             if (itemsInGroup.isNotEmpty()) {
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth().clickable(onClick = { groceriesStates[grocery.id]?.let { groceriesStates[grocery.id] = !it } }),
+                        modifier = Modifier.fillMaxWidth()
+                            .clickable { onGroceryClick(grocery.id) },
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(20.dp)
                     ) {
@@ -250,7 +237,7 @@ fun SelectionScreen(
                                 fontSize = 18.sp,
                                 color = Color.Black
                             )
-                            if (groceriesStates[grocery.id] == true) {
+                            if (expandedGroceries.contains(grocery.id)) {
                                 Spacer(modifier = Modifier.height(8.dp))
 
                                 itemsInGroup.forEach { item ->
@@ -292,135 +279,6 @@ fun SelectionScreen(
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun ResultsScreen(
-    exactMatchRecipes: List<Recipe>,
-    recipesWithMissing: List<Recipe>,  // ← просто список
-    onBackClick: () -> Unit,
-    navController: NavController
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Кнопка назад
-        item {
-            Button(
-                onClick = onBackClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE4DB40))
-            ) {
-                Text("← Выбрать другие продукты", color = Color.Black)
-            }
-        }
-
-        // Рецепты, которые можно приготовить из выбранных продуктов
-        if (exactMatchRecipes.isNotEmpty()) {
-            item {
-                Text(
-                    text = "Абсолютное совпадение продуктов",
-                    fontSize = 18.sp,
-                    color = Color(0xFF3AC42A)
-                )
-            }
-
-            items(exactMatchRecipes) { recipe ->
-                RecipeResultCard(
-                    recipe = recipe,
-                    showMissingLabel = false,
-                    navController = navController
-                )
-            }
-        }
-
-        // Рецепты с дополнительными ингредиентами
-        if (recipesWithMissing.isNotEmpty()) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Нужно докупить продукты",
-                    fontSize = 18.sp,
-                    color = Color(0xFFE4DB40)
-                )
-            }
-
-            items(recipesWithMissing) { recipe ->
-                RecipeResultCard(
-                    recipe = recipe,
-                    showMissingLabel = true,
-                    navController = navController
-                )
-            }
-        }
-
-        // Если ничего не найдено
-        if (exactMatchRecipes.isEmpty() && recipesWithMissing.isEmpty()) {
-            item {
-                Box(
-                    modifier = Modifier.fillMaxSize().height(200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Рецептов не найдено\nПопробуйте выбрать другие продукты",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun RecipeResultCard(
-    recipe: Recipe,
-    showMissingLabel: Boolean,
-    navController: NavController
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                navController.navigate("recipe/${recipe.id}")
-            },
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-                text = recipe.title,
-                fontSize = 16.sp,
-                color = Color.Black
-            )
-
-            if (showMissingLabel) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Нужно докупить некоторые продукты :",
-                    fontSize = 12.sp,
-                    color = Color(0xFFE4DB40)
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "⏱ ${recipe.cookingTimeMinutes} мин",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-                Text(
-                    text = "❤️ ${recipe.likesCount}",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
             }
         }
     }

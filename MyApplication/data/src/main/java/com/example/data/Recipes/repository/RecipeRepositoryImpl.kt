@@ -223,7 +223,7 @@ class RecipeRepositoryImpl(
         val allRecipes = getRecipes()
         return allRecipes.filter { recipe ->
             val missingCount = recipe.groceryItems.count { it.id !in groceryItemIds }
-            missingCount in 1..2
+            missingCount in 1..3
         }
     }
 

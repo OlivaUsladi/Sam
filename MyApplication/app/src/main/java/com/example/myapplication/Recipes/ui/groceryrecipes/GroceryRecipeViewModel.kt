@@ -15,17 +15,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class GroceryRecipeUiState(
-    val selectedItems: Set<Int> = emptySet(),
     val exactMatchRecipes: List<Recipe> = emptyList(),
     val recipesWithMissing: List<Recipe> = emptyList(),
+    val anyMatchRecipes: List<Recipe> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null,
-    val onlyGroceries: Boolean = false
+    val error: String? = null
 )
 
 sealed class GroceryRecipeEvent {
-    data class ToggleRecipe(val itemId: Int) : GroceryRecipeEvent()
-    data object SearchRecipes : GroceryRecipeEvent()
+    data class LoadExactMatchRecipes(val selectedItems: List<Int>) : GroceryRecipeEvent()
+    data class LoadAnyMatchRecipes(val selectedItems: List<Int>) : GroceryRecipeEvent()
 }
 
 class GroceryRecipeViewModel (
@@ -36,25 +35,58 @@ class GroceryRecipeViewModel (
     private val _uiState = MutableStateFlow(GroceryRecipeUiState())
     val uiState: StateFlow<GroceryRecipeUiState> = _uiState.asStateFlow()
 
-    init {
-        loadData()
+
+    fun onEvent(event: GroceryRecipeEvent) {
+        when (event) {
+            is GroceryRecipeEvent.LoadExactMatchRecipes -> loadExactMatchRecipes(event.selectedItems)
+            is GroceryRecipeEvent.LoadAnyMatchRecipes -> loadAnyMatchRecipes(event.selectedItems)
+        }
     }
 
-    private fun loadData(){
+    private fun loadExactMatchRecipes(selectedItems: List<Int>) {
+        if (selectedItems.isEmpty()) return
+
         viewModelScope.launch {
-            val selectedIds = _uiState.value.selectedItems.toList()
-            if (selectedIds.isEmpty()) return@launch
-
-            _uiState.update { it.copy(isLoading = true) }
-
             try {
-                val exactMatches = getRecipesByExactGroceryItemsUseCase(selectedIds)
-                val recipesWithMissing = getRecipesWithMissingItemsUseCase(selectedIds)
+                _uiState.update { it.copy(isLoading = true, error = null) }
+
+                val exactMatches = getRecipesByExactGroceryItemsUseCase(selectedItems)
+
+                val withMissing = getRecipesWithMissingItemsUseCase(selectedItems)
 
                 _uiState.update {
                     it.copy(
                         exactMatchRecipes = exactMatches,
-                        recipesWithMissing = recipesWithMissing,
+                        recipesWithMissing = withMissing,
+                        anyMatchRecipes = emptyList(),
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
+            }
+        }
+    }
+
+    private fun loadAnyMatchRecipes(selectedItems: List<Int>) {
+        if (selectedItems.isEmpty()) return
+
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isLoading = true, error = null) }
+
+                val anyMatches = getRecipesByGroceryItemsUseCase(selectedItems)
+
+                _uiState.update {
+                    it.copy(
+                        exactMatchRecipes = emptyList(),
+                        recipesWithMissing = emptyList(),
+                        anyMatchRecipes = anyMatches,
                         isLoading = false
                     )
                 }
