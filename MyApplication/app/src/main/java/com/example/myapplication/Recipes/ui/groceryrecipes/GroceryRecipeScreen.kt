@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +35,6 @@ import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.Recipes.components.RecipeCard
 import com.example.myapplication.Recipes.navigation.Routes
-import com.example.myapplication.Recipes.ui.home.RecipeHomeEvent
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -46,7 +43,7 @@ fun GroceryRecipeScreen(
     selectedItemsStr: String,
     onlyGroceriesStr: String,
     viewModel: GroceryRecipeViewModel = koinViewModel()
-    ) {
+) {
     val selectedItems = if (selectedItemsStr.isEmpty()) {
         emptySet()
     } else {
@@ -62,7 +59,6 @@ fun GroceryRecipeScreen(
             colors = listOf(Color(0xFFE4DB40), Color(0xFF3AC42A))
         )
     }
-
 
     LaunchedEffect(selectedItems, onlyGroceries) {
         if (selectedItems.isNotEmpty()) {
@@ -82,7 +78,6 @@ fun GroceryRecipeScreen(
                     .background(brush)
                     .padding(top = 12.dp, bottom = 8.dp)
             ) {
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -102,7 +97,7 @@ fun GroceryRecipeScreen(
                     }
 
                     Text(
-                        text = "Добавить ингредиенты",
+                        text = "Рецепты по продуктам",
                         fontSize = 18.sp,
                         color = Color.White
                     )
@@ -124,7 +119,7 @@ fun GroceryRecipeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = Color(0xFFE4DB40))
                     }
                 }
 
@@ -169,22 +164,22 @@ fun GroceryRecipeScreen(
                                     )
                                 }
 
-                                //Вот тут логика как на основном экране
                                 items(uiState.exactMatchRecipes) { recipe ->
                                     RecipeCard(
                                         recipe = recipe,
                                         onFavoriteClick = {
-                                        //viewModel.onEvent(RecipeHomeEvent.ToggleFavorite(recipe.id))
-                                    },
+                                            viewModel.onEvent(GroceryRecipeEvent.ToggleFavorite(recipe.id))
+                                        },
                                         onLikeClick = {
-                                            //viewModel.onEvent(RecipeHomeEvent.ToggleLike(recipe.id))
+                                            viewModel.onEvent(GroceryRecipeEvent.ToggleLike(recipe.id))
                                         },
                                         onRecipeClick = {
                                             navController.navigate("${Routes.Recipe.route}/${recipe.id}")
                                         },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 16.dp, vertical = 4.dp))
+                                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                                    )
                                 }
                             }
 
@@ -192,7 +187,7 @@ fun GroceryRecipeScreen(
                                 item {
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
-                                        text = "Нужно докупить 1-3 продукта",
+                                        text = "Нужно докупить 1-3 продукта:",
                                         fontSize = 18.sp,
                                         color = Color.Black
                                     )
@@ -202,17 +197,18 @@ fun GroceryRecipeScreen(
                                     RecipeCard(
                                         recipe = recipe,
                                         onFavoriteClick = {
-                                            //viewModel.onEvent(RecipeHomeEvent.ToggleFavorite(recipe.id))
+                                            viewModel.onEvent(GroceryRecipeEvent.ToggleFavorite(recipe.id))
                                         },
                                         onLikeClick = {
-                                            //viewModel.onEvent(RecipeHomeEvent.ToggleLike(recipe.id))
+                                            viewModel.onEvent(GroceryRecipeEvent.ToggleLike(recipe.id))
                                         },
                                         onRecipeClick = {
                                             navController.navigate("${Routes.Recipe.route}/${recipe.id}")
                                         },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 16.dp, vertical = 4.dp))
+                                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                                    )
                                 }
                             }
                         }
@@ -239,10 +235,9 @@ fun GroceryRecipeScreen(
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-
                             item {
                                 Text(
-                                    text = "Рецепты, содержащие выбранные продукты",
+                                    text = "Рецепты, содержащие выбранные продукты:",
                                     fontSize = 18.sp,
                                     color = Color.Black
                                 )
@@ -252,17 +247,18 @@ fun GroceryRecipeScreen(
                                 RecipeCard(
                                     recipe = recipe,
                                     onFavoriteClick = {
-                                        //viewModel.onEvent(RecipeHomeEvent.ToggleFavorite(recipe.id))
+                                        viewModel.onEvent(GroceryRecipeEvent.ToggleFavorite(recipe.id))
                                     },
                                     onLikeClick = {
-                                        //viewModel.onEvent(RecipeHomeEvent.ToggleLike(recipe.id))
+                                        viewModel.onEvent(GroceryRecipeEvent.ToggleLike(recipe.id))
                                     },
                                     onRecipeClick = {
                                         navController.navigate("${Routes.Recipe.route}/${recipe.id}")
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 4.dp))
+                                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                                )
                             }
                         }
                     }

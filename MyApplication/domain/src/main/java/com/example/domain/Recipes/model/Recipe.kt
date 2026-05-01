@@ -7,7 +7,6 @@ data class Recipe(
     val title: String,
     val description: String?,
     val categories: List<Category>,
-    val groceries: List<Grocery>,
     val groceryItems: List<GroceryItem> = emptyList(),
     val author: String,
     val previewImageUrl: String?,

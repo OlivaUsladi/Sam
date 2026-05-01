@@ -7,6 +7,7 @@ import com.example.myapplication.Hints.ui.categoryarticles.CategoryArticlesViewM
 import com.example.myapplication.Hints.ui.favourite.FavouriteViewModel
 import com.example.myapplication.Recipes.ui.home.RecipeHomeViewModel
 import com.example.myapplication.Recipes.ui.category.RecipeCategoriesViewModel
+import com.example.myapplication.Recipes.ui.categoryrecipes.CategoryRecipesViewModel
 import com.example.myapplication.Recipes.ui.grocery.GroceriesViewModel
 import com.example.myapplication.Recipes.ui.groceryrecipes.GroceryRecipeViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -97,7 +98,30 @@ val appModule = module {
         GroceryRecipeViewModel(
             getRecipesByExactGroceryItemsUseCase = get(),
             getRecipesWithMissingItemsUseCase = get(),
-            getRecipesByGroceryItemsUseCase = get()
+            getRecipesByGroceryItemsUseCase = get(),
+            addToFavoritesUseCase = get(),
+            removeFromFavoritesUseCase = get(),
+            isRecipeFavoriteUseCase = get(),
+            addLikeUseCase = get(),
+            removeLikeUseCase = get(),
+            isRecipeLikedUseCase = get(),
+            getLikesCountUseCase = get()
+        )
+    }
+
+    viewModel { (categoryId: Int, categoryName: String) ->
+        CategoryRecipesViewModel(
+            categoryId = categoryId,
+            categoryName = categoryName,
+            getRecipesByCategoryUseCase = get(),
+            searchRecipesUseCase = get(),
+            addToFavoritesUseCase = get(),
+            removeFromFavoritesUseCase = get(),
+            isRecipeFavoriteUseCase = get(),
+            addLikeUseCase = get(),
+            removeLikeUseCase = get(),
+            isRecipeLikedUseCase = get(),
+            getLikesCountUseCase = get()
         )
     }
 }

@@ -68,4 +68,9 @@ dependencies {
 
     implementation(project(":data"))
     implementation(project(":domain"))
+
+    testImplementation(project(":domain"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testImplementation("org.mockito:mockito-core:5.7.0")
 }

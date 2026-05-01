@@ -26,7 +26,6 @@ data class RecipeEntity(
             title = title,
             description = description,
             categories = categories.map { it.toDomain() },
-            groceries = groceries.map { it.toDomain() },
             groceryItems = groceryItems.map { it.toDomain() },
             author = author,
             previewImageUrl = previewImageUrl,
