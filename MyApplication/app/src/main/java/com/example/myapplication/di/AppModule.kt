@@ -8,6 +8,7 @@ import com.example.myapplication.Hints.ui.favourite.FavouriteViewModel
 import com.example.myapplication.Recipes.ui.home.RecipeHomeViewModel
 import com.example.myapplication.Recipes.ui.category.RecipeCategoriesViewModel
 import com.example.myapplication.Recipes.ui.categoryrecipes.CategoryRecipesViewModel
+import com.example.myapplication.Recipes.ui.favourite.FavouriteRecipeViewModel
 import com.example.myapplication.Recipes.ui.grocery.GroceriesViewModel
 import com.example.myapplication.Recipes.ui.groceryrecipes.GroceryRecipeViewModel
 import com.example.myapplication.Recipes.ui.recipe.RecipeScreenViewModel
@@ -140,4 +141,14 @@ val appModule = module {
             getLikesCountUseCase = get()
         )
     }
+
+    viewModel { FavouriteRecipeViewModel(
+        getFavoriteRecipesUseCase = get(),
+        removeFromFavoritesUseCase = get(),
+        addLikeUseCase = get(),
+        removeLikeUseCase = get(),
+        isRecipeLikedUseCase = get(),
+        getLikesCountUseCase = get()
+    ) }
+
 }

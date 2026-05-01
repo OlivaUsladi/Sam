@@ -162,7 +162,7 @@ fun RecipeBottomAppBar(navController: NavController) {
             .fillMaxSize()
             .clickable(onClick = {
                 selectedButton.value =1
-                navController.navigate(Routes.Favourite.route)
+                navController.navigate(Routes.Lists.route)
             }),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
@@ -182,7 +182,7 @@ fun RecipeBottomAppBar(navController: NavController) {
             .weight(1f)
             .fillMaxSize()
             .clickable(onClick = {
-                selectedButton.value =1
+                selectedButton.value = 2
                 navController.navigate(Routes.Favourite.route)
             }),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -190,13 +190,13 @@ fun RecipeBottomAppBar(navController: NavController) {
             Icon(
                 painter = painterResource(R.drawable.favourite),
                 contentDescription = "Bookmark",
-                modifier = Modifier.size(if  (selectedButton.value==1) 22.dp else 18.dp),
-                tint = if  (selectedButton.value==1) Color.Black else Color.LightGray
+                modifier = Modifier.size(if  (selectedButton.value==2) 22.dp else 18.dp),
+                tint = if  (selectedButton.value==2) Color.Black else Color.LightGray
             )
             Text(text="Избранное",
-                fontSize = if (selectedButton.value==1) 12.sp else 10.sp,
-                color = if (selectedButton.value==1) Color.Black else Color.LightGray,
-                fontWeight = if (selectedButton.value==1) FontWeight.Bold else FontWeight.Normal)
+                fontSize = if (selectedButton.value==2) 12.sp else 10.sp,
+                color = if (selectedButton.value==2) Color.Black else Color.LightGray,
+                fontWeight = if (selectedButton.value==2) FontWeight.Bold else FontWeight.Normal)
         }
     }
 }

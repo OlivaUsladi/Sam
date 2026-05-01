@@ -10,6 +10,7 @@ import com.example.myapplication.Recipes.ui.grocery.GroceriesScreen
 import com.example.myapplication.Recipes.ui.groceryrecipes.GroceryRecipeScreen
 import com.example.myapplication.Recipes.ui.home.RecipeHomeScreen
 import com.example.myapplication.Recipes.ui.recipe.RecipeScreen
+import com.example.myapplication.Recipes.ui.favourite.FavouriteRecipeScreen
 
 
 sealed class Routes(val route: String) {
@@ -21,6 +22,8 @@ sealed class Routes(val route: String) {
     object CategoryRecipes : Routes("categoryRecipes")
     object GroceryRecipes: Routes("groceryRecipes")
     object Favourite : Routes("favourite")
+    object Lists : Routes("lists")
+
 }
 
 @Composable
@@ -69,7 +72,7 @@ fun RecipeNavHost(navController: NavHostController) {
         }
 
         composable(Routes.Favourite.route) {
-            //FavouriteArticlesScreen(navController)
+            FavouriteRecipeScreen(navController)
         }
     }
 }
