@@ -64,13 +64,17 @@ class FavouriteViewModel(
             try {
                 val articles = getFavoriteArticlesUseCase(_uiState.value.userId)
                 allArticles = articles
+                val enrichedArticles = articles.map { article ->
+                    article.copy(isFavorite = true)
+                }
 
                 _uiState.update {
                     it.copy(
-                        articles = articles,
+                        articles = enrichedArticles,
                         isLoading = false
                     )
                 }
+
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(

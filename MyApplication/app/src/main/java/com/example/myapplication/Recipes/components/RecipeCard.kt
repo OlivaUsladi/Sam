@@ -46,11 +46,10 @@ fun RecipeCard(
                 .clip(RoundedCornerShape(12.dp))
         ) {
             if (!recipe.previewImageUrl.isNullOrEmpty()) {
-                //Картинку еды если не загрузилось добавить
                 AsyncImage(
                     model = recipe.previewImageUrl,
                     contentDescription = recipe.title,
-                    error = painterResource(R.drawable.img_3),
+                    error = painterResource(R.drawable.food),
                     placeholder = painterResource(R.drawable.loading),
                     modifier = Modifier
                         .fillMaxSize()

@@ -11,16 +11,29 @@ class RecipeRepositoryImpl(
     private val userId: Int = 1
 ) : RecipeRepository {
 
-
-
     private suspend fun getCategoriesForRecipe(recipeId: Int): List<CategoryEntity> {
         val categoryIds = localDataSource.getRecipeCategoryIds(recipeId)
         return localDataSource.getCategories().filter { it.id in categoryIds }
     }
 
-    private suspend fun getGroceryItemsForRecipe(recipeId: Int): List<GroceryItemEntity> {
-        val groceryItemIds = localDataSource.getRecipeGroceryItemIds(recipeId)
-        return localDataSource.getGroceryItems().filter { it.id in groceryItemIds }
+    private suspend fun getIngredientsForRecipe(recipeId: Int): List<RecipeIngredient> {
+        val crossEntities = localDataSource.getRecipeGroceryItemsCrossRef(recipeId)
+        val allGroceryItems = localDataSource.getGroceryItems()
+
+        return crossEntities.mapNotNull { cross ->
+            val groceryItemEntity = allGroceryItems.find { it.id == cross.groceryItemId }
+            if (groceryItemEntity != null) {
+                RecipeIngredient(
+                    groceryItem = groceryItemEntity.toDomain(),
+                    amount = cross.amount,
+                    unit = cross.unit
+                )
+            } else null
+        }
+    }
+
+    private suspend fun getGroceryItemIdsForRecipe(recipeId: Int): List<Int> {
+        return localDataSource.getRecipeGroceryItemIds(recipeId)
     }
 
     private suspend fun isRecipeFavorite(recipeId: Int): Boolean =
@@ -30,22 +43,19 @@ class RecipeRepositoryImpl(
         localDataSource.isLiked(userId, recipeId)
 
 
-
     override suspend fun getRecipes(): List<Recipe> {
         val recipeEntities = localDataSource.getRecipes()
-        val allGroceries = localDataSource.getGroceries()
 
         return recipeEntities.map { entity ->
             val categories = getCategoriesForRecipe(entity.id)
-            val groceryItems = getGroceryItemsForRecipe(entity.id)
+            val ingredients = getIngredientsForRecipe(entity.id)
 
             Recipe(
                 id = entity.id,
                 title = entity.title,
                 description = entity.description,
                 categories = categories.map { it.toDomain() },
-                groceries = allGroceries.map { it.toDomain() },
-                groceryItems = groceryItems.map { it.toDomain() },
+                ingredients = ingredients,
                 author = entity.author,
                 previewImageUrl = entity.previewImageUrl,
                 cookingTimeMinutes = entity.cookingTimeMinutes,
@@ -61,16 +71,14 @@ class RecipeRepositoryImpl(
     override suspend fun getRecipeById(recipeId: Int): Recipe? {
         val entity = localDataSource.getRecipeById(recipeId) ?: return null
         val categories = getCategoriesForRecipe(recipeId)
-        val groceryItems = getGroceryItemsForRecipe(recipeId)
-        val allGroceries = localDataSource.getGroceries()
+        val ingredients = getIngredientsForRecipe(recipeId)
 
         return Recipe(
             id = entity.id,
             title = entity.title,
             description = entity.description,
             categories = categories.map { it.toDomain() },
-            groceries = allGroceries.map { it.toDomain() },
-            groceryItems = groceryItems.map { it.toDomain() },
+            ingredients = ingredients,
             author = entity.author,
             previewImageUrl = entity.previewImageUrl,
             cookingTimeMinutes = entity.cookingTimeMinutes,
@@ -84,11 +92,11 @@ class RecipeRepositoryImpl(
 
     override suspend fun getRecipeContent(recipeId: Int): RecipeContent? {
         val contentEntity = localDataSource.getRecipeContent(recipeId) ?: return null
-        val groceryItemEntities = getGroceryItemsForRecipe(recipeId)
+        val ingredients = getIngredientsForRecipe(recipeId)
 
         return RecipeContent(
             recipeId = recipeId,
-            groceryItems = groceryItemEntities.map { it.toDomain() },
+            ingredients = ingredients,
             cookingSteps = contentEntity.cookingSteps,
             tips = contentEntity.tips
         )
@@ -96,19 +104,17 @@ class RecipeRepositoryImpl(
 
     override suspend fun searchRecipes(query: String): List<Recipe> {
         val recipeEntities = localDataSource.searchRecipes(query)
-        val allGroceries = localDataSource.getGroceries()
 
         return recipeEntities.map { entity ->
             val categories = getCategoriesForRecipe(entity.id)
-            val groceryItems = getGroceryItemsForRecipe(entity.id)
+            val ingredients = getIngredientsForRecipe(entity.id)
 
             Recipe(
                 id = entity.id,
                 title = entity.title,
                 description = entity.description,
                 categories = categories.map { it.toDomain() },
-                groceries = allGroceries.map { it.toDomain() },
-                groceryItems = groceryItems.map { it.toDomain() },
+                ingredients = ingredients,
                 author = entity.author,
                 previewImageUrl = entity.previewImageUrl,
                 cookingTimeMinutes = entity.cookingTimeMinutes,
@@ -123,19 +129,17 @@ class RecipeRepositoryImpl(
 
     override suspend fun getRecipesByCategory(categoryId: Int): List<Recipe> {
         val recipeEntities = localDataSource.getRecipesByCategory(categoryId)
-        val allGroceries = localDataSource.getGroceries()
 
         return recipeEntities.map { entity ->
             val categories = getCategoriesForRecipe(entity.id)
-            val groceryItems = getGroceryItemsForRecipe(entity.id)
+            val ingredients = getIngredientsForRecipe(entity.id)
 
             Recipe(
                 id = entity.id,
                 title = entity.title,
                 description = entity.description,
                 categories = categories.map { it.toDomain() },
-                groceries = allGroceries.map { it.toDomain() },
-                groceryItems = groceryItems.map { it.toDomain() },
+                ingredients = ingredients,
                 author = entity.author,
                 previewImageUrl = entity.previewImageUrl,
                 cookingTimeMinutes = entity.cookingTimeMinutes,
@@ -159,23 +163,25 @@ class RecipeRepositoryImpl(
     override suspend fun getGroceryItems(): List<GroceryItem> =
         localDataSource.getGroceryItems().map { it.toDomain() }
 
+    override suspend fun getGroceryItemById(groceryItemId: Int): GroceryItem? {
+        return localDataSource.getGroceryItemById(groceryItemId)?.toDomain()
+    }
+
     override suspend fun getRecipesByGroceryItems(groceryItemIds: List<Int>): List<Recipe> {
         if (groceryItemIds.isEmpty()) return emptyList()
 
         val recipeEntities = localDataSource.getRecipesByGroceryItems(groceryItemIds)
-        val allGroceries = localDataSource.getGroceries()
 
         return recipeEntities.map { entity ->
             val categories = getCategoriesForRecipe(entity.id)
-            val groceryItems = getGroceryItemsForRecipe(entity.id)
+            val ingredients = getIngredientsForRecipe(entity.id)
 
             Recipe(
                 id = entity.id,
                 title = entity.title,
                 description = entity.description,
                 categories = categories.map { it.toDomain() },
-                groceries = allGroceries.map { it.toDomain() },
-                groceryItems = groceryItems.map { it.toDomain() },
+                ingredients = ingredients,
                 author = entity.author,
                 previewImageUrl = entity.previewImageUrl,
                 cookingTimeMinutes = entity.cookingTimeMinutes,
@@ -192,19 +198,17 @@ class RecipeRepositoryImpl(
         if (groceryItemIds.isEmpty()) return emptyList()
 
         val recipeEntities = localDataSource.getRecipesByExactGroceryItems(groceryItemIds)
-        val allGroceries = localDataSource.getGroceries()
 
         return recipeEntities.map { entity ->
             val categories = getCategoriesForRecipe(entity.id)
-            val groceryItems = getGroceryItemsForRecipe(entity.id)
+            val ingredients = getIngredientsForRecipe(entity.id)
 
             Recipe(
                 id = entity.id,
                 title = entity.title,
                 description = entity.description,
                 categories = categories.map { it.toDomain() },
-                groceries = allGroceries.map { it.toDomain() },
-                groceryItems = groceryItems.map { it.toDomain() },
+                ingredients = ingredients,
                 author = entity.author,
                 previewImageUrl = entity.previewImageUrl,
                 cookingTimeMinutes = entity.cookingTimeMinutes,
@@ -222,11 +226,10 @@ class RecipeRepositoryImpl(
 
         val allRecipes = getRecipes()
         return allRecipes.filter { recipe ->
-            val missingCount = recipe.groceryItems.count { it.id !in groceryItemIds }
+            val missingCount = recipe.ingredients.count { it.groceryItem.id !in groceryItemIds }
             missingCount in 1..3
         }
     }
-
 
 
     override suspend fun getFavoriteRecipes(userId: Int): List<Recipe> {
@@ -247,7 +250,6 @@ class RecipeRepositoryImpl(
     override suspend fun isRecipeFavorite(userId: Int, recipeId: Int): Boolean =
         localDataSource.isFavorite(userId, recipeId)
 
-    // ========== ЛАЙКИ ==========
 
     override suspend fun getLikedRecipes(userId: Int): List<Recipe> {
         val likedRecipes = localDataSource.getUserLikes(userId)
@@ -270,7 +272,6 @@ class RecipeRepositoryImpl(
     override suspend fun getLikesCount(recipeId: Int): Int =
         localDataSource.getLikesCount(recipeId)
 
-    // ========== СПИСКИ ПОКУПОК (ЗАГЛУШКИ) ==========
 
     override suspend fun getShoppingLists(userId: Int): List<ShoppingList> = emptyList()
     override suspend fun getShoppingListById(listId: Int): ShoppingList? = null

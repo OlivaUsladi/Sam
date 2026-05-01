@@ -90,16 +90,16 @@ class RecipeLocalDataSourceImpl : RecipeLocalDataSource {
 
 
     private val recipes = listOf(
-        RecipeEntity(1, "Борщ с пампушками", "Традиционный украинский борщ...", "Елена Иванова", "https://images.unsplash.com/photo-1547592180-2f1a1b3c3b3a?w=500", 90, LocalDateTime.now().minusDays(15), LocalDateTime.now().minusDays(10), 45),
-        RecipeEntity(2, "Цезарь с курицей", "Классический салат Цезарь...", "Алексей Петров", "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=500", 25, LocalDateTime.now().minusDays(20), LocalDateTime.now().minusDays(5), 32),
-        RecipeEntity(3, "Паста Карбонара", "Итальянская паста с беконом...", "Мария Смирнова", "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=500", 30, LocalDateTime.now().minusDays(25), LocalDateTime.now().minusDays(7), 67),
-        RecipeEntity(4, "Шоколадный брауни", "Влажный шоколадный пирог...", "Дмитрий Соколов", "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500", 45, LocalDateTime.now().minusDays(10), LocalDateTime.now().minusDays(2), 89),
-        RecipeEntity(5, "Овощной суп-пюре", "Легкий суп из тыквы...", "Анна Кузнецова", "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=500", 40, LocalDateTime.now().minusDays(30), LocalDateTime.now().minusDays(12), 23),
-        RecipeEntity(6, "Гречка по-купечески", "Гречневая каша с мясом...", "Иван Петров", "https://images.unsplash.com/photo-1586201375761-83865001e8ac?w=500", 50, LocalDateTime.now().minusDays(18), LocalDateTime.now().minusDays(3), 18),
-        RecipeEntity(7, "Пицца Маргарита", "Тонкое тесто, моцарелла...", "Павел Орлов", "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500", 35, LocalDateTime.now().minusDays(22), LocalDateTime.now().minusDays(8), 56),
-        RecipeEntity(8, "Салат Оливье", "Классический новогодний салат...", "Татьяна Морозова", "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=500", 60, LocalDateTime.now().minusDays(40), LocalDateTime.now().minusDays(15), 34),
-        RecipeEntity(9, "Молочный коктейль", "Освежающий коктейль...", "Сергей Волков", "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=500", 10, LocalDateTime.now().minusDays(12), LocalDateTime.now().minusDays(1), 12),
-        RecipeEntity(10, "Яблочный пирог", "Нежный пирог с яблоками...", "Ольга Новикова", "https://images.unsplash.com/photo-1600335895229-6e755c92e4a7?w=500", 70, LocalDateTime.now().minusDays(28), LocalDateTime.now().minusDays(9), 41)
+        RecipeEntity(1, "Борщ с пампушками", "Традиционный украинский борщ...", "Елена Иванова", "https://i.ibb.co/0j76530T/article-ae55d88d-13f6-40a3-a4f6-077cfee27e1b-large.jpg", 90, LocalDateTime.now().minusDays(15), LocalDateTime.now().minusDays(10), 0),
+        RecipeEntity(2, "Цезарь с курицей", "Классический салат Цезарь...", "Алексей Петров", "https://i.ibb.co/Q7SN4SNc/2325597-amp.jpg", 25, LocalDateTime.now().minusDays(20), LocalDateTime.now().minusDays(5), 0),
+        RecipeEntity(3, "Паста Карбонара", "Итальянская паста с беконом...", "Мария Смирнова", "https://i.ibb.co/23XKwRQf/slivochnaya-quotkarbonaraquot-550154.jpg", 30, LocalDateTime.now().minusDays(25), LocalDateTime.now().minusDays(7), 0),
+        RecipeEntity(4, "Шоколадный брауни", "Влажный шоколадный пирог...", "Дмитрий Соколов", "https://i.ibb.co/j1HjbR8/f3155d0e00724da353ac4876dcc27cf6.jpg", 45, LocalDateTime.now().minusDays(10), LocalDateTime.now().minusDays(2), 0),
+        RecipeEntity(5, "Овощной суп-пюре", "Легкий суп из тыквы...", "Анна Кузнецова", "https://i.ibb.co/7txhpLMB/soup-veget.jpg", 40, LocalDateTime.now().minusDays(30), LocalDateTime.now().minusDays(12), 0),
+        RecipeEntity(6, "Гречка по-купечески", "Гречневая каша с мясом...", "Иван Петров", "https://i.ibb.co/DgTD6Kqc/maxresdefault.jpg", 50, LocalDateTime.now().minusDays(18), LocalDateTime.now().minusDays(3), 0),
+        RecipeEntity(7, "Пицца Маргарита", "Тонкое тесто, моцарелла...", "Павел Орлов", "https://i.ibb.co/QjNcX5pp/pitstsa-margarita-istoriya-sostav-retsept-4.jpg", 35, LocalDateTime.now().minusDays(22), LocalDateTime.now().minusDays(8), 0),
+        RecipeEntity(8, "Салат Оливье", "Классический новогодний салат...", "Татьяна Морозова", "https://i.ibb.co/7xXV6S2j/maxresdefault-1.jpg", 60, LocalDateTime.now().minusDays(40), LocalDateTime.now().minusDays(15), 0),
+        RecipeEntity(9, "Молочный коктейль", "Освежающий коктейль...", "Сергей Волков", "https://i.ibb.co/G4YwssmM/maxresdefault-2.jpg", 10, LocalDateTime.now().minusDays(12), LocalDateTime.now().minusDays(1), 0),
+        RecipeEntity(10, "Яблочный пирог", "Нежный пирог с яблоками...", "Ольга Новикова", "https://i.ibb.co/8n7p62Sp/maxresdefault-3.jpg", 70, LocalDateTime.now().minusDays(28), LocalDateTime.now().minusDays(9), 0)
     )
 
 
@@ -238,9 +238,12 @@ class RecipeLocalDataSourceImpl : RecipeLocalDataSource {
     override suspend fun getGroceries(): List<GroceryEntity> = groceries
     override suspend fun getGroceryById(groceryId: Int): GroceryEntity? = groceries.find { it.id == groceryId }
     override suspend fun getGroceryItems(): List<GroceryItemEntity> = groceryItems
-    override suspend fun getGroceryItemById(groceryItemId: Int): GroceryItemEntity? = groceryItems.find { it.id == groceryItemId }
-    override suspend fun getRecipeGroceryItemIds(recipeId: Int): List<Int> = recipeGroceryItemsCrossRef.filter { it.recipeId == recipeId }.map { it.groceryItemId }
-    override suspend fun getRecipeGroceryItemsCrossRef(recipeId: Int): List<RecipeGroceryItemCrossEntity> = recipeGroceryItemsCrossRef.filter { it.recipeId == recipeId }
+    override suspend fun getGroceryItemById(groceryItemId: Int): GroceryItemEntity? = groceryItems
+        .find { it.id == groceryItemId }
+    override suspend fun getRecipeGroceryItemIds(recipeId: Int): List<Int> = recipeGroceryItemsCrossRef
+        .filter { it.recipeId == recipeId }.map { it.groceryItemId }
+    override suspend fun getRecipeGroceryItemsCrossRef(recipeId: Int): List<RecipeGroceryItemCrossEntity> = recipeGroceryItemsCrossRef
+        .filter { it.recipeId == recipeId }
     override suspend fun getRecipeContent(recipeId: Int): RecipeContentEntity? = recipeContents.find { it.recipeId == recipeId }
     override suspend fun getAllRecipeGroceryItemCross(): List<RecipeGroceryItemCrossEntity> = recipeGroceryItemsCrossRef
 

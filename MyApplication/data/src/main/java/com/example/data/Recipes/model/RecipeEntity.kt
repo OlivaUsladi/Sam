@@ -1,6 +1,7 @@
 package com.example.data.Recipes.model
 
 import com.example.domain.Recipes.model.Recipe
+import com.example.domain.Recipes.model.RecipeIngredient
 import java.time.LocalDateTime
 
 data class RecipeEntity(
@@ -16,8 +17,7 @@ data class RecipeEntity(
 ) {
     fun toDomain(
         categories: List<CategoryEntity> = emptyList(),
-        groceries: List<GroceryEntity> = emptyList(),
-        groceryItems: List<GroceryItemEntity> = emptyList(),
+        ingredients: List<RecipeIngredient> = emptyList(),
         isFavorite: Boolean = false,
         isLiked: Boolean = false
     ): Recipe {
@@ -26,8 +26,7 @@ data class RecipeEntity(
             title = title,
             description = description,
             categories = categories.map { it.toDomain() },
-            groceries = groceries.map { it.toDomain() },
-            groceryItems = groceryItems.map { it.toDomain() },
+            ingredients = ingredients,
             author = author,
             previewImageUrl = previewImageUrl,
             cookingTimeMinutes = cookingTimeMinutes,

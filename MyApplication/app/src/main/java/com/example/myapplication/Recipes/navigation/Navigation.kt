@@ -5,9 +5,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.myapplication.Recipes.ui.category.CategoriesScreen
+import com.example.myapplication.Recipes.ui.categoryrecipes.CategoryRecipesScreen
 import com.example.myapplication.Recipes.ui.grocery.GroceriesScreen
 import com.example.myapplication.Recipes.ui.groceryrecipes.GroceryRecipeScreen
 import com.example.myapplication.Recipes.ui.home.RecipeHomeScreen
+import com.example.myapplication.Recipes.ui.recipe.RecipeScreen
 
 
 sealed class Routes(val route: String) {
@@ -33,7 +35,8 @@ fun RecipeNavHost(navController: NavHostController) {
 
         composable("${Routes.Recipe.route}/{recipeId}") { backStackEntry ->
             val recipeId = backStackEntry.arguments?.getString("recipeId")?.toInt() ?: 0
-            //Recipe(articleId = articleId)
+            RecipeScreen(navController = navController,
+                recipeId = recipeId)
         }
 
         composable(Routes.Grocery.route) {
@@ -58,11 +61,11 @@ fun RecipeNavHost(navController: NavHostController) {
         composable("${Routes.CategoryRecipes.route}/{categoryId}/{categoryName}") { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId")?.toInt() ?: 1
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: "Категория"
-//            CategoryArticlesScreen(
-//                navController = navController,
-//                categoryId = categoryId,
-//                categoryName = categoryName
-//            )
+            CategoryRecipesScreen(
+                navController = navController,
+                categoryId = categoryId,
+                categoryName = categoryName
+            )
         }
 
         composable(Routes.Favourite.route) {

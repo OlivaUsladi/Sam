@@ -28,6 +28,7 @@ interface RecipeRepository {
         groceryItemIds: List<Int>
     ): List<Recipe>
 
+    suspend fun getGroceryItemById(groceryItemId: Int): GroceryItem?
 
     suspend fun getFavoriteRecipes(userId: Int): List<Recipe>
     suspend fun addToFavorites(userId: Int, recipeId: Int): Favourite
