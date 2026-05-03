@@ -42,4 +42,6 @@ val recipesDomainModule = module {
     factory { RemoveShoppingListItemUseCase(get()) }
     factory { MergeShoppingListsUseCase(get()) }
     factory { ClearCompletedItemsUseCase(get()) }
+
+    factory{ GetGroceryItemsUseCase(get()) }
 }

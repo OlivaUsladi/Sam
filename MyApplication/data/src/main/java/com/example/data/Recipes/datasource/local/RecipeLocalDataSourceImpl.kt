@@ -412,4 +412,132 @@ class RecipeLocalDataSourceImpl : RecipeLocalDataSource {
     }
     override suspend fun isLiked(userId: Int, recipeId: Int): Boolean = likes.any { it.userId == userId && it.recipeId == recipeId }
     override suspend fun getLikesCount(recipeId: Int): Int = likes.count { it.recipeId == recipeId }
+
+
+
+    private val shoppingLists = mutableListOf<ShoppingListEntity>()
+    private val shoppingListItems = mutableListOf<ShoppingListItemEntity>()
+    private var nextListId = 1
+    private var nextItemId = 1
+
+    override suspend fun getShoppingLists(userId: Int): List<ShoppingListEntity> {
+        return shoppingLists.filter { it.userId == userId }
+    }
+
+    override suspend fun getShoppingListById(listId: Int): ShoppingListEntity? {
+        return shoppingLists.find { it.id == listId }
+    }
+
+    override suspend fun createShoppingList(userId: Int, name: String): ShoppingListEntity {
+        val newList = ShoppingListEntity(
+            id = nextListId++,
+            userId = userId,
+            name = name,
+            createdAt = LocalDateTime.now(),
+            isCompleted = false
+        )
+        shoppingLists.add(newList)
+        return newList
+    }
+
+    override suspend fun updateShoppingListName(listId: Int, newName: String): ShoppingListEntity? {
+        val index = shoppingLists.indexOfFirst { it.id == listId }
+        if (index != -1) {
+            val updated = shoppingLists[index].copy(name = newName)
+            shoppingLists[index] = updated
+            return updated
+        }
+        return null
+    }
+
+    override suspend fun deleteShoppingList(listId: Int): Boolean {
+        val removed = shoppingLists.removeAll { it.id == listId }
+        shoppingListItems.removeAll { it.shoppingListId == listId }
+        return removed
+    }
+
+    override suspend fun getShoppingListItems(listId: Int): List<ShoppingListItemEntity> {
+        return shoppingListItems.filter { it.shoppingListId == listId }
+    }
+
+    override suspend fun addShoppingListItem(listId: Int, description: String): ShoppingListItemEntity {
+        val newItem = ShoppingListItemEntity(
+            id = nextItemId++,
+            shoppingListId = listId,
+            description = description,
+            isChecked = false
+        )
+        shoppingListItems.add(newItem)
+        return newItem
+    }
+
+    override suspend fun updateShoppingListItem(itemId: Int, isChecked: Boolean): ShoppingListItemEntity? {
+        val index = shoppingListItems.indexOfFirst { it.id == itemId }
+        if (index != -1) {
+            val updated = shoppingListItems[index].copy(isChecked = isChecked)
+            shoppingListItems[index] = updated
+            return updated
+        }
+        return null
+    }
+
+    override suspend fun deleteShoppingListItem(itemId: Int): Boolean {
+        return shoppingListItems.removeAll { it.id == itemId }
+    }
+
+    override suspend fun clearCompletedItems(listId: Int): Boolean {
+        val itemsToRemove = shoppingListItems.filter { it.shoppingListId == listId && it.isChecked }
+        return shoppingListItems.removeAll(itemsToRemove.toSet())
+    }
+
+    override suspend fun mergeShoppingLists(targetListId: Int, sourceListIds: List<Int>): ShoppingListEntity? {
+        val targetList = shoppingLists.find { it.id == targetListId } ?: return null
+
+        for (sourceId in sourceListIds) {
+            val sourceItems = shoppingListItems.filter { it.shoppingListId == sourceId }
+            for (item in sourceItems) {
+                val existingItem = shoppingListItems.find {
+                    it.shoppingListId == targetListId &&
+                            it.description.equals(item.description, ignoreCase = true)
+                }
+
+                if (existingItem != null) {
+                    val newQuantity = (existingItem.quantity ?: 0.0) + (item.quantity ?: 0.0)
+                    val index = shoppingListItems.indexOfFirst { it.id == existingItem.id }
+                    if (index != -1) {
+                        shoppingListItems[index] = existingItem.copy(quantity = newQuantity)
+                    }
+                } else {
+                    val newItem = item.copy(
+                        id = nextItemId++,
+                        shoppingListId = targetListId
+                    )
+                    shoppingListItems.add(newItem)
+                }
+            }
+            shoppingLists.removeAll { it.id == sourceId }
+            shoppingListItems.removeAll { it.shoppingListId == sourceId }
+        }
+
+        return targetList
+    }
+
+    override suspend fun updateShoppingListItemDetails(
+        itemId: Int,
+        description: String,
+        quantity: Double?,
+        unit: String?
+    ): ShoppingListItemEntity? {
+        val index = shoppingListItems.indexOfFirst { it.id == itemId }
+        if (index != -1) {
+            val updated = shoppingListItems[index].copy(
+                description = description,
+                quantity = quantity,
+                unit = unit
+            )
+            shoppingListItems[index] = updated
+            return updated
+        }
+        return null
+    }
 }

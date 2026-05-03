@@ -273,18 +273,105 @@ class RecipeRepositoryImpl(
         localDataSource.getLikesCount(recipeId)
 
 
-    override suspend fun getShoppingLists(userId: Int): List<ShoppingList> = emptyList()
-    override suspend fun getShoppingListById(listId: Int): ShoppingList? = null
-    override suspend fun createShoppingList(userId: Int, name: String, recipeId: Int?): ShoppingList =
-        ShoppingList(0, userId, name, LocalDateTime.now(), mutableListOf(), false)
-    override suspend fun updateShoppingListName(listId: Int, newName: String): ShoppingList? = null
-    override suspend fun deleteShoppingList(listId: Int): Boolean = false
-    override suspend fun getShoppingListItems(listId: Int): List<ShoppingListItem> = emptyList()
-    override suspend fun addItemToList(listId: Int, item: ShoppingListItem): ShoppingListItem = item
-    override suspend fun addItemsFromRecipe(listId: Int, recipeId: Int, groceryItems: List<GroceryItem>): List<ShoppingListItem> = emptyList()
-    override suspend fun updateShoppingListItem(itemId: Int, isChecked: Boolean): ShoppingListItem? = null
-    override suspend fun updateShoppingListItemDetails(itemId: Int, description: String, quantity: Double?, unit: String?): ShoppingListItem? = null
-    override suspend fun removeShoppingListItem(itemId: Int): Boolean = false
-    override suspend fun mergeShoppingLists(targetListId: Int, sourceListIds: List<Int>): ShoppingList? = null
-    override suspend fun clearCompletedItems(listId: Int): Boolean = false
+    override suspend fun getShoppingLists(userId: Int): List<ShoppingList> {
+        val listEntities = localDataSource.getShoppingLists(userId)
+        return listEntities.map { listEntity ->
+            val itemEntities = localDataSource.getShoppingListItems(listEntity.id)
+            listEntity.toDomain(itemEntities)
+        }
+    }
+
+    override suspend fun getShoppingListById(listId: Int): ShoppingList? {
+        val listEntity = localDataSource.getShoppingListById(listId) ?: return null
+        val itemEntities = localDataSource.getShoppingListItems(listId)
+        return listEntity.toDomain(itemEntities)
+    }
+
+    override suspend fun createShoppingList(userId: Int, name: String, recipeId: Int?): ShoppingList {
+        val listEntity = localDataSource.createShoppingList(userId, name)
+        return listEntity.toDomain(emptyList())
+    }
+
+    override suspend fun updateShoppingListName(listId: Int, newName: String): ShoppingList? {
+        val updatedEntity = localDataSource.updateShoppingListName(listId, newName)
+        if (updatedEntity != null) {
+            val itemEntities = localDataSource.getShoppingListItems(listId)
+            return updatedEntity.toDomain(itemEntities)
+        }
+        return null
+    }
+
+    override suspend fun deleteShoppingList(listId: Int): Boolean {
+        return localDataSource.deleteShoppingList(listId)
+    }
+
+    override suspend fun getShoppingListItems(listId: Int): List<ShoppingListItem> {
+        val itemEntities = localDataSource.getShoppingListItems(listId)
+        return itemEntities.map { it.toDomain() }
+    }
+
+    override suspend fun addItemToList(listId: Int, item: ShoppingListItem): ShoppingListItem {
+        val newItemEntity = localDataSource.addShoppingListItem(listId, item.description)
+        return newItemEntity.toDomain()
+    }
+
+    override suspend fun addItemsFromRecipe(listId: Int, recipeId: Int, groceryItems: List<GroceryItem>): List<ShoppingListItem> {
+        val addedItems = mutableListOf<ShoppingListItem>()
+        for (groceryItem in groceryItems) {
+
+            val existingItems = localDataSource.getShoppingListItems(listId)
+            val existing = existingItems.find {
+                it.description.equals(groceryItem.name, ignoreCase = true)
+            }
+
+            if (existing != null) {
+
+                val newQuantity = (existing.quantity ?: 0.0) + 1.0
+                localDataSource.updateShoppingListItemDetails(
+                    existing.id,
+                    existing.description,
+                    newQuantity,
+                    existing.unit
+                )
+                addedItems.add(existing.copy(quantity = newQuantity).toDomain())
+            } else {
+
+                val newItem = localDataSource.addShoppingListItem(listId, groceryItem.name)
+                addedItems.add(newItem.toDomain())
+            }
+        }
+        return addedItems
+    }
+
+    override suspend fun updateShoppingListItem(itemId: Int, isChecked: Boolean): ShoppingListItem? {
+        val updatedEntity = localDataSource.updateShoppingListItem(itemId, isChecked)
+        return updatedEntity?.toDomain()
+    }
+
+    override suspend fun updateShoppingListItemDetails(
+        itemId: Int,
+        description: String,
+        quantity: Double?,
+        unit: String?
+    ): ShoppingListItem? {
+
+        return null
+    }
+
+    override suspend fun removeShoppingListItem(itemId: Int): Boolean {
+        return localDataSource.deleteShoppingListItem(itemId)
+    }
+
+    override suspend fun mergeShoppingLists(targetListId: Int, sourceListIds: List<Int>): ShoppingList? {
+        val mergedEntity = localDataSource.mergeShoppingLists(targetListId, sourceListIds)
+        if (mergedEntity != null) {
+            val itemEntities = localDataSource.getShoppingListItems(targetListId)
+            return mergedEntity.toDomain(itemEntities)
+        }
+        return null
+    }
+
+    override suspend fun clearCompletedItems(listId: Int): Boolean {
+        return localDataSource.clearCompletedItems(listId)
+    }
 }

@@ -41,4 +41,18 @@ interface RecipeLocalDataSource {
 
     suspend fun getRecipesByGroceryItems(groceryItemIds: List<Int>): List<RecipeEntity>
     suspend fun getRecipesByExactGroceryItems(groceryItemIds: List<Int>): List<RecipeEntity>
+
+    suspend fun getShoppingLists(userId: Int): List<ShoppingListEntity>
+    suspend fun getShoppingListById(listId: Int): ShoppingListEntity?
+    suspend fun createShoppingList(userId: Int, name: String): ShoppingListEntity
+    suspend fun updateShoppingListName(listId: Int, newName: String): ShoppingListEntity?
+    suspend fun deleteShoppingList(listId: Int): Boolean
+
+    suspend fun getShoppingListItems(listId: Int): List<ShoppingListItemEntity>
+    suspend fun addShoppingListItem(listId: Int, description: String): ShoppingListItemEntity
+    suspend fun updateShoppingListItem(itemId: Int, isChecked: Boolean): ShoppingListItemEntity?
+    suspend fun deleteShoppingListItem(itemId: Int): Boolean
+    suspend fun clearCompletedItems(listId: Int): Boolean
+    suspend fun mergeShoppingLists(targetListId: Int, sourceListIds: List<Int>): ShoppingListEntity?
+    suspend fun updateShoppingListItemDetails(itemId: Int, description: String, quantity: Double?, unit: String?): ShoppingListItemEntity?
 }

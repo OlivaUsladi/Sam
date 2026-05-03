@@ -12,6 +12,7 @@ import com.example.myapplication.Recipes.ui.favourite.FavouriteRecipeViewModel
 import com.example.myapplication.Recipes.ui.grocery.GroceriesViewModel
 import com.example.myapplication.Recipes.ui.groceryrecipes.GroceryRecipeViewModel
 import com.example.myapplication.Recipes.ui.recipe.RecipeScreenViewModel
+import com.example.myapplication.Recipes.ui.shoppinglist.ShoppingListViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -151,4 +152,17 @@ val appModule = module {
         getLikesCountUseCase = get()
     ) }
 
+    viewModel {
+        ShoppingListViewModel(
+            getShoppingListsUseCase = get(),
+            createShoppingListUseCase = get(),
+            updateShoppingListNameUseCase = get(),
+            deleteShoppingListUseCase = get(),
+            toggleShoppingListItemUseCase = get(),
+            removeShoppingListItemUseCase = get(),
+            addItemToListUseCase = get(),
+            mergeShoppingListsUseCase = get(),
+            getGroceryItemsUseCase = get()
+        )
+    }
 }

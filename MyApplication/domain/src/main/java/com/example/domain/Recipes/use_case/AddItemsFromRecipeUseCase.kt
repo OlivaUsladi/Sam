@@ -8,7 +8,7 @@ import com.example.domain.Recipes.repository.RecipeRepository
 class AddItemsFromRecipeUseCase(
     private val repository: RecipeRepository
 ) {
-    suspend operator fun invoke(listId: Int, recipeId: Int, groceries: List<GroceryItem>): List<ShoppingListItem> {
-        return repository.addItemsFromRecipe(listId, recipeId, groceries)
+    suspend operator fun invoke(listId: Int, recipeId: Int, groceryItems: List<GroceryItem>): List<ShoppingListItem> {
+        return repository.addItemsFromRecipe(listId, recipeId, groceryItems)
     }
 }

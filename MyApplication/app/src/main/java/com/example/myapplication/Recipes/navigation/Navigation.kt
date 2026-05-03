@@ -11,6 +11,7 @@ import com.example.myapplication.Recipes.ui.groceryrecipes.GroceryRecipeScreen
 import com.example.myapplication.Recipes.ui.home.RecipeHomeScreen
 import com.example.myapplication.Recipes.ui.recipe.RecipeScreen
 import com.example.myapplication.Recipes.ui.favourite.FavouriteRecipeScreen
+import com.example.myapplication.Recipes.ui.shoppinglist.ShoppingListScreen
 
 
 sealed class Routes(val route: String) {
@@ -73,6 +74,10 @@ fun RecipeNavHost(navController: NavHostController) {
 
         composable(Routes.Favourite.route) {
             FavouriteRecipeScreen(navController)
+        }
+
+        composable(Routes.Lists.route) {
+            ShoppingListScreen(navController)
         }
     }
 }
