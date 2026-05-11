@@ -288,6 +288,46 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public boolean isRecipeFavourite(Integer recipeId, Integer userId) {
+        if (userId == null) {
+            return false;
+        }
+
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        RecipeEntity recipe = recipeRepository.findById(recipeId).orElse(null);
+
+        if (user == null || recipe == null) {
+            return false;
+        }
+
+        return favouriteRecipeRepository.existsByUserAndRecipe(user, recipe);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isRecipeLiked(Integer recipeId, Integer userId) {
+        if (userId == null) {
+            return false;
+        }
+
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        RecipeEntity recipe = recipeRepository.findById(recipeId).orElse(null);
+
+        if (user == null || recipe == null) {
+            return false;
+        }
+
+        return likeRecipeRepository.existsByUserAndRecipe(user, recipe);
+    }
+
+    @Transactional(readOnly = true)
+    public int getLikesCount(Integer recipeId) {
+        RecipeEntity recipe = recipeRepository.findById(recipeId).orElse(null);
+        if (recipe == null) {
+            return 0;
+        }
+        return recipe.getLikesCount() != null ? recipe.getLikesCount() : 0;
+    }
 
 
     //проверка лайка и избранного

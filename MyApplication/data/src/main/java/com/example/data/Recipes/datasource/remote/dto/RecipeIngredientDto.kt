@@ -1,4 +1,4 @@
-package com.example.data.Recipes.remote.dto
+package com.example.data.Recipes.datasource.remote.dto
 
 import java.math.BigDecimal
 

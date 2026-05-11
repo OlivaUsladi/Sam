@@ -20,6 +20,12 @@ public class RecipeController {
     //@PathVariable - часть URL, обязательный параметр (просто через /)
     //@RequestBody - помогает «извлечь» данные из тела HTTP-запроса и преобразовать их в объект Java
 
+    //Коды состояния ответа HTTP    https://developer.mozilla.org/ru/docs/Web/HTTP/Reference/Status
+    //400 Bad Request
+    //401 Unauthorized
+    //200 OK
+    //201 Created
+
     //Без авторизации
     @GetMapping("/public")
     public ResponseEntity<List<RecipeResponseDto>> getAllRecipesPublic() {
@@ -94,40 +100,5 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.getRecipesByExactGroceryItemsForUser(groceryItemIds, userId));
     }
 
-    @GetMapping("/favourites")
-    public ResponseEntity<List<RecipeResponseDto>> getFavouriteRecipes(@RequestHeader("userId") Integer userId) {
-        return ResponseEntity.ok(recipeService.getFavouriteRecipes(userId));
-    }
 
-    @PostMapping("/{id}/like")
-    public ResponseEntity<Void> addLike(
-            @PathVariable Integer id,
-            @RequestHeader("userId") Integer userId) {
-        recipeService.addLike(id, userId);
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/{id}/like")
-    public ResponseEntity<Void> removeLike(
-            @PathVariable Integer id,
-            @RequestHeader("userId") Integer userId) {
-        recipeService.removeLike(id, userId);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/{id}/favourite")
-    public ResponseEntity<Void> addToFavourites(
-            @PathVariable Integer id,
-            @RequestHeader("userId") Integer userId) {
-        recipeService.addToFavourites(id, userId);
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/{id}/favourite")
-    public ResponseEntity<Void> removeFromFavourites(
-            @PathVariable Integer id,
-            @RequestHeader("userId") Integer userId) {
-        recipeService.removeFromFavourites(id, userId);
-        return ResponseEntity.ok().build();
-    }
 }

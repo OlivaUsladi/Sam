@@ -1,7 +1,11 @@
-package com.example.data.Recipes.remote
+package com.example.data.Recipes.datasource.remote
 
-import com.example.data.Recipes.remote.api.RecipeApiService
-import com.example.data.Recipes.remote.dto.*
+import com.example.data.Recipes.datasource.remote.api.RecipeApiService
+import com.example.data.Recipes.datasource.remote.dto.CategoryDto
+import com.example.data.Recipes.datasource.remote.dto.GroceryDto
+import com.example.data.Recipes.datasource.remote.dto.GroceryItemDto
+import com.example.data.Recipes.datasource.remote.dto.RecipeDetailResponseDto
+import com.example.data.Recipes.datasource.remote.dto.RecipeResponseDto
 
 class RecipeRemoteDataSource(
     private val apiService: RecipeApiService
@@ -152,6 +156,24 @@ class RecipeRemoteDataSource(
         }
     }
 
+    suspend fun isRecipeFavourite(recipeId: Int, userId: Int): Boolean {
+        return try {
+            val response = apiService.isRecipeFavourite(recipeId, userId)
+            response.isSuccessful && response.body() == true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun isRecipeLiked(recipeId: Int, userId: Int): Boolean {
+        return try {
+            val response = apiService.isRecipeLiked(recipeId, userId)
+            response.isSuccessful && response.body() == true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
 
     suspend fun getRecipesByGroceryItemsForUser(groceryItemIds: List<Int>, userId: Int): List<RecipeResponseDto> {
         return try {
@@ -174,6 +196,19 @@ class RecipeRemoteDataSource(
             apiService.getAllGroceries()
         } catch (e: Exception) {
             emptyList()
+        }
+    }
+
+    suspend fun getLikesCount(recipeId: Int): Int {
+        return try {
+            val response = apiService.getLikesCount(recipeId)
+            if (response.isSuccessful) {
+                response.body() ?: 0
+            } else {
+                0
+            }
+        } catch (e: Exception) {
+            0
         }
     }
 }

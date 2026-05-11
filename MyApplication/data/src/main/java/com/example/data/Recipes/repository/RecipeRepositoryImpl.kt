@@ -1,12 +1,11 @@
 package com.example.data.Recipes.repository
 
 import com.example.data.Recipes.datasource.local.RecipeLocalDataSource
-import com.example.data.Recipes.remote.RecipeRemoteDataSource
-import com.example.data.Recipes.remote.mapper.RecipeNetworkMapper
+import com.example.data.Recipes.datasource.remote.RecipeRemoteDataSource
+import com.example.data.Recipes.datasource.remote.mapper.RecipeNetworkMapper
 import com.example.data.Recipes.model.*
 import com.example.domain.Recipes.model.*
 import com.example.domain.Recipes.repository.RecipeRepository
-import java.time.LocalDateTime
 
 class RecipeRepositoryImpl(
     private val localDataSource: RecipeLocalDataSource,
@@ -36,13 +35,6 @@ class RecipeRepositoryImpl(
         }
     }
 
-    private suspend fun isRecipeFavoriteLocal(recipeId: Int): Boolean =
-        localDataSource.isFavorite(userId, recipeId)
-
-    private suspend fun isRecipeLikedLocal(recipeId: Int): Boolean =
-        localDataSource.isLiked(userId, recipeId)
-
-
 
     override suspend fun getRecipes(): List<Recipe> {
         return try {
@@ -66,8 +58,8 @@ class RecipeRepositoryImpl(
                     createdAt = entity.createdAt,
                     updatedAt = entity.updatedAt,
                     likesCount = entity.likesCount,
-                    isFavorite = isRecipeFavoriteLocal(entity.id),
-                    isLiked = isRecipeLikedLocal(entity.id)
+                    isFavorite = isRecipeFavorite(userId,entity.id),
+                    isLiked = isRecipeLiked(userId,entity.id)
                 )
             }
         }
@@ -94,8 +86,8 @@ class RecipeRepositoryImpl(
                 createdAt = entity.createdAt,
                 updatedAt = entity.updatedAt,
                 likesCount = entity.likesCount,
-                isFavorite = isRecipeFavoriteLocal(recipeId),
-                isLiked = isRecipeLikedLocal(recipeId)
+                isFavorite = isRecipeFavorite(userId,recipeId),
+                isLiked = isRecipeLiked(userId,recipeId)
             )
         }
     }
@@ -187,8 +179,8 @@ class RecipeRepositoryImpl(
                     createdAt = entity.createdAt,
                     updatedAt = entity.updatedAt,
                     likesCount = entity.likesCount,
-                    isFavorite = isRecipeFavoriteLocal(entity.id),
-                    isLiked = isRecipeLikedLocal(entity.id)
+                    isFavorite = isRecipeFavorite(userId,entity.id),
+                    isLiked = isRecipeLiked(userId,entity.id)
                 )
             }
         }
@@ -216,8 +208,8 @@ class RecipeRepositoryImpl(
                     createdAt = entity.createdAt,
                     updatedAt = entity.updatedAt,
                     likesCount = entity.likesCount,
-                    isFavorite = isRecipeFavoriteLocal(entity.id),
-                    isLiked = isRecipeLikedLocal(entity.id)
+                    isFavorite = isRecipeFavorite(userId, entity.id),
+                    isLiked = isRecipeLiked(userId,entity.id)
                 )
             }
         }
@@ -287,8 +279,8 @@ class RecipeRepositoryImpl(
                     createdAt = entity.createdAt,
                     updatedAt = entity.updatedAt,
                     likesCount = entity.likesCount,
-                    isFavorite = isRecipeFavoriteLocal(entity.id),
-                    isLiked = isRecipeLikedLocal(entity.id)
+                    isFavorite = isRecipeFavorite(userId,entity.id),
+                    isLiked = isRecipeLiked(userId,entity.id)
                 )
             }
         }
@@ -315,8 +307,8 @@ class RecipeRepositoryImpl(
                     createdAt = entity.createdAt,
                     updatedAt = entity.updatedAt,
                     likesCount = entity.likesCount,
-                    isFavorite = isRecipeFavoriteLocal(entity.id),
-                    isLiked = isRecipeLikedLocal(entity.id)
+                    isFavorite = isRecipeFavorite(userId,entity.id),
+                    isLiked = isRecipeLiked(userId,entity.id)
                 )
             }
         }
@@ -343,22 +335,44 @@ class RecipeRepositoryImpl(
 
 
     override suspend fun getFavoriteRecipes(userId: Int): List<Recipe> {
-        val favorites = localDataSource.getFavorites(userId)
-        val favoriteRecipeIds = favorites.map { it.recipeId }
-        val allRecipes = getRecipes()
-        return allRecipes.filter { it.id in favoriteRecipeIds }.map { it.copy(isFavorite = true) }
+        return try {
+            val favoritesDto = remoteDataSource.getFavouriteRecipes(userId)
+            favoritesDto.map { RecipeNetworkMapper.mapToDomain(it) }
+        } catch (e: Exception) {
+            val favorites = localDataSource.getFavorites(userId)
+            val favoriteRecipeIds = favorites.map { it.recipeId }
+            val allRecipes = getRecipes()
+            return allRecipes.filter { it.id in favoriteRecipeIds }.map { it.copy(isFavorite = true) }
+        }
+
     }
 
     override suspend fun addToFavorites(userId: Int, recipeId: Int): Favourite {
-        localDataSource.addFavorite(userId, recipeId)
+        remoteDataSource.addToFavourites(recipeId, userId)
+        //localDataSource.addFavorite(userId, recipeId)
         return Favourite(userId, recipeId)
     }
 
     override suspend fun removeFromFavorites(userId: Int, recipeId: Int): Boolean =
-        localDataSource.removeFavorite(userId, recipeId)
+        //localDataSource.removeFavorite(userId, recipeId)
+        remoteDataSource.removeFromFavourites(recipeId, userId)
 
-    override suspend fun isRecipeFavorite(userId: Int, recipeId: Int): Boolean =
-        localDataSource.isFavorite(userId, recipeId)
+    override suspend fun isRecipeFavorite(userId: Int, recipeId: Int): Boolean {
+        return try {
+            remoteDataSource.isRecipeFavourite(recipeId, userId)
+        } catch (e: Exception) {
+            localDataSource.isFavorite(userId, recipeId)
+        }
+    }
+
+    override suspend fun isRecipeLiked(userId: Int, recipeId: Int): Boolean {
+        return try {
+            remoteDataSource.isRecipeLiked(recipeId, userId)
+        } catch (e: Exception) {
+            localDataSource.isLiked(userId, recipeId)
+        }
+    }
+
 
     override suspend fun getLikedRecipes(userId: Int): List<Recipe> {
         val likedRecipes = localDataSource.getUserLikes(userId)
@@ -368,18 +382,23 @@ class RecipeRepositoryImpl(
     }
 
     override suspend fun addLike(userId: Int, recipeId: Int): Like {
-        localDataSource.addLike(userId, recipeId)
+        remoteDataSource.addLike(recipeId, userId)
+        //localDataSource.addLike(userId, recipeId)
         return Like(userId, recipeId)
     }
 
     override suspend fun removeLike(userId: Int, recipeId: Int): Boolean =
-        localDataSource.removeLike(userId, recipeId)
+        //localDataSource.removeLike(userId, recipeId)
+        remoteDataSource.removeLike(recipeId, userId)
 
-    override suspend fun isRecipeLiked(userId: Int, recipeId: Int): Boolean =
-        localDataSource.isLiked(userId, recipeId)
 
-    override suspend fun getLikesCount(recipeId: Int): Int =
-        localDataSource.getLikesCount(recipeId)
+    override suspend fun getLikesCount(recipeId: Int): Int {
+        return try {
+            remoteDataSource.getLikesCount(recipeId)
+        } catch (e: Exception) {
+            localDataSource.getLikesCount(recipeId)
+        }
+    }
 
 
 

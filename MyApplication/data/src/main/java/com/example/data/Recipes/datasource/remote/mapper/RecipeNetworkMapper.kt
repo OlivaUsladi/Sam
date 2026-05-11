@@ -1,6 +1,8 @@
-package com.example.data.Recipes.remote.mapper
+package com.example.data.Recipes.datasource.remote.mapper
 
-import com.example.data.Recipes.remote.dto.*
+import com.example.data.Recipes.datasource.remote.dto.CategoryDto
+import com.example.data.Recipes.datasource.remote.dto.RecipeDetailResponseDto
+import com.example.data.Recipes.datasource.remote.dto.RecipeResponseDto
 import com.example.domain.Recipes.model.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

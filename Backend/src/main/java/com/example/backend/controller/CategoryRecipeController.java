@@ -1,7 +1,6 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.CategoryResponseDto;
-import com.example.backend.entity.CategoryEntity;
 import com.example.backend.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryRecipeController {
 
     private final CategoryRepository categoryRepository;
 

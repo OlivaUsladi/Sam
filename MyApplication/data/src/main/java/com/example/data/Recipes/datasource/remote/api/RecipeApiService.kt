@@ -1,6 +1,11 @@
-package com.example.data.Recipes.remote.api
+package com.example.data.Recipes.datasource.remote.api
 
-import com.example.data.Recipes.remote.dto.*
+import com.example.data.Recipes.datasource.remote.dto.CategoryDto
+import com.example.data.Recipes.datasource.remote.dto.GroceryDto
+import com.example.data.Recipes.datasource.remote.dto.GroceryItemDto
+import com.example.data.Recipes.datasource.remote.dto.RecipeDetailResponseDto
+import com.example.data.Recipes.datasource.remote.dto.RecipeResponseDto
+import retrofit2.Response
 import retrofit2.http.*
 
 interface RecipeApiService {
@@ -49,25 +54,40 @@ interface RecipeApiService {
     suspend fun addLike(
         @Path("id") id: Int,
         @Header("userId") userId: Int
-    ): retrofit2.Response<Unit>
+    ): Response<Unit>
 
     @DELETE("/api/recipes/{id}/like")
     suspend fun removeLike(
         @Path("id") id: Int,
         @Header("userId") userId: Int
-    ): retrofit2.Response<Unit>
+    ): Response<Unit>
 
     @POST("/api/recipes/{id}/favourite")
     suspend fun addToFavourites(
         @Path("id") id: Int,
         @Header("userId") userId: Int
-    ): retrofit2.Response<Unit>
+    ): Response<Unit>
 
     @DELETE("/api/recipes/{id}/favourite")
     suspend fun removeFromFavourites(
         @Path("id") id: Int,
         @Header("userId") userId: Int
-    ): retrofit2.Response<Unit>
+    ): Response<Unit>
+
+    @GET("/api/recipes/{id}/favourite")
+    suspend fun isRecipeFavourite(
+        @Path("id") id: Int,
+        @Header("userId") userId: Int
+    ): Response<Boolean>
+
+    @GET("/api/recipes/{id}/like")
+    suspend fun isRecipeLiked(
+        @Path("id") id: Int,
+        @Header("userId") userId: Int
+    ): Response<Boolean>
+
+    @GET("/api/recipes/{id}/likes_count")
+    suspend fun getLikesCount(@Path("id") id: Int): Response<Int>
 
     @POST("/api/recipes/by-grocery-items")
     suspend fun getRecipesByGroceryItemsForUser(
