@@ -29,7 +29,7 @@ sealed class ShoppingListEvent {
     data class DeleteList(val listId: Int) : ShoppingListEvent()
     data class ToggleItem(val itemId: Int, val isChecked: Boolean) : ShoppingListEvent()
     data class DeleteItem(val itemId: Int) : ShoppingListEvent()
-    data class AddItem(val listId: Int, val description: String) : ShoppingListEvent()
+    data class AddItem(val listId: Int, val description: String, val quantity: String, val unit: String) : ShoppingListEvent()
     data class CheckAllItems(val listId: Int) : ShoppingListEvent()
     data class UncheckAllItems(val listId: Int) : ShoppingListEvent()
     data class MergeLists(val listIds: List<Int>) : ShoppingListEvent()
@@ -68,7 +68,7 @@ class ShoppingListViewModel(
             is ShoppingListEvent.DeleteList -> deleteList(event.listId)
             is ShoppingListEvent.ToggleItem -> toggleItem(event.itemId, event.isChecked)
             is ShoppingListEvent.DeleteItem -> deleteItem(event.itemId)
-            is ShoppingListEvent.AddItem -> addItem(event.listId, event.description)
+            is ShoppingListEvent.AddItem -> addItem(event.listId, event.description, event.quantity, event.unit)
             is ShoppingListEvent.CheckAllItems -> checkAllItems(event.listId)
             is ShoppingListEvent.UncheckAllItems -> uncheckAllItems(event.listId)
             is ShoppingListEvent.MergeLists -> mergeLists(event.listIds)
@@ -212,13 +212,16 @@ class ShoppingListViewModel(
         }
     }
 
-    private fun addItem(listId: Int, description: String) {
+    private fun addItem(listId: Int, description: String, quantity: String, unit: String) {
         viewModelScope.launch {
             try {
+                val quantityDouble = quantity.toDoubleOrNull()
                 val newItem = ShoppingListItem(
                     id = nextItemId++,
                     description = description,
-                    isChecked = false
+                    isChecked = false,
+                    quantity = quantityDouble,
+                    unit = unit
                 )
                 addItemToListUseCase(listId, newItem)
 

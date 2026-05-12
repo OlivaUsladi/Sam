@@ -1,4 +1,4 @@
-package com.example.data.Recipes.model
+package com.example.data.Recipes.datasource.local.model
 
 import com.example.domain.Recipes.model.ShoppingListItem
 
@@ -14,7 +14,9 @@ data class ShoppingListItemEntity(
         return ShoppingListItem(
             id = id,
             description = description,
-            isChecked = isChecked
+            isChecked = isChecked,
+            quantity = quantity,
+            unit = unit
         )
     }
 }

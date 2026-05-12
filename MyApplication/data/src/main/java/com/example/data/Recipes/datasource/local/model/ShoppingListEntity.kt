@@ -1,7 +1,6 @@
-package com.example.data.Recipes.model
+package com.example.data.Recipes.datasource.local.model
 
 import com.example.domain.Recipes.model.ShoppingList
-import com.example.domain.Recipes.model.ShoppingListItem
 import java.time.LocalDateTime
 
 data class ShoppingListEntity(

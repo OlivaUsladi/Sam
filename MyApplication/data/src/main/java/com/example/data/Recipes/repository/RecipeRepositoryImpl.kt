@@ -1,9 +1,9 @@
 package com.example.data.Recipes.repository
 
 import com.example.data.Recipes.datasource.local.RecipeLocalDataSource
+import com.example.data.Recipes.datasource.local.model.CategoryEntity
 import com.example.data.Recipes.datasource.remote.RecipeRemoteDataSource
 import com.example.data.Recipes.datasource.remote.mapper.RecipeNetworkMapper
-import com.example.data.Recipes.model.*
 import com.example.domain.Recipes.model.*
 import com.example.domain.Recipes.repository.RecipeRepository
 
@@ -464,31 +464,49 @@ class RecipeRepositoryImpl(
     }
 
     override suspend fun addItemToList(listId: Int, item: ShoppingListItem): ShoppingListItem {
-        val newItemEntity = localDataSource.addShoppingListItem(listId, item.description)
+        val newItemEntity = localDataSource.addShoppingListItem(listId, item.description, item.quantity, item.unit)
         return newItemEntity.toDomain()
     }
 
-    override suspend fun addItemsFromRecipe(listId: Int, recipeId: Int, groceryItems: List<GroceryItem>): List<ShoppingListItem> {
+    override suspend fun addItemsFromRecipe(
+        listId: Int,
+        recipeId: Int,
+        ingredients: List<RecipeIngredient>
+    ): List<ShoppingListItem> {
         val addedItems = mutableListOf<ShoppingListItem>()
-        for (groceryItem in groceryItems) {
-            val existingItems = localDataSource.getShoppingListItems(listId)
+        val existingItems = localDataSource.getShoppingListItems(listId)
+
+        for (ingredient in ingredients) {
+            val productName = ingredient.groceryItem.name
+            val amount = ingredient.amount
+            val unit = ingredient.unit
+
             val existing = existingItems.find {
-                it.description.equals(groceryItem.name, ignoreCase = true)
+                it.description.equals(productName, ignoreCase = true)
             }
+
             if (existing != null) {
-                val newQuantity = (existing.quantity ?: 0.0) + 1.0
-                localDataSource.updateShoppingListItemDetails(
+                val existingQuantity = existing.quantity ?: 0.0
+                val newQuantity = existingQuantity + amount
+
+                val updated = localDataSource.updateShoppingListItemDetails(
                     existing.id,
                     existing.description,
                     newQuantity,
-                    existing.unit
+                    unit
                 )
-                addedItems.add(existing.copy(quantity = newQuantity).toDomain())
+                updated?.let { addedItems.add(it.toDomain()) }
             } else {
-                val newItem = localDataSource.addShoppingListItem(listId, groceryItem.name)
+                val newItem = localDataSource.addShoppingListItem(
+                    listId = listId,
+                    description = productName,
+                    quantity = amount,
+                    unit = unit
+                )
                 addedItems.add(newItem.toDomain())
             }
         }
+
         return addedItems
     }
 

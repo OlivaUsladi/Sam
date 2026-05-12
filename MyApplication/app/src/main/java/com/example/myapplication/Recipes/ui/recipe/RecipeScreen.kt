@@ -43,6 +43,7 @@ import coil3.compose.AsyncImage
 import com.example.myapplication.R
 import com.example.myapplication.Recipes.components.CookingStepsSection
 import com.example.myapplication.Recipes.components.IngredientsSection
+import com.example.myapplication.Recipes.components.ShoppingListSelectionDialog
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.time.format.DateTimeFormatter
@@ -255,5 +256,28 @@ fun RecipeScreen(
                 }
             }
         }
+    }
+    if (uiState.showShoppingListDialog) {
+        ShoppingListSelectionDialog(
+            shoppingLists = uiState.shoppingLists,
+            isCreatingNewList = uiState.isCreatingNewList,
+            newListName = uiState.newListName,
+            onListSelected = { listId ->
+                if (listId == -1) {
+                    viewModel.onEvent(RecipeDetailEvent.CreateNewList)
+                } else {
+                    viewModel.onEvent(RecipeDetailEvent.SelectShoppingList(listId))
+                }
+            },
+            onCreateNewList = {
+                viewModel.onEvent(RecipeDetailEvent.CreateNewList)
+            },
+            onNewListNameChange = {
+                viewModel.onEvent(RecipeDetailEvent.UpdateNewListName(it))
+            },
+            onDismiss = {
+                viewModel.onEvent(RecipeDetailEvent.HideShoppingListDialog)
+            }
+        )
     }
 }

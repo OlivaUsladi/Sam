@@ -1,6 +1,15 @@
 package com.example.data.Recipes.datasource.local
 
-import com.example.data.Recipes.model.*
+import com.example.data.Recipes.datasource.local.model.CategoryEntity
+import com.example.data.Recipes.datasource.local.model.FavoriteEntity
+import com.example.data.Recipes.datasource.local.model.GroceryEntity
+import com.example.data.Recipes.datasource.local.model.GroceryItemEntity
+import com.example.data.Recipes.datasource.local.model.LikeEntity
+import com.example.data.Recipes.datasource.local.model.RecipeContentEntity
+import com.example.data.Recipes.datasource.local.model.RecipeEntity
+import com.example.data.Recipes.datasource.local.model.RecipeGroceryItemCrossEntity
+import com.example.data.Recipes.datasource.local.model.ShoppingListEntity
+import com.example.data.Recipes.datasource.local.model.ShoppingListItemEntity
 
 interface RecipeLocalDataSource {
     suspend fun getRecipes(): List<RecipeEntity>
@@ -49,10 +58,11 @@ interface RecipeLocalDataSource {
     suspend fun deleteShoppingList(listId: Int): Boolean
 
     suspend fun getShoppingListItems(listId: Int): List<ShoppingListItemEntity>
-    suspend fun addShoppingListItem(listId: Int, description: String): ShoppingListItemEntity
+    suspend fun addShoppingListItem(listId: Int, description: String, quantity: Double?, unit: String?): ShoppingListItemEntity
     suspend fun updateShoppingListItem(itemId: Int, isChecked: Boolean): ShoppingListItemEntity?
     suspend fun deleteShoppingListItem(itemId: Int): Boolean
     suspend fun clearCompletedItems(listId: Int): Boolean
     suspend fun mergeShoppingLists(targetListId: Int, sourceListIds: List<Int>): ShoppingListEntity?
+
     suspend fun updateShoppingListItemDetails(itemId: Int, description: String, quantity: Double?, unit: String?): ShoppingListItemEntity?
 }

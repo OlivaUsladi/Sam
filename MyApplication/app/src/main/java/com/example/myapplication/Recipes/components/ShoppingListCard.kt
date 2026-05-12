@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -50,7 +51,7 @@ fun ShoppingListCard(
     onDeleteList: () -> Unit,
     onToggleItem: (Int, Boolean) -> Unit,
     onDeleteItem: (Int) -> Unit,
-    onAddItem: (String) -> Unit,
+    onAddItem: (String, String, String) -> Unit,
     onCheckAll: () -> Unit,
     onUncheckAll: () -> Unit,
     suggestions: List<String>
@@ -59,6 +60,8 @@ fun ShoppingListCard(
     var newName by remember { mutableStateOf(shoppingList.name) }
     var showAddItemDialog by remember { mutableStateOf(false) }
     var newItemDescription by remember { mutableStateOf("") }
+    var newItemQantity by remember { mutableStateOf("") }
+    var newItemUnit by remember { mutableStateOf("") }
     var showSuggestions by remember { mutableStateOf(false) }
 
     val allItemsChecked = shoppingList.items.isNotEmpty() && shoppingList.items.all { it.isChecked }
@@ -256,6 +259,22 @@ fun ShoppingListCard(
                         label = { Text("Название продукта") },
                         singleLine = true
                     )
+                    OutlinedTextField(
+                        value = newItemQantity,
+                        onValueChange = {
+                            newItemQantity = it
+                        },
+                        label = { Text("Количество") },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = newItemUnit,
+                        onValueChange = {
+                            newItemUnit = it
+                        },
+                        label = { Text("Единица измерения") },
+                        singleLine = true
+                    )
 
                     if (showSuggestions && suggestions.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
@@ -267,11 +286,13 @@ fun ShoppingListCard(
                         ) {
                             suggestions.filter {
                                 it.contains(newItemDescription, ignoreCase = true)
-                            }.take(5).forEach { suggestion ->
+                            }.take(8).forEach { suggestion ->
                                 TextButton(
                                     onClick = {
-                                        onAddItem(suggestion)
+                                        onAddItem(suggestion, newItemQantity, newItemUnit)
                                         newItemDescription = ""
+                                        newItemQantity=""
+                                        newItemUnit=""
                                         showSuggestions = false
                                         showAddItemDialog = false
                                     },
@@ -288,8 +309,10 @@ fun ShoppingListCard(
                 TextButton(
                     onClick = {
                         if (newItemDescription.isNotBlank()) {
-                            onAddItem(newItemDescription)
+                            onAddItem(newItemDescription, newItemQantity, newItemUnit)
                             newItemDescription = ""
+                            newItemQantity=""
+                            newItemUnit=""
                             showAddItemDialog = false
                         }
                     }
@@ -323,14 +346,24 @@ fun ShoppingListItemRow(
             onCheckedChange = { onToggle() }
         )
 
-        Text(
-            text = item.description,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Normal,
-            color = Color.Black,
-            textDecoration = if (item.isChecked) TextDecoration.LineThrough else null,
-            modifier = Modifier.weight(1f)
-        )
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = item.description,
+                fontSize = 16.sp,
+                color = if (item.isChecked) Color.Gray else Color.Black,
+                fontWeight = if (item.isChecked) FontWeight.Normal else FontWeight.Medium
+            )
+
+            if (item.quantity != null && item.unit != null) {
+                Text(
+                    text = "${item.quantity} ${item.unit}",
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+            }
+        }
 
         Icon(
             painter = painterResource(R.drawable.cross),

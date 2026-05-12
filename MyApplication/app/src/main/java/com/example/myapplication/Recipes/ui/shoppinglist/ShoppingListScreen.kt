@@ -171,8 +171,8 @@ fun ShoppingListScreen(
                             onDeleteItem = { itemId ->
                                 viewModel.onEvent(ShoppingListEvent.DeleteItem(itemId))
                             },
-                            onAddItem = { description ->
-                                viewModel.onEvent(ShoppingListEvent.AddItem(list.id, description))
+                            onAddItem = { description, quantity, unit ->
+                                viewModel.onEvent(ShoppingListEvent.AddItem(list.id, description, quantity, unit))
                             },
                             onCheckAll = {
                                 viewModel.onEvent(ShoppingListEvent.CheckAllItems(list.id))

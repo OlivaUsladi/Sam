@@ -7,6 +7,7 @@ import com.example.domain.Recipes.model.GroceryItem
 import com.example.domain.Recipes.model.Like
 import com.example.domain.Recipes.model.Recipe
 import com.example.domain.Recipes.model.RecipeContent
+import com.example.domain.Recipes.model.RecipeIngredient
 import com.example.domain.Recipes.model.ShoppingList
 import com.example.domain.Recipes.model.ShoppingListItem
 
@@ -50,7 +51,11 @@ interface RecipeRepository {
     suspend fun deleteShoppingList(listId: Int): Boolean
     suspend fun getShoppingListItems(listId: Int): List<ShoppingListItem>
     suspend fun addItemToList(listId: Int, item: ShoppingListItem): ShoppingListItem
-    suspend fun addItemsFromRecipe(listId: Int, recipeId: Int, groceryItems: List<GroceryItem>): List<ShoppingListItem>
+    suspend fun addItemsFromRecipe(
+        listId: Int,
+        recipeId: Int,
+        ingredients: List<RecipeIngredient>
+    ): List<ShoppingListItem>
     suspend fun updateShoppingListItem(itemId: Int, isChecked: Boolean): ShoppingListItem?
     suspend fun updateShoppingListItemDetails(itemId: Int, description: String, quantity: Double?, unit: String?): ShoppingListItem?
     suspend fun removeShoppingListItem(itemId: Int): Boolean

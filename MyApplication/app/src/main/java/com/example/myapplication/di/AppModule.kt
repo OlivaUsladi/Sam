@@ -139,7 +139,10 @@ val appModule = module {
             addLikeUseCase = get(),
             removeLikeUseCase = get(),
             isRecipeLikedUseCase = get(),
-            getLikesCountUseCase = get()
+            getLikesCountUseCase = get(),
+            getShoppingListsUseCase = get(),
+            createShoppingListUseCase = get(),
+            addItemsFromRecipeUseCase = get()
         )
     }
 
