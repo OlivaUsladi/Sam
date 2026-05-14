@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface LikeRecipeRepository extends JpaRepository<LikeRecipeEntity, Long> {
 
+    //Optional представляет собой контейнер, который может содержать значение или быть пустым
     Optional<LikeRecipeEntity> findByUserAndRecipe(UserEntity user, RecipeEntity recipe);
 
     boolean existsByUserAndRecipe(UserEntity user, RecipeEntity recipe);

@@ -81,13 +81,9 @@ class ShoppingListViewModel(
 
     private fun loadGrocerySuggestions() {
         viewModelScope.launch {
-            try {
-                val groceryItems = getGroceryItemsUseCase()
-                _uiState.update {
-                    it.copy(grocerySuggestions = groceryItems.map { item -> item.name })
-                }
-            } catch (e: Exception) {
-                // Пупупу пока не придумала
+            val groceryItems = getGroceryItemsUseCase()
+            _uiState.update {
+                it.copy(grocerySuggestions = groceryItems.map { item -> item.name })
             }
         }
     }
@@ -243,44 +239,30 @@ class ShoppingListViewModel(
         }
     }
 
-    private fun checkAllItems(listId: Int) {
-        _uiState.update { state ->
-            val updatedLists = state.shoppingLists.map { list ->
-                if (list.id == listId) {
-                    val updatedItems = list.items.map { it.copy(isChecked = true) }
-                    list.copy(items = updatedItems.toMutableList())
-                } else list
-            }
-            state.copy(shoppingLists = updatedLists)
-        }
+    private fun checkAllItems(listId: Int) = setAllItemsChecked(listId, true)
 
+    private fun uncheckAllItems(listId: Int) = setAllItemsChecked(listId, false)
+
+    private fun setAllItemsChecked(listId: Int, isChecked: Boolean) {
         viewModelScope.launch {
-            val list = _uiState.value.shoppingLists.find { it.id == listId }
-            list?.items?.forEach { item ->
-                if (!item.isChecked) {
-                    toggleShoppingListItemUseCase(item.id, true)
+            val list = _uiState.value.shoppingLists.find { it.id == listId } ?: return@launch
+            val itemsToFlip = list.items.filter { it.isChecked != isChecked }
+            if (itemsToFlip.isEmpty()) return@launch
+            try {
+                itemsToFlip.forEach { item ->
+                    toggleShoppingListItemUseCase(item.id, isChecked)
                 }
-            }
-        }
-    }
-
-    private fun uncheckAllItems(listId: Int) {
-        _uiState.update { state ->
-            val updatedLists = state.shoppingLists.map { list ->
-                if (list.id == listId) {
-                    val updatedItems = list.items.map { it.copy(isChecked = false) }
-                    list.copy(items = updatedItems.toMutableList())
-                } else list
-            }
-            state.copy(shoppingLists = updatedLists)
-        }
-
-        viewModelScope.launch {
-            val list = _uiState.value.shoppingLists.find { it.id == listId }
-            list?.items?.forEach { item ->
-                if (item.isChecked) {
-                    toggleShoppingListItemUseCase(item.id, false)
+                _uiState.update { state ->
+                    val updatedLists = state.shoppingLists.map { l ->
+                        if (l.id == listId) {
+                            val updatedItems = l.items.map { it.copy(isChecked = isChecked) }
+                            l.copy(items = updatedItems.toMutableList())
+                        } else l
+                    }
+                    state.copy(shoppingLists = updatedLists)
                 }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = e.message) }
             }
         }
     }

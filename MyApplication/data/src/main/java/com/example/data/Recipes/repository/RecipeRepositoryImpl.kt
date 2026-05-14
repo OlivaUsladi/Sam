@@ -3,13 +3,19 @@ package com.example.data.Recipes.repository
 import com.example.data.Recipes.datasource.local.RecipeLocalDataSource
 import com.example.data.Recipes.datasource.local.model.CategoryEntity
 import com.example.data.Recipes.datasource.remote.RecipeRemoteDataSource
+import com.example.data.Recipes.datasource.remote.ShoppingListRemoteDataSource
+import com.example.data.Recipes.datasource.remote.dto.AddShoppingListItemRequestDto
+import com.example.data.Recipes.datasource.remote.dto.RecipeIngredientFromRecipeDto
+import com.example.data.Recipes.datasource.remote.dto.UpdateShoppingListItemRequestDto
 import com.example.data.Recipes.datasource.remote.mapper.RecipeNetworkMapper
+import com.example.data.Recipes.datasource.remote.mapper.ShoppingListNetworkMapper
 import com.example.domain.Recipes.model.*
 import com.example.domain.Recipes.repository.RecipeRepository
 
 class RecipeRepositoryImpl(
     private val localDataSource: RecipeLocalDataSource,
     private val remoteDataSource: RecipeRemoteDataSource,
+    private val shoppingListRemoteDataSource: ShoppingListRemoteDataSource,
     private val userId: Int = 1
 ) : RecipeRepository {
 
@@ -41,7 +47,6 @@ class RecipeRepositoryImpl(
             val recipesDto = remoteDataSource.getAllRecipesForUser(userId)
             recipesDto.map { RecipeNetworkMapper.mapToDomain(it) }
         } catch (e: Exception) {
-            // Если сеть недоступна — локальная БД
             val recipeEntities = localDataSource.getRecipes()
             recipeEntities.map { entity ->
                 val categories = getCategoriesForRecipe(entity.id)
@@ -419,53 +424,94 @@ class RecipeRepositoryImpl(
         }
     }
 
-    //Пока заглушки
 
     override suspend fun getRecipeByGrocery(groceryId: Int): List<Recipe> = emptyList()
     override suspend fun getGroceryItemById(groceryItemId: Int): GroceryItem? = null
 
-    //Списки покупок пока локально
+
 
     override suspend fun getShoppingLists(userId: Int): List<ShoppingList> {
-        val listEntities = localDataSource.getShoppingLists(userId)
-        return listEntities.map { listEntity ->
-            val itemEntities = localDataSource.getShoppingListItems(listEntity.id)
-            listEntity.toDomain(itemEntities)
+        return try {
+            shoppingListRemoteDataSource.getShoppingLists(userId)
+                .map { ShoppingListNetworkMapper.mapToDomain(it) }
+        } catch (e: Exception) {
+            localDataSource.getShoppingLists(userId).map { listEntity ->
+                val itemEntities = localDataSource.getShoppingListItems(listEntity.id)
+                listEntity.toDomain(itemEntities)
+            }
         }
     }
 
     override suspend fun getShoppingListById(listId: Int): ShoppingList? {
-        val listEntity = localDataSource.getShoppingListById(listId) ?: return null
-        val itemEntities = localDataSource.getShoppingListItems(listId)
-        return listEntity.toDomain(itemEntities)
+        return try {
+            ShoppingListNetworkMapper.mapToDomain(
+                shoppingListRemoteDataSource.getShoppingListById(listId, userId)
+            )
+        } catch (e: Exception) {
+            val listEntity = localDataSource.getShoppingListById(listId) ?: return null
+            val itemEntities = localDataSource.getShoppingListItems(listId)
+            listEntity.toDomain(itemEntities)
+        }
     }
 
     override suspend fun createShoppingList(userId: Int, name: String, recipeId: Int?): ShoppingList {
-        val listEntity = localDataSource.createShoppingList(userId, name)
-        return listEntity.toDomain(emptyList())
+        return try {
+            ShoppingListNetworkMapper.mapToDomain(
+                shoppingListRemoteDataSource.createShoppingList(userId, name)
+            )
+        } catch (e: Exception) {
+            val listEntity = localDataSource.createShoppingList(userId, name)
+            listEntity.toDomain(emptyList())
+        }
     }
 
     override suspend fun updateShoppingListName(listId: Int, newName: String): ShoppingList? {
-        val updatedEntity = localDataSource.updateShoppingListName(listId, newName)
-        if (updatedEntity != null) {
+        return try {
+            ShoppingListNetworkMapper.mapToDomain(
+                shoppingListRemoteDataSource.renameShoppingList(listId, userId, newName)
+            )
+        } catch (e: Exception) {
+            val updatedEntity = localDataSource.updateShoppingListName(listId, newName) ?: return null
             val itemEntities = localDataSource.getShoppingListItems(listId)
-            return updatedEntity.toDomain(itemEntities)
+            updatedEntity.toDomain(itemEntities)
         }
-        return null
     }
 
     override suspend fun deleteShoppingList(listId: Int): Boolean {
-        return localDataSource.deleteShoppingList(listId)
+        return try {
+            shoppingListRemoteDataSource.deleteShoppingList(listId, userId)
+        } catch (e: Exception) {
+            localDataSource.deleteShoppingList(listId)
+        }
     }
 
     override suspend fun getShoppingListItems(listId: Int): List<ShoppingListItem> {
-        val itemEntities = localDataSource.getShoppingListItems(listId)
-        return itemEntities.map { it.toDomain() }
+        return try {
+            shoppingListRemoteDataSource.getShoppingListById(listId, userId).items
+                .map { ShoppingListNetworkMapper.mapToDomain(it) }
+        } catch (e: Exception) {
+            localDataSource.getShoppingListItems(listId).map { it.toDomain() }
+        }
     }
 
     override suspend fun addItemToList(listId: Int, item: ShoppingListItem): ShoppingListItem {
-        val newItemEntity = localDataSource.addShoppingListItem(listId, item.description, item.quantity, item.unit)
-        return newItemEntity.toDomain()
+        return try {
+            ShoppingListNetworkMapper.mapToDomain(
+                shoppingListRemoteDataSource.addItemToList(
+                    listId = listId,
+                    userId = userId,
+                    body = AddShoppingListItemRequestDto(
+                        description = item.description,
+                        quantity = item.quantity,
+                        unit = item.unit
+                    )
+                )
+            )
+        } catch (e: Exception) {
+            val newItemEntity =
+                localDataSource.addShoppingListItem(listId, item.description, item.quantity, item.unit)
+            newItemEntity.toDomain()
+        }
     }
 
     override suspend fun addItemsFromRecipe(
@@ -473,46 +519,63 @@ class RecipeRepositoryImpl(
         recipeId: Int,
         ingredients: List<RecipeIngredient>
     ): List<ShoppingListItem> {
-        val addedItems = mutableListOf<ShoppingListItem>()
-        val existingItems = localDataSource.getShoppingListItems(listId)
-
-        for (ingredient in ingredients) {
-            val productName = ingredient.groceryItem.name
-            val amount = ingredient.amount
-            val unit = ingredient.unit
-
-            val existing = existingItems.find {
-                it.description.equals(productName, ignoreCase = true)
-            }
-
-            if (existing != null) {
-                val existingQuantity = existing.quantity ?: 0.0
-                val newQuantity = existingQuantity + amount
-
-                val updated = localDataSource.updateShoppingListItemDetails(
-                    existing.id,
-                    existing.description,
-                    newQuantity,
-                    unit
-                )
-                updated?.let { addedItems.add(it.toDomain()) }
-            } else {
-                val newItem = localDataSource.addShoppingListItem(
-                    listId = listId,
-                    description = productName,
-                    quantity = amount,
-                    unit = unit
-                )
-                addedItems.add(newItem.toDomain())
-            }
+        val payload = ingredients.map { ingredient ->
+            RecipeIngredientFromRecipeDto(
+                name = ingredient.groceryItem.name,
+                amount = ingredient.amount,
+                unit = ingredient.unit
+            )
         }
 
-        return addedItems
+        return try {
+            shoppingListRemoteDataSource.addItemsFromRecipe(
+                listId = listId,
+                userId = userId,
+                recipeId = recipeId,
+                ingredients = payload
+            ).map { ShoppingListNetworkMapper.mapToDomain(it) }
+        } catch (e: Exception) {
+            val addedItems = mutableListOf<ShoppingListItem>()
+            val existingItems = localDataSource.getShoppingListItems(listId)
+            for (ingredient in ingredients) {
+                val productName = ingredient.groceryItem.name
+                val amount = ingredient.amount
+                val unit = ingredient.unit
+                val existing = existingItems.find {
+                    it.description.equals(productName, ignoreCase = true)
+                }
+                if (existing != null) {
+                    val newQuantity = (existing.quantity ?: 0.0) + amount
+                    val updated = localDataSource.updateShoppingListItemDetails(
+                        existing.id, existing.description, newQuantity, unit
+                    )
+                    updated?.let { addedItems.add(it.toDomain()) }
+                } else {
+                    val newItem = localDataSource.addShoppingListItem(
+                        listId = listId,
+                        description = productName,
+                        quantity = amount,
+                        unit = unit
+                    )
+                    addedItems.add(newItem.toDomain())
+                }
+            }
+            addedItems
+        }
     }
 
     override suspend fun updateShoppingListItem(itemId: Int, isChecked: Boolean): ShoppingListItem? {
-        val updatedEntity = localDataSource.updateShoppingListItem(itemId, isChecked)
-        return updatedEntity?.toDomain()
+        return try {
+            ShoppingListNetworkMapper.mapToDomain(
+                shoppingListRemoteDataSource.updateItem(
+                    itemId = itemId,
+                    userId = userId,
+                    body = UpdateShoppingListItemRequestDto(isChecked = isChecked)
+                )
+            )
+        } catch (e: Exception) {
+            localDataSource.updateShoppingListItem(itemId, isChecked)?.toDomain()
+        }
     }
 
     override suspend fun updateShoppingListItemDetails(
@@ -521,23 +584,48 @@ class RecipeRepositoryImpl(
         quantity: Double?,
         unit: String?
     ): ShoppingListItem? {
-        return null
+        return try {
+            ShoppingListNetworkMapper.mapToDomain(
+                shoppingListRemoteDataSource.updateItem(
+                    itemId = itemId,
+                    userId = userId,
+                    body = UpdateShoppingListItemRequestDto(
+                        description = description,
+                        quantity = quantity,
+                        unit = unit
+                    )
+                )
+            )
+        } catch (e: Exception) {
+            localDataSource.updateShoppingListItemDetails(itemId, description, quantity, unit)?.toDomain()
+        }
     }
 
     override suspend fun removeShoppingListItem(itemId: Int): Boolean {
-        return localDataSource.deleteShoppingListItem(itemId)
+        return try {
+            shoppingListRemoteDataSource.deleteItem(itemId, userId)
+        } catch (e: Exception) {
+            localDataSource.deleteShoppingListItem(itemId)
+        }
     }
 
     override suspend fun mergeShoppingLists(targetListId: Int, sourceListIds: List<Int>): ShoppingList? {
-        val mergedEntity = localDataSource.mergeShoppingLists(targetListId, sourceListIds)
-        if (mergedEntity != null) {
+        return try {
+            ShoppingListNetworkMapper.mapToDomain(
+                shoppingListRemoteDataSource.mergeShoppingLists(targetListId, sourceListIds, userId)
+            )
+        } catch (e: Exception) {
+            val mergedEntity = localDataSource.mergeShoppingLists(targetListId, sourceListIds) ?: return null
             val itemEntities = localDataSource.getShoppingListItems(targetListId)
-            return mergedEntity.toDomain(itemEntities)
+            mergedEntity.toDomain(itemEntities)
         }
-        return null
     }
 
     override suspend fun clearCompletedItems(listId: Int): Boolean {
-        return localDataSource.clearCompletedItems(listId)
+        return try {
+            shoppingListRemoteDataSource.clearCompletedItems(listId, userId)
+        } catch (e: Exception) {
+            localDataSource.clearCompletedItems(listId)
+        }
     }
 }

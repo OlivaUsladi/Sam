@@ -281,20 +281,16 @@ fun ShoppingListCard(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(150.dp)
+                                .height(250.dp)
                                 .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
                         ) {
                             suggestions.filter {
                                 it.contains(newItemDescription, ignoreCase = true)
-                            }.take(8).forEach { suggestion ->
+                            }.take(5).forEach { suggestion ->
                                 TextButton(
                                     onClick = {
-                                        onAddItem(suggestion, newItemQantity, newItemUnit)
-                                        newItemDescription = ""
-                                        newItemQantity=""
-                                        newItemUnit=""
+                                        newItemDescription = suggestion
                                         showSuggestions = false
-                                        showAddItemDialog = false
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {

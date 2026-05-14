@@ -212,12 +212,13 @@ class RecipeScreenViewModel(
         viewModelScope.launch {
             try {
                 val lists = getShoppingListsUseCase(_uiState.value.userId)
+                val recipe = getRecipeByIdUseCase(recipeId)
                 _uiState.update {
                     it.copy(
                         showShoppingListDialog = true,
                         shoppingLists = lists,
                         isCreatingNewList = false,
-                        newListName = ""
+                        newListName = recipe?.title ?: ""
                     )
                 }
             } catch (e: Exception) {

@@ -1,6 +1,7 @@
 package com.example.data.Recipes.datasource.remote
 
 import com.example.data.Recipes.datasource.remote.api.RecipeApiService
+import com.example.data.Recipes.datasource.remote.api.ShoppingListApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -36,4 +37,5 @@ object RetrofitClient {
         .build()
 
     val recipeApiService: RecipeApiService = retrofit.create(RecipeApiService::class.java)
+    val shoppingListApiService: ShoppingListApiService = retrofit.create(ShoppingListApiService::class.java)
 }
