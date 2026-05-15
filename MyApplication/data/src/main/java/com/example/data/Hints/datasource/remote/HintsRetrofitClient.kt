@@ -1,14 +1,13 @@
-package com.example.data.Recipes.datasource.remote
+package com.example.data.Hints.datasource.remote
 
-import com.example.data.Recipes.datasource.remote.api.RecipeApiService
-import com.example.data.Recipes.datasource.remote.api.ShoppingListApiService
+import com.example.data.Hints.datasource.remote.api.ArticleApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-object RetrofitClient {
+object HintsRetrofitClient {
 
     // Для эмулятора Android сюда вставляем 10.0.2.2
     // Для реального устройства — IP компьютера (192.168.0.102)
@@ -36,6 +35,5 @@ object RetrofitClient {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val recipeApiService: RecipeApiService = retrofit.create(RecipeApiService::class.java)
-    val shoppingListApiService: ShoppingListApiService = retrofit.create(ShoppingListApiService::class.java)
+    val hintsApiService: ArticleApiService = retrofit.create(ArticleApiService::class.java)
 }

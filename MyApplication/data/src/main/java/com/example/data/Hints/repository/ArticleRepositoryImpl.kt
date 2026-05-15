@@ -1,6 +1,7 @@
 package com.example.data.Hints.repository
 
-import com.example.data.Hints.datasource.local.ArticleLocalDataSource
+import com.example.data.Hints.datasource.remote.ArticleRemoteDataSource
+import com.example.data.Hints.datasource.remote.mapper.ArticleNetworkMapper
 import com.example.domain.Hints.model.Article
 import com.example.domain.Hints.model.ArticleContent
 import com.example.domain.Hints.model.Category
@@ -8,110 +9,67 @@ import com.example.domain.Hints.model.Favorite
 import com.example.domain.Hints.model.Like
 import com.example.domain.Hints.repository.ArticleRepository
 
-//В общем этот файл будем под БД и локальные БД переделывать
+//. Когда добавится авторизация — заменить на чтение из TokenStorage / AuthSession. Наверное Spring Security
 class ArticleRepositoryImpl(
-    private val localDataSource: ArticleLocalDataSource,
+    private val remoteDataSource: ArticleRemoteDataSource,
     private val userId: Int = 1
 ) : ArticleRepository {
 
-    override suspend fun getArticles(): List<Article> {
-        val articleEntities = localDataSource.getArticles()
-        return articleEntities.map { entity ->
-            val category = localDataSource.getCategories()
-                .find { it.id == entity.categoryId }
-                ?: throw IllegalStateException("Category not found for article ${entity.id}")
-            val likesCount = localDataSource.getLikesCount(entity.id)
-            entity.toDomain(category, likesCount)
-        }
-    }
+    override suspend fun getArticles(): List<Article> =
+        remoteDataSource.getArticles(userId)
+            .map { ArticleNetworkMapper.mapToDomain(it) }
 
     override suspend fun getArticleContent(articleId: Int): ArticleContent {
-        val contentEntity = localDataSource.getArticleContent(articleId)
-            ?: throw IllegalStateException("Content not found for article $articleId")
-        return contentEntity.toDomain()
+        val detail = remoteDataSource.getArticleById(articleId, userId)
+        return ArticleNetworkMapper.mapDetailToContent(detail)
     }
 
-    override suspend fun getArticlesByCategory(categoryId: Int): List<Article> {
-        val articleEntities = localDataSource.getArticlesByCategory(categoryId)
-        return articleEntities.map { entity ->
-            val category = localDataSource.getCategories()
-                .find { it.id == entity.categoryId }
-                ?: throw IllegalStateException("Category not found for article ${entity.id}")
-            val likesCount = localDataSource.getLikesCount(entity.id)
-            entity.toDomain(category, likesCount)
-        }
-    }
+    override suspend fun getArticlesByCategory(categoryId: Int): List<Article> =
+        remoteDataSource.getArticlesByCategory(categoryId, userId)
+            .map { ArticleNetworkMapper.mapToDomain(it) }
 
-    override suspend fun searchArticles(query: String): List<Article> {
-        val articleEntities = localDataSource.getArticles().filter { article ->
-            article.title.contains(query, ignoreCase = true) ||
-                    article.mainWords.any { it.contains(query, ignoreCase = true) }
-        }
-        return articleEntities.map { entity ->
-            val category = localDataSource.getCategories()
-                .find { it.id == entity.categoryId }
-                ?: throw IllegalStateException("Category not found for article ${entity.id}")
-            val likesCount = localDataSource.getLikesCount(entity.id)
-            entity.toDomain(category, likesCount)
-        }
-    }
+    override suspend fun searchArticles(query: String): List<Article> =
+        remoteDataSource.searchArticles(query, userId)
+            .map { ArticleNetworkMapper.mapToDomain(it) }
 
-    override suspend fun getFavoriteArticles(userId: Int): List<Article> {
-        val favoriteEntities = localDataSource.getFavorites(userId)
-        val favoriteArticleIds = favoriteEntities.map { it.articleId }
-
-        return localDataSource.getArticles()
-            .filter { it.id in favoriteArticleIds }
-            .map { entity ->
-                val category = localDataSource.getCategories()
-                    .find { it.id == entity.categoryId }
-                    ?: throw IllegalStateException("Category not found for article ${entity.id}")
-                val likesCount = localDataSource.getLikesCount(entity.id)
-                entity.toDomain(category, likesCount)
-            }
-    }
+    override suspend fun getFavoriteArticles(userId: Int): List<Article> =
+        remoteDataSource.getFavourites(userId)
+            .map { ArticleNetworkMapper.mapToDomain(it) }
 
     override suspend fun addToFavorites(userId: Int, articleId: Int): Favorite {
-        val favoriteEntity = localDataSource.addFavorite(userId, articleId)
-        return favoriteEntity.toDomain()
+        remoteDataSource.addToFavourites(articleId, userId)
+        return Favorite(userId = userId, articleId = articleId)
     }
 
-    override suspend fun removeFromFavorites(userId: Int, articleId: Int): Boolean =
-        localDataSource.removeFavorite(userId, articleId)
+    override suspend fun removeFromFavorites(userId: Int, articleId: Int): Boolean {
+        remoteDataSource.removeFromFavourites(articleId, userId)
+        return true
+    }
 
     override suspend fun isArticleFavorite(userId: Int, articleId: Int): Boolean =
-        localDataSource.isFavorite(userId, articleId)
+        remoteDataSource.isFavourite(articleId, userId)
 
-    override suspend fun getLikedArticles(userId: Int): List<Article> {
-        val likedEntities = localDataSource.getUserLikes(userId)
-        val likedArticleIds = likedEntities.map { it.articleId }
-
-        return localDataSource.getArticles()
-            .filter { it.id in likedArticleIds }
-            .map { entity ->
-                val category = localDataSource.getCategories()
-                    .find { it.id == entity.categoryId }
-                    ?: throw IllegalStateException("Category not found for article ${entity.id}")
-                val likesCount = localDataSource.getLikesCount(entity.id)
-                entity.toDomain(category, likesCount)
-            }
-    }
+    override suspend fun getLikedArticles(userId: Int): List<Article> =
+        remoteDataSource.getLiked(userId)
+            .map { ArticleNetworkMapper.mapToDomain(it) }
 
     override suspend fun addLike(userId: Int, articleId: Int): Like {
-        val likeEntity = localDataSource.addLike(userId, articleId)
-        return likeEntity.toDomain()
+        remoteDataSource.addLike(articleId, userId)
+        return Like(userId = userId, articleId = articleId)
     }
 
-    override suspend fun removeLike(userId: Int, articleId: Int): Boolean =
-        localDataSource.removeLike(userId, articleId)
+    override suspend fun removeLike(userId: Int, articleId: Int): Boolean {
+        remoteDataSource.removeLike(articleId, userId)
+        return true
+    }
 
     override suspend fun isArticleLiked(userId: Int, articleId: Int): Boolean =
-        localDataSource.isLiked(userId, articleId)
+        remoteDataSource.isLiked(articleId, userId)
 
     override suspend fun getLikesCount(articleId: Int): Int =
-        localDataSource.getLikesCount(articleId)
+        remoteDataSource.getLikesCount(articleId)
 
-    override suspend fun getCategories(): List<Category> {
-        return localDataSource.getCategories().map { it.toDomain() }
-    }
+    override suspend fun getCategories(): List<Category> =
+        remoteDataSource.getCategories()
+            .map { ArticleNetworkMapper.mapToDomain(it) }
 }
