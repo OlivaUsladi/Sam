@@ -1,8 +1,10 @@
 package com.example.backend.controller;
 
+import com.example.backend.security.AuthenticatedUser;
 import com.example.backend.service.RecipeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,9 +16,9 @@ public class LikeRecipeController {
     @GetMapping("/{id}/like")
     public ResponseEntity<Boolean> isRecipeLiked(
             @PathVariable Integer id,
-            @RequestHeader(value = "userId") Integer userId) {
+            @AuthenticationPrincipal AuthenticatedUser principal) {
 
-        boolean isLiked = recipeService.isRecipeLiked(id, userId);
+        boolean isLiked = recipeService.isRecipeLiked(id, principal.id());
         return ResponseEntity.ok(isLiked);
     }
 
@@ -31,22 +33,16 @@ public class LikeRecipeController {
     @PostMapping("/{id}/like")
     public ResponseEntity<Void> addLike(
             @PathVariable Integer id,
-            @RequestHeader(value = "userId") Integer userId) {
-        if (userId == null) {
-            return ResponseEntity.status(401).build();
-        }
-        recipeService.addLike(id, userId);
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+        recipeService.addLike(id, principal.id());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/like")
     public ResponseEntity<Void> removeLike(
             @PathVariable Integer id,
-            @RequestHeader(value = "userId") Integer userId) {
-        if (userId == null) {
-            return ResponseEntity.status(401).build();
-        }
-        recipeService.removeLike(id, userId);
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+        recipeService.removeLike(id, principal.id());
         return ResponseEntity.ok().build();
     }
 }

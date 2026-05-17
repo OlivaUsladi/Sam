@@ -1,10 +1,12 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.ArticleResponseDto;
+import com.example.backend.security.AuthenticatedUser;
 import com.example.backend.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,28 +19,27 @@ public class FavouriteArticleController {
     private final ArticleService service;
 
     @GetMapping
-    public List<ArticleResponseDto> getFavourites(@RequestHeader("userId") Integer userId) {
-        return service.getFavouriteArticles(userId);
+    public List<ArticleResponseDto> getFavourites(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return service.getFavouriteArticles(principal.id());
     }
 
     @GetMapping("/{articleId}")
-    public Boolean isFavourite(@RequestHeader("userId") Integer userId,
+    public Boolean isFavourite(@AuthenticationPrincipal AuthenticatedUser principal,
                                @PathVariable Integer articleId) {
-        return service.isFavourite(userId, articleId);
+        return service.isFavourite(principal.id(), articleId);
     }
 
     @PostMapping("/{articleId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addToFavourites(@RequestHeader("userId") Integer userId,
+    public void addToFavourites(@AuthenticationPrincipal AuthenticatedUser principal,
                                 @PathVariable Integer articleId) {
-        service.addToFavourites(userId, articleId);
+        service.addToFavourites(principal.id(), articleId);
     }
 
     @DeleteMapping("/{articleId}")
-    public ResponseEntity<Void> removeFromFavourites(@RequestHeader("userId") Integer userId,
+    public ResponseEntity<Void> removeFromFavourites(@AuthenticationPrincipal AuthenticatedUser principal,
                                                      @PathVariable Integer articleId) {
-        service.removeFromFavourites(userId, articleId);
+        service.removeFromFavourites(principal.id(), articleId);
         return ResponseEntity.noContent().build();
     }
 }
-
