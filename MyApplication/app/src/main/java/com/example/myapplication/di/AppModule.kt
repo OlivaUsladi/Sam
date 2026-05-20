@@ -1,5 +1,8 @@
 package com.example.myapplication.di
 
+import com.example.myapplication.Auth.ui.forgot.ForgotPasswordViewModel
+import com.example.myapplication.Auth.ui.login.LoginViewModel
+import com.example.myapplication.Auth.ui.register.RegisterViewModel
 import com.example.myapplication.Hints.ui.home.HomeViewModel
 import com.example.myapplication.Hints.ui.article.ArticleViewModel
 import com.example.myapplication.Hints.ui.category.CategoriesViewModel
@@ -168,4 +171,8 @@ val appModule = module {
             getGroceryItemsUseCase = get()
         )
     }
+
+    viewModel { LoginViewModel(get()) }
+    viewModel { RegisterViewModel(get(), get()) }
+    viewModel { ForgotPasswordViewModel(get(), get()) }
 }

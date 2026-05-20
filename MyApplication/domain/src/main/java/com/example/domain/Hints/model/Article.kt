@@ -1,6 +1,6 @@
 package com.example.domain.Hints.model
 
-import com.example.domain.User
+import com.example.domain.Auth.model.User
 import java.time.LocalDateTime
 
 //общая сущность статьи без контента

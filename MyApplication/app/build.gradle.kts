@@ -66,6 +66,10 @@ dependencies {
     implementation("io.insert-koin:koin-android:3.5.0")
     implementation("io.insert-koin:koin-androidx-compose:3.5.0")
 
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
+
     implementation(project(":data"))
     implementation(project(":domain"))
 

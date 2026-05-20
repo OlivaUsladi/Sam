@@ -115,9 +115,9 @@ fun ArticleCard(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                IconButton(
-                    onClick = onFavoriteClick,
-                    modifier = Modifier.size(24.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onFavoriteClick() }
                 ) {
                     Icon(
                         painter = painterResource(
@@ -125,7 +125,7 @@ fun ArticleCard(
                             else R.drawable.bookmark
                         ),
                         contentDescription = "Избранное",
-                        tint = if (article.isFavorite) Color.Red else Color.Gray,
+                        tint = if (article.isFavorite) Color(0xFFF45B03) else Color.Gray,
                         modifier = Modifier.size(20.dp)
                     )
                 }
