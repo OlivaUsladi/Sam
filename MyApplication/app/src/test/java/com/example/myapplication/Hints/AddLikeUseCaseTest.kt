@@ -1,10 +1,10 @@
-package com.example.myapplication.Hints
+package com.example.myapplication.Hints.usecase
 
 import com.example.domain.Hints.model.Like
 import com.example.domain.Hints.repository.ArticleRepository
 import com.example.domain.Hints.use_case.AddLikeUseCase
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -12,34 +12,32 @@ import org.mockito.Mockito
 class AddLikeUseCaseTest {
 
     private lateinit var repository: ArticleRepository
-    private lateinit var addLikeUseCase: AddLikeUseCase
+    private lateinit var useCase: AddLikeUseCase
 
     @Before
     fun setUp() {
         repository = Mockito.mock(ArticleRepository::class.java)
-        addLikeUseCase = AddLikeUseCase(repository)
+        useCase = AddLikeUseCase(repository)
     }
 
     @Test
-    fun `toggle and return Like`() {
+    fun `invoke returns like from repository`() {
         runBlocking {
             val userId = 1
             val articleId = 100
-            val expectedLike = Like(userId, articleId)
+            val expected = Like(userId, articleId)
 
-            Mockito.`when`(repository.addLike(userId, articleId)).thenReturn(expectedLike)
+            Mockito.`when`(repository.addLike(userId, articleId)).thenReturn(expected)
 
-            val result = addLikeUseCase.invoke(userId, articleId)
+            val result = useCase(userId, articleId)
 
-            Assert.assertEquals(expectedLike, result)
-            Assert.assertEquals(userId, result.userId)
-            Assert.assertEquals(articleId, result.articleId)
-            Mockito.verify(repository, Mockito.times(1)).addLike(userId, articleId)
+            assertEquals(expected, result)
+            Mockito.verify(repository).addLike(userId, articleId)
         }
     }
 
     @Test(expected = IllegalStateException::class)
-    fun `Exception`() {
+    fun `invoke throws when repository throws`() {
         runBlocking {
             val userId = 1
             val articleId = 100
@@ -47,7 +45,7 @@ class AddLikeUseCaseTest {
             Mockito.`when`(repository.addLike(userId, articleId))
                 .thenThrow(IllegalStateException("Already liked"))
 
-            addLikeUseCase.invoke(userId, articleId)
+            useCase(userId, articleId)
         }
     }
 }

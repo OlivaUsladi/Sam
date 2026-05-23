@@ -9,7 +9,6 @@ import com.example.domain.Hints.model.Favorite
 import com.example.domain.Hints.model.Like
 import com.example.domain.Hints.repository.ArticleRepository
 
-//. Когда добавится авторизация — заменить на чтение из TokenStorage / AuthSession. Наверное Spring Security
 class ArticleRepositoryImpl(
     private val remoteDataSource: ArticleRemoteDataSource,
     private val userId: Int = 1
