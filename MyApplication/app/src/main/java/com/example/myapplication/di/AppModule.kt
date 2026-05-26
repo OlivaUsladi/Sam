@@ -3,6 +3,17 @@ package com.example.myapplication.di
 import com.example.myapplication.Auth.ui.forgot.ForgotPasswordViewModel
 import com.example.myapplication.Auth.ui.login.LoginViewModel
 import com.example.myapplication.Auth.ui.register.RegisterViewModel
+import com.example.myapplication.Finance.ui.accounts.AccountsViewModel
+import com.example.myapplication.Finance.ui.analytics.AnalyticsViewModel
+import com.example.myapplication.Finance.ui.bankreport.BankReportsViewModel
+import com.example.myapplication.Finance.ui.goal.GoalDetailViewModel
+import com.example.myapplication.Finance.ui.goal.GoalEditViewModel
+import com.example.myapplication.Finance.ui.history.HistoryViewModel
+import com.example.myapplication.Finance.ui.sources.SourcesViewModel
+import com.example.myapplication.Finance.ui.tag.AssignTagTransactionsViewModel
+import com.example.myapplication.Finance.ui.tag.TagEditViewModel
+import com.example.myapplication.Finance.ui.tagsgoals.TagsGoalsViewModel
+import com.example.myapplication.Finance.ui.transaction.TransactionEditViewModel
 import com.example.myapplication.Hints.ui.home.HomeViewModel
 import com.example.myapplication.Hints.ui.article.ArticleViewModel
 import com.example.myapplication.Hints.ui.category.CategoriesViewModel
@@ -175,4 +186,18 @@ val appModule = module {
     viewModel { LoginViewModel(get()) }
     viewModel { RegisterViewModel(get(), get()) }
     viewModel { ForgotPasswordViewModel(get(), get()) }
+
+    viewModel { AccountsViewModel(get()) }
+    viewModel { HistoryViewModel(get(), get(), get(), get()) }
+    viewModel { SourcesViewModel(get(), get(), get(), get()) }
+    viewModel { TransactionEditViewModel(get(), get(), get(), get(),
+        get(), get(), get()) }
+    viewModel { BankReportsViewModel(get(), get(), get(), get()) }
+    viewModel { AnalyticsViewModel(get()) }
+    viewModel { TagsGoalsViewModel(get(), get(), get(), get()) }
+    viewModel { TagEditViewModel(get(), get(), get(), get(),
+        get(), get()) }
+    viewModel { AssignTagTransactionsViewModel(get(), get(), get()) }
+    viewModel { GoalDetailViewModel(get(), get(), get()) }
+    viewModel { GoalEditViewModel(get(), get(), get()) }
 }

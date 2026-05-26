@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myapplication.Finance.FinanceActivity
 import com.example.myapplication.Hints.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.Recipes.navigation.Routes
@@ -58,6 +59,7 @@ fun RecipeTopAppBar(navController: NavController) {
     }
 
     val intentHints = Intent(context, MainActivity::class.java)
+    val intentFinance = Intent(context, FinanceActivity::class.java)
 
     Box(Modifier.fillMaxWidth().height(if (drawerState.isOpen) 250.dp else 90.dp)) {
         ModalNavigationDrawer(
@@ -75,7 +77,7 @@ fun RecipeTopAppBar(navController: NavController) {
                                 when (selectedItem.value){
                                     "Самоорганизация" -> context.startActivity(intentHints)
                                     "Кулинария" -> navController.navigate("home")
-                                    //"Финансовый менеджер" -> context.startActivity(intenttips)
+                                    "Финансовый менеджер" -> context.startActivity(intentFinance)
                                 }
                             },
                         ) { Text(item, fontSize = 22.sp, color = Color.White) }

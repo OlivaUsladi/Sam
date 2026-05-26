@@ -6,6 +6,8 @@ import com.example.data.Recipes.datasource.remote.RetrofitClient
 import com.example.myapplication.di.appModule
 import com.example.myapplication.di.auth.authDataModule
 import com.example.myapplication.di.auth.authDomainModule
+import com.example.myapplication.di.finance.financeDataModule
+import com.example.myapplication.di.finance.financeDomainModule
 import com.example.myapplication.di.hints.hintsDataModule
 import com.example.myapplication.di.hints.hintsDomainModule
 import com.example.myapplication.di.recipes.recipesDataModule
@@ -30,7 +32,9 @@ class MyApplication : Application() {
                 hintsDataModule,
                 hintsDomainModule,
                 recipesDataModule,
-                recipesDomainModule
+                recipesDomainModule,
+                financeDataModule,
+                financeDomainModule
             )
         }
     }

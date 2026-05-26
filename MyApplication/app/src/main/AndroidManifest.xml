@@ -36,6 +36,9 @@
         <activity
             android:name=".Hints.MainActivity"
             android:exported="false" />
+        <activity
+            android:name=".Finance.FinanceActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>
