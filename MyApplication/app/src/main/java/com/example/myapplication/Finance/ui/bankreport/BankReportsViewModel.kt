@@ -2,70 +2,77 @@ package com.example.myapplication.Finance.ui.bankreport
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.domain.Finance.model.BankReport
-import com.example.domain.Finance.use_case.DeleteBankReportUseCase
-import com.example.domain.Finance.use_case.GetBankReportsUseCase
-import com.example.domain.Finance.use_case.ProcessBankReportUseCase
-import com.example.domain.Finance.use_case.UploadBankReportUseCase
+import com.example.domain.Finance.model.ImportReport
+import com.example.domain.Finance.model.Source
+import com.example.domain.Finance.use_case.GetSourcesUseCase
+import com.example.domain.Finance.use_case.ImportBankReportUseCase
+import com.example.domain.Finance.use_case.ObserveFinanceChangesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-//пока типа заглушки
 data class BankReportsUiState(
-    val reports: List<BankReport> = emptyList(),
-    val isLoading: Boolean = false,
+    val sources: List<Source> = emptyList(),
+    val selectedSourceId: Int? = null,
+    val isUploading: Boolean = false,
+    val lastReport: ImportReport? = null,
     val error: String? = null,
 )
 
 sealed class BankReportsEvent {
-    data object Reload : BankReportsEvent()
-    data class Upload(val fileName: String, val sizeBytes: Long, val content: ByteArray) : BankReportsEvent()
-    data class Delete(val id: Int) : BankReportsEvent()
-    data class Process(val id: Int) : BankReportsEvent()
+    data class SelectSource(val id: Int) : BankReportsEvent()
+    data class Import(val fileName: String, val content: ByteArray) : BankReportsEvent()
+    data object Reset : BankReportsEvent()
 }
 
 class BankReportsViewModel(
-    private val getReports: GetBankReportsUseCase,
-    private val uploadReport: UploadBankReportUseCase,
-    private val deleteReport: DeleteBankReportUseCase,
-    private val processReport: ProcessBankReportUseCase,
+    private val getSources: GetSourcesUseCase,
+    private val importReport: ImportBankReportUseCase,
+    private val observeChanges: ObserveFinanceChangesUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BankReportsUiState())
     val state: StateFlow<BankReportsUiState> = _state.asStateFlow()
 
-    init { load() }
+    init {
+        viewModelScope.launch { observeChanges().collectLatest { loadSources() } }
+    }
 
     fun onEvent(e: BankReportsEvent) {
         when (e) {
-            BankReportsEvent.Reload     -> load()
-            is BankReportsEvent.Upload  -> upload(e.fileName, e.sizeBytes, e.content)
-            is BankReportsEvent.Delete  -> remove(e.id)
-            is BankReportsEvent.Process -> process(e.id)
+            is BankReportsEvent.SelectSource -> _state.update { it.copy(selectedSourceId = e.id) }
+            is BankReportsEvent.Import -> doImport(e.fileName, e.content)
+            BankReportsEvent.Reset -> _state.update { it.copy(lastReport = null, error = null) }
         }
     }
 
-    private fun load() = viewModelScope.launch {
-        _state.update { it.copy(isLoading = true, error = null) }
-        try { _state.update { it.copy(reports = getReports(), isLoading = false) } }
-        catch (t: Throwable) { _state.update { it.copy(isLoading = false, error = t.message ?: "Ошибка") } }
+    private fun loadSources() = viewModelScope.launch {
+        try {
+            val sources = getSources()
+            _state.update {
+                it.copy(sources = sources,
+                    selectedSourceId = it.selectedSourceId ?: sources.firstOrNull()?.id)
+            }
+        } catch (t: Throwable) {
+            _state.update { it.copy(error = t.message ?: "Не удалось загрузить источники") }
+        }
     }
 
-    private fun upload(fileName: String, sizeBytes: Long, content: ByteArray) = viewModelScope.launch {
-        try { uploadReport(fileName, sizeBytes, content); load() }
-        catch (t: Throwable) { _state.update { it.copy(error = t.message ?: "Не удалось загрузить") } }
-    }
-
-    private fun remove(id: Int) = viewModelScope.launch {
-        try { deleteReport(id); load() }
-        catch (t: Throwable) { _state.update { it.copy(error = t.message ?: "Не удалось удалить") } }
-    }
-
-    private fun process(id: Int) = viewModelScope.launch {
-        try { processReport(id); load() }
-        catch (t: Throwable) { _state.update { it.copy(error = t.message ?: "Не удалось обработать") } }
+    private fun doImport(fileName: String, content: ByteArray) = viewModelScope.launch {
+        val srcId = _state.value.selectedSourceId
+        if (srcId == null) {
+            _state.update { it.copy(error = "Сначала выберите счёт") }
+            return@launch
+        }
+        _state.update { it.copy(isUploading = true, error = null, lastReport = null) }
+        try {
+            val r = importReport(fileName, srcId, content)
+            _state.update { it.copy(isUploading = false, lastReport = r) }
+        } catch (t: Throwable) {
+            _state.update { it.copy(isUploading = false, error = t.message ?: "Не удалось импортировать") }
+        }
     }
 }

@@ -31,10 +31,10 @@ val financeDomainModule = module {
 
     factory { GetAnalyticsUseCase(get()) }
 
-    factory { GetBankReportsUseCase(get()) }
-    factory { UploadBankReportUseCase(get()) }
-    factory { DeleteBankReportUseCase(get()) }
-    factory { ProcessBankReportUseCase(get()) }
 
     factory { IsLoggedInUseCase(get()) }
+
+    factory { ObserveFinanceChangesUseCase(get()) }
+
+    factory { ImportBankReportUseCase(get()) }
 }

@@ -1,15 +1,20 @@
 package com.example.data.Finance.repository
 
 import com.example.data.Finance.datasource.local.FinanceLocalDataSource
+import com.example.data.Finance.parsing.MockBankStatementParser
 import com.example.domain.Finance.model.*
 import com.example.domain.Finance.repository.FinanceRepository
+import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
+
 class FinanceRepositoryImpl(
     private val local: FinanceLocalDataSource
 ) : FinanceRepository {
+
+    override fun observeDataVersion(): Flow<Long> = local.dataVersion
 
     override suspend fun getSources(): List<Source> = local.listSources()
     override suspend fun createSource(name: String, type: SourceType): Source =
@@ -68,6 +73,7 @@ class FinanceRepositoryImpl(
         val to = month.atEndOfMonth()
         val (txs, sources, tags) = local.snapshotForAnalytics(from, to, type)
 
+
         val dailyMap = generateSequence(from) { d -> if (d.isBefore(to)) d.plusDays(1) else null }
             .associateWithTo(linkedMapOf()) { BigDecimal.ZERO }
         var total = BigDecimal.ZERO
@@ -99,12 +105,17 @@ class FinanceRepositoryImpl(
         )
     }
 
-    override suspend fun getBankReports(): List<BankReport> = local.listBankReports()
-
-    override suspend fun uploadBankReport(
-        fileName: String, sizeBytes: Long, content: ByteArray,
-    ): BankReport = local.uploadBankReport(fileName, sizeBytes)
-
-    override suspend fun deleteBankReport(id: Int) = local.deleteBankReport(id)
-    override suspend fun processBankReport(id: Int): BankReport = local.markReportProcessed(id)
+    override suspend fun importBankReport(
+        fileName: String, sourceId: Int, content: ByteArray,
+    ): ImportReport {
+        val parsed = MockBankStatementParser.parse(fileName, content)
+        val result = local.importTransactions(sourceId, parsed)
+        return ImportReport(
+            fileName = fileName,
+            sourceId = sourceId,
+            imported = result.imported,
+            skipped = result.skipped,
+            total = parsed.size,
+        )
+    }
 }

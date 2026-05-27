@@ -9,9 +9,11 @@ import com.example.domain.Finance.use_case.DeleteGoalUseCase
 import com.example.domain.Finance.use_case.DeleteTagUseCase
 import com.example.domain.Finance.use_case.GetGoalsUseCase
 import com.example.domain.Finance.use_case.GetTagsUseCase
+import com.example.domain.Finance.use_case.ObserveFinanceChangesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -44,6 +46,7 @@ class TagsGoalsViewModel(
     private val getGoals: GetGoalsUseCase,
     private val deleteTag: DeleteTagUseCase,
     private val deleteGoal: DeleteGoalUseCase,
+    private val observeChanges: ObserveFinanceChangesUseCase,
 ) : ViewModel() {
 
     private val calculator = CalculateExpectedIncomeUseCase()
@@ -51,7 +54,9 @@ class TagsGoalsViewModel(
     private val _state = MutableStateFlow(TagsGoalsUiState())
     val state: StateFlow<TagsGoalsUiState> = _state.asStateFlow()
 
-    init { load() }
+    init {
+        viewModelScope.launch { observeChanges().collectLatest { load() } }
+    }
 
     fun onEvent(e: TagsGoalsEvent) {
         when (e) {
@@ -78,12 +83,12 @@ class TagsGoalsViewModel(
     }
 
     private fun removeTag(id: Int) = viewModelScope.launch {
-        try { deleteTag(id); load() }
+        try { deleteTag(id) }
         catch (t: Throwable) { _state.update { it.copy(error = t.message ?: "Не удалось удалить тэг") } }
     }
 
     private fun removeGoal(id: Int) = viewModelScope.launch {
-        try { deleteGoal(id); load() }
+        try { deleteGoal(id) }
         catch (t: Throwable) { _state.update { it.copy(error = t.message ?: "Не удалось удалить цель") } }
     }
 

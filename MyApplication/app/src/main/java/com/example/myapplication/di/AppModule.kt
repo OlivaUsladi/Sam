@@ -187,17 +187,17 @@ val appModule = module {
     viewModel { RegisterViewModel(get(), get()) }
     viewModel { ForgotPasswordViewModel(get(), get()) }
 
-    viewModel { AccountsViewModel(get()) }
-    viewModel { HistoryViewModel(get(), get(), get(), get()) }
-    viewModel { SourcesViewModel(get(), get(), get(), get()) }
+    viewModel { AccountsViewModel(get(), get()) }
+    viewModel { HistoryViewModel(get(), get(), get(), get(), get()) }
+    viewModel { SourcesViewModel(get(), get(), get(), get(), get()) }
     viewModel { TransactionEditViewModel(get(), get(), get(), get(),
         get(), get(), get()) }
-    viewModel { BankReportsViewModel(get(), get(), get(), get()) }
-    viewModel { AnalyticsViewModel(get()) }
-    viewModel { TagsGoalsViewModel(get(), get(), get(), get()) }
+    viewModel { BankReportsViewModel(get(), get(), get()) }
+    viewModel { AnalyticsViewModel(get(), get()) }
+    viewModel { TagsGoalsViewModel(get(), get(), get(), get(), get()) }
     viewModel { TagEditViewModel(get(), get(), get(), get(),
         get(), get()) }
     viewModel { AssignTagTransactionsViewModel(get(), get(), get()) }
-    viewModel { GoalDetailViewModel(get(), get(), get()) }
+    viewModel { GoalDetailViewModel(get(), get(), get(), get()) }
     viewModel { GoalEditViewModel(get(), get(), get()) }
 }

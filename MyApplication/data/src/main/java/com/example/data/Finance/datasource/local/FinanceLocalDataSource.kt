@@ -1,12 +1,15 @@
 package com.example.data.Finance.datasource.local
 
 import com.example.domain.Finance.model.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 class FinanceLocalDataSource {
 
@@ -14,31 +17,31 @@ class FinanceLocalDataSource {
     private val tags = mutableListOf<Tag>()
     private val transactions = mutableListOf<Transaction>()
     private val goals = mutableListOf<Goal>()
-    private val bankReports = mutableListOf<BankReport>()
 
     private val sourceIds = AtomicInteger(0)
     private val tagIds = AtomicInteger(0)
     private val transactionIds = AtomicInteger(0)
     private val goalIds = AtomicInteger(0)
-    private val bankReportIds = AtomicInteger(0)
 
     private val mutex = Mutex()
+
+    private val _dataVersion = MutableStateFlow(0L)
+    val dataVersion: StateFlow<Long> = _dataVersion.asStateFlow()
+    private val versionCounter = AtomicLong(0L)
+    private fun bumpVersion() { _dataVersion.value = versionCounter.incrementAndGet() }
 
     init { seed() }
 
     private fun seed() {
-        // Источники
         sources += Source(sourceIds.incrementAndGet(), "Наличные", SourceType.CASH)
         sources += Source(sourceIds.incrementAndGet(), "Сбер дебетовая", SourceType.CARD)
         sources += Source(sourceIds.incrementAndGet(), "Т-Банк", SourceType.BANK)
 
-        // Тэги
         tags += Tag(tagIds.incrementAndGet(), "Продукты", BigDecimal.ZERO)
         tags += Tag(tagIds.incrementAndGet(), "Кафе", BigDecimal.ZERO)
         tags += Tag(tagIds.incrementAndGet(), "Транспорт", BigDecimal.ZERO)
         tags += Tag(tagIds.incrementAndGet(), "Кино", BigDecimal.ZERO)
 
-        // Транзакции
         val today = LocalDate.now()
         addTxInternal("Стипендия", BigDecimal(8500), TransactionType.INCOME,
             "за май", today.withDayOfMonth(1), 2, null)
@@ -55,7 +58,6 @@ class FinanceLocalDataSource {
         addTxInternal("Подработка", BigDecimal(3500), TransactionType.INCOME,
             "репетиторство", today.minusDays(4), 3, null)
 
-        // Цели
         goals += Goal(
             id = goalIds.incrementAndGet(),
             name = "Поездка в Питер",
@@ -113,13 +115,13 @@ class FinanceLocalDataSource {
         require(sources.none { it.name.equals(name, ignoreCase = true) }) {
             "Источник с таким именем уже есть"
         }
-        Source(sourceIds.incrementAndGet(), name.trim(), type).also { sources += it }
+        Source(sourceIds.incrementAndGet(), name.trim(), type).also { sources += it; bumpVersion() }
     }
 
     suspend fun updateSource(id: Int, name: String, type: SourceType): Source = mutex.withLock {
         val idx = sources.indexOfFirst { it.id == id }
         require(idx >= 0) { "Источник не найден" }
-        Source(id, name.trim(), type).also { sources[idx] = it }
+        Source(id, name.trim(), type).also { sources[idx] = it; bumpVersion() }
     }
 
     suspend fun deleteSource(id: Int) = mutex.withLock {
@@ -127,9 +129,9 @@ class FinanceLocalDataSource {
             "У источника есть транзакции — сначала удалите их"
         }
         sources.removeAll { it.id == id }
+        bumpVersion()
         Unit
     }
-
 
     suspend fun listTags(): List<Tag> = mutex.withLock { tags.sortedBy { it.name } }
 
@@ -137,13 +139,15 @@ class FinanceLocalDataSource {
         require(tags.none { it.name.equals(name, ignoreCase = true) }) {
             "Тэг с таким именем уже есть"
         }
-        Tag(tagIds.incrementAndGet(), name.trim(), BigDecimal.ZERO).also { tags += it }
+        Tag(tagIds.incrementAndGet(), name.trim(), BigDecimal.ZERO).also {
+            tags += it; bumpVersion()
+        }
     }
 
     suspend fun updateTag(id: Int, name: String): Tag = mutex.withLock {
         val idx = tags.indexOfFirst { it.id == id }
         require(idx >= 0) { "Тэг не найден" }
-        tags[idx].copy(name = name.trim()).also { tags[idx] = it }
+        tags[idx].copy(name = name.trim()).also { tags[idx] = it; bumpVersion() }
     }
 
     suspend fun deleteTag(id: Int) = mutex.withLock {
@@ -152,6 +156,7 @@ class FinanceLocalDataSource {
         }
         tags.removeAll { it.id == id }
         recomputeTagTotals()
+        bumpVersion()
         Unit
     }
 
@@ -166,6 +171,7 @@ class FinanceLocalDataSource {
             }
         }
         recomputeTagTotals()
+        bumpVersion()
         Unit
     }
 
@@ -203,6 +209,7 @@ class FinanceLocalDataSource {
         ).also {
             transactions += it
             recomputeTagTotals()
+            bumpVersion()
         }
     }
 
@@ -224,12 +231,14 @@ class FinanceLocalDataSource {
         ).also {
             transactions[idx] = it
             recomputeTagTotals()
+            bumpVersion()
         }
     }
 
     suspend fun deleteTransaction(id: Int) = mutex.withLock {
         transactions.removeAll { it.id == id }
         recomputeTagTotals()
+        bumpVersion()
         Unit
     }
 
@@ -252,7 +261,7 @@ class FinanceLocalDataSource {
             targetDate = targetDate,
             monthlyAmount = monthlyAmount ?: recommendedMonthly(
                 targetAmount, BigDecimal.ZERO, targetDate),
-        ).also { goals += it }
+        ).also { goals += it; bumpVersion() }
     }
 
     suspend fun updateGoal(
@@ -271,11 +280,12 @@ class FinanceLocalDataSource {
             targetDate = targetDate,
             monthlyAmount = monthlyAmount ?: recommendedMonthly(
                 targetAmount, currentAmount, targetDate),
-        ).also { goals[idx] = it }
+        ).also { goals[idx] = it; bumpVersion() }
     }
 
     suspend fun deleteGoal(id: Int) = mutex.withLock {
         goals.removeAll { it.id == id }
+        bumpVersion()
         Unit
     }
 
@@ -292,30 +302,38 @@ class FinanceLocalDataSource {
         return remaining.divide(BigDecimal.valueOf(months), 0, java.math.RoundingMode.CEILING)
     }
 
-    suspend fun listBankReports(): List<BankReport> =
-        mutex.withLock { bankReports.sortedByDescending { it.uploadedAt } }
-
-    suspend fun uploadBankReport(fileName: String, sizeBytes: Long): BankReport = mutex.withLock {
-        BankReport(
-            id = bankReportIds.incrementAndGet(),
-            fileName = fileName,
-            sizeBytes = sizeBytes,
-            processed = false,
-            uploadedAt = LocalDateTime.now(),
-        ).also { bankReports += it }
+    suspend fun importTransactions(
+        sourceId: Int,
+        parsed: List<ParsedTransaction>,
+    ): ImportResult = mutex.withLock {
+        require(sources.any { it.id == sourceId }) { "Источник не найден" }
+        var imported = 0
+        var skipped = 0
+        for (p in parsed) {
+            val isDup = transactions.any {
+                it.sourceId == sourceId &&
+                        it.type == p.type &&
+                        it.date == p.date &&
+                        it.name.equals(p.name, ignoreCase = true) &&
+                        it.amount.compareTo(p.amount) == 0
+            }
+            if (isDup) { skipped++; continue }
+            transactions += Transaction(
+                id = transactionIds.incrementAndGet(),
+                name = p.name.trim(),
+                amount = p.amount,
+                type = p.type,
+                description = p.description,
+                date = p.date,
+                sourceId = sourceId,
+                tagId = null,
+            )
+            imported++
+        }
+        recomputeTagTotals()
+        if (imported > 0) bumpVersion()
+        ImportResult(imported, skipped)
     }
-
-    suspend fun deleteBankReport(id: Int) = mutex.withLock {
-        bankReports.removeAll { it.id == id }
-        Unit
-    }
-
-    suspend fun markReportProcessed(id: Int): BankReport = mutex.withLock {
-        val idx = bankReports.indexOfFirst { it.id == id }
-        require(idx >= 0) { "Отчёт не найден" }
-        bankReports[idx].copy(processed = true).also { bankReports[idx] = it }
-    }
-
 
     suspend fun snapshotForAnalytics(
         from: LocalDate, to: LocalDate, type: TransactionType,

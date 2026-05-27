@@ -1,23 +1,24 @@
 package com.example.domain.Finance.repository
 
 import com.example.domain.Finance.model.*
+import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
 interface FinanceRepository {
 
+    fun observeDataVersion(): Flow<Long>
+
     suspend fun getSources(): List<Source>
     suspend fun createSource(name: String, type: SourceType): Source
     suspend fun updateSource(id: Int, name: String, type: SourceType): Source
     suspend fun deleteSource(id: Int)
 
-
     suspend fun getTags(): List<Tag>
     suspend fun createTag(name: String): Tag
     suspend fun updateTag(id: Int, name: String): Tag
     suspend fun deleteTag(id: Int)
-
 
     suspend fun getTransactions(
         type: TransactionType? = null,
@@ -50,7 +51,6 @@ interface FinanceRepository {
 
     suspend fun deleteTransaction(id: Int)
 
-
     suspend fun assignTagToTransactions(tagId: Int, transactionIds: List<Int>)
 
     suspend fun getGoals(): List<Goal>
@@ -75,15 +75,7 @@ interface FinanceRepository {
 
     suspend fun deleteGoal(id: Int)
 
-
     suspend fun getAnalytics(month: YearMonth, type: TransactionType): Analytics
 
-
-    suspend fun getBankReports(): List<BankReport>
-
-    suspend fun uploadBankReport(fileName: String, sizeBytes: Long, content: ByteArray): BankReport
-    suspend fun deleteBankReport(id: Int)
-
-    // Заглушка на парсер пока
-    suspend fun processBankReport(id: Int): BankReport
+    suspend fun importBankReport(fileName: String, sourceId: Int, content: ByteArray): ImportReport
 }

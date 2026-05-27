@@ -71,11 +71,18 @@ fun FinanceNavHost(navController: NavHostController) {
 
         composable(FinanceRoutes.NewGoal.route) { GoalEditScreen(navController, id = null) }
         composable(
+            FinanceRoutes.EditGoal.route,
+            arguments = listOf(navArgument("id") { type = NavType.IntType }),
+        ) {
+            val id = it.arguments?.getInt("id")?.takeIf { v -> v > 0 }
+            GoalEditScreen(navController, id = id)
+        }
+        composable(
             FinanceRoutes.GoalDetail.route,
             arguments = listOf(navArgument("id") { type = NavType.IntType }),
         ) {
-            val id = it.arguments?.getInt("id") ?: 0
-            GoalDetailScreen(navController, id = id)
+            val id = it.arguments?.getInt("id")?.takeIf { v -> v > 0 }
+            id?.let { it1 -> GoalDetailScreen(navController, id = it1) }
         }
     }
 }

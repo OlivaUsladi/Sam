@@ -10,9 +10,11 @@ import com.example.domain.Finance.use_case.DeleteTransactionUseCase
 import com.example.domain.Finance.use_case.GetSourcesUseCase
 import com.example.domain.Finance.use_case.GetTagsUseCase
 import com.example.domain.Finance.use_case.GetTransactionsUseCase
+import com.example.domain.Finance.use_case.ObserveFinanceChangesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -40,12 +42,15 @@ class HistoryViewModel(
     private val getSources: GetSourcesUseCase,
     private val getTags: GetTagsUseCase,
     private val deleteTx: DeleteTransactionUseCase,
+    private val observeChanges: ObserveFinanceChangesUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HistoryUiState())
     val state: StateFlow<HistoryUiState> = _state.asStateFlow()
 
-    init { onEvent(HistoryEvent.Reload) }
+    init {
+        viewModelScope.launch { observeChanges().collectLatest { load() } }
+    }
 
     fun onEvent(e: HistoryEvent) {
         when (e) {
@@ -86,7 +91,6 @@ class HistoryViewModel(
     private fun remove(id: Int) = viewModelScope.launch {
         try {
             deleteTx(id)
-            load()
         } catch (t: Throwable) {
             _state.update { it.copy(error = t.message ?: "Не удалось удалить") }
         }

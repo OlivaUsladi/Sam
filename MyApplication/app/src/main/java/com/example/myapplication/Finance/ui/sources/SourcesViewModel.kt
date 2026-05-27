@@ -7,10 +7,12 @@ import com.example.domain.Finance.model.SourceType
 import com.example.domain.Finance.use_case.CreateSourceUseCase
 import com.example.domain.Finance.use_case.DeleteSourceUseCase
 import com.example.domain.Finance.use_case.GetSourcesUseCase
+import com.example.domain.Finance.use_case.ObserveFinanceChangesUseCase
 import com.example.domain.Finance.use_case.UpdateSourceUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -36,12 +38,15 @@ class SourcesViewModel(
     private val createSource: CreateSourceUseCase,
     private val updateSource: UpdateSourceUseCase,
     private val deleteSource: DeleteSourceUseCase,
+    private val observeChanges: ObserveFinanceChangesUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SourcesUiState())
     val state: StateFlow<SourcesUiState> = _state.asStateFlow()
 
-    init { load() }
+    init {
+        viewModelScope.launch { observeChanges().collectLatest { load() } }
+    }
 
     fun onEvent(e: SourcesEvent) {
         when (e) {
@@ -67,14 +72,13 @@ class SourcesViewModel(
         try {
             if (id == null) createSource(name, type) else updateSource(id, name, type)
             _state.update { it.copy(showCreateDialog = false, editing = null) }
-            load()
         } catch (t: Throwable) {
             _state.update { it.copy(error = t.message ?: "Не удалось сохранить") }
         }
     }
 
     private fun remove(id: Int) = viewModelScope.launch {
-        try { deleteSource(id); load() }
+        try { deleteSource(id) }
         catch (t: Throwable) { _state.update { it.copy(error = t.message ?: "Не удалось удалить") } }
     }
 }

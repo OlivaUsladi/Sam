@@ -32,4 +32,7 @@ sealed class FinanceRoutes(val route: String) {
     object GoalDetail  : FinanceRoutes("goal/{id}") {
         fun build(id: Int) = "goal/$id"
     }
+    object EditGoal    : FinanceRoutes("goal/{id}/edit") {
+        fun build(id: Int) = "goal/$id/edit"
+    }
 }

@@ -96,72 +96,61 @@ fun AnalyticsScreen(
             )
         }
 
-        when {
-            state.isLoading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = FinanceColors.PrimaryDark)
-                }
+        if (state.isLoading) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = FinanceColors.PrimaryDark)
             }
-            state.error != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Ошибка: ${state.error}",
-                        color = Color.Red,
-                        fontSize = 16.sp
-                    )
-                }
-            }
-            else ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    val data = state.data
-                    // Итог
-                    FinanceCard {
-                        Text("Всего за месяц", color = FinanceColors.TextSecondary, fontSize = 12.sp)
-                        Text(
-                            text = formatMoney(data?.total ?: BigDecimal.ZERO) + " р",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (state.type == TransactionType.INCOME)
-                                FinanceColors.Income else FinanceColors.Expense,
-                        )
-                    }
-
-                    // Столбчатая
-                    FinanceCard {
-                        Text(
-                            if (state.type == TransactionType.INCOME) "Доходы по дням"
-                            else "Расходы по дням",
-                            fontWeight = FontWeight.SemiBold,
-                            color = FinanceColors.TextPrimary,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        BarChart(daily = data?.daily.orEmpty())
-                    }
-
-                    // Круговая
-                    FinanceCard {
-                        Text(
-                            "По источникам",
-                            fontWeight = FontWeight.SemiBold,
-                            color = FinanceColors.TextPrimary,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        PieWithLegend(buckets = data?.bySource.orEmpty())
-                    }
-                }
+            return@Column
         }
 
+        state.error?.let { Text(it, color = FinanceColors.Expense, modifier = Modifier.padding(16.dp)) }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            val data = state.data
+            // Итог
+            FinanceCard {
+                Text("Всего за месяц", color = FinanceColors.TextSecondary, fontSize = 12.sp)
+                Text(
+                    text = formatMoney(data?.total ?: BigDecimal.ZERO) + " Р",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (state.type == TransactionType.INCOME)
+                        FinanceColors.Income else FinanceColors.Expense,
+                )
+            }
+
+            // Столбчатая
+            FinanceCard {
+                Text(
+                    if (state.type == TransactionType.INCOME) "Доходы по дням"
+                    else "Расходы по дням",
+                    fontWeight = FontWeight.SemiBold,
+                    color = FinanceColors.TextPrimary,
+                )
+                Spacer(Modifier.height(8.dp))
+                BarChart(daily = data?.daily.orEmpty())
+            }
+
+            // Круговая
+            FinanceCard {
+                Text(
+                    "По источникам",
+                    fontWeight = FontWeight.SemiBold,
+                    color = FinanceColors.TextPrimary,
+                )
+                Spacer(Modifier.height(8.dp))
+                PieWithLegend(buckets = data?.bySource.orEmpty())
+            }
+        }
     }
 }
+
 
 @Composable
 private fun BarChart(daily: List<DailyTotal>) {
@@ -174,42 +163,65 @@ private fun BarChart(daily: List<DailyTotal>) {
     val barTopColor = FinanceColors.AccentSolid
     val barBottomColor = FinanceColors.AccentDark
     val gridColor = FinanceColors.Divider
-    val labelColor = FinanceColors.TextSecondary
-    val labelPaint = remember {
+
+
+    val xLabelPaint = remember {
         android.graphics.Paint().apply {
             color = android.graphics.Color.parseColor("#7A7A7A")
-            textSize = 22f
+            textSize = 24f
             isAntiAlias = true
             textAlign = android.graphics.Paint.Align.CENTER
+        }
+    }
+
+    val yLabelPaint = remember {
+        android.graphics.Paint().apply {
+            color = android.graphics.Color.parseColor("#7A7A7A")
+            textSize = 24f
+            isAntiAlias = true
+            textAlign = android.graphics.Paint.Align.RIGHT
         }
     }
 
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp)
+            .height(240.dp)
     ) {
-        val xAxisLabelHeight = 28f
-        val chartHeight = size.height - xAxisLabelHeight
+        val xLabelStripH = 32f
+        val yAxisStripW = 70f
+        val chartHeight = size.height - xLabelStripH
+        val chartLeft   = yAxisStripW
+        val chartWidth  = size.width - yAxisStripW
 
-        for (i in 0..4) {
-            val y = chartHeight * i / 4f
+
+        val steps = 4
+        for (i in 0..steps) {
+            val y = chartHeight * i / steps.toFloat()
             drawLine(
                 color = gridColor,
-                start = Offset(0f, y),
+                start = Offset(chartLeft, y),
                 end = Offset(size.width, y),
                 strokeWidth = 1f,
+            )
+
+            val value = max * (1.0 - i.toDouble() / steps)
+            drawContext.canvas.nativeCanvas.drawText(
+                shortRubLabel(value),
+                chartLeft - 6f,
+                y + 8f,
+                yLabelPaint,
             )
         }
 
         val n = daily.size
-        val slotW = size.width / n
+        val slotW = chartWidth / n
         val barW = slotW * 0.55f
         val barOffset = (slotW - barW) / 2
         daily.forEachIndexed { i, d ->
             val ratio = (d.amount.toDouble() / max).toFloat().coerceIn(0f, 1f)
             val h = chartHeight * ratio
-            val left = i * slotW + barOffset
+            val left = chartLeft + i * slotW + barOffset
             drawRoundRect(
                 brush = androidx.compose.ui.graphics.Brush.verticalGradient(
                     listOf(barTopColor, barBottomColor)
@@ -222,13 +234,21 @@ private fun BarChart(daily: List<DailyTotal>) {
             if (day == 1 || day % 5 == 0 || i == n - 1) {
                 drawContext.canvas.nativeCanvas.drawText(
                     day.toString(),
-                    i * slotW + slotW / 2,
-                    size.height - 4f,
-                    labelPaint,
+                    chartLeft + i * slotW + slotW / 2,
+                    size.height - 6f,
+                    xLabelPaint,
                 )
             }
         }
     }
+}
+
+
+private fun shortRubLabel(v: Double): String = when {
+    v >= 1_000_000 -> "%.1fмР".format(v / 1_000_000).replace(',', '.')
+    v >= 1_000     -> "%.1fкР".format(v / 1_000).replace(',', '.')
+    v >= 1         -> "${v.toInt()}Р"
+    else           -> "0"
 }
 
 @Composable
@@ -256,7 +276,6 @@ private fun PieWithLegend(buckets: List<SourceBucket>) {
                 )
                 start += sweep
             }
-
             drawCircle(color = Color.White, radius = size.minDimension / 3.2f)
         }
         Spacer(Modifier.width(12.dp))
@@ -264,7 +283,7 @@ private fun PieWithLegend(buckets: List<SourceBucket>) {
             buckets.forEachIndexed { i, b ->
                 val pct = (b.amount.toDouble() / total * 100).toInt()
                 Row(
-                    modifier = Modifier.padding(vertical = 2.dp),
+                    modifier = Modifier.padding(vertical = 3.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(
@@ -274,9 +293,14 @@ private fun PieWithLegend(buckets: List<SourceBucket>) {
                             .background(palette[i % palette.size]),
                     )
                     Spacer(Modifier.width(6.dp))
-                    Text(b.sourceName, fontSize = 12.sp, modifier = Modifier.weight(1f),
-                        color = FinanceColors.TextPrimary)
-                    Text("$pct%", fontSize = 12.sp, color = FinanceColors.TextSecondary)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(b.sourceName, fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = FinanceColors.TextPrimary)
+                        Text("${formatMoney(b.amount)} Р · $pct%",
+                            fontSize = 11.sp,
+                            color = FinanceColors.TextSecondary)
+                    }
                 }
             }
         }
