@@ -4,6 +4,7 @@ import com.example.data.Auth.datasource.local.TokenStorage
 import com.example.data.Auth.datasource.remote.api.AuthApiService
 import com.example.data.Auth.security.AuthInterceptor
 import com.example.data.Auth.security.TokenAuthenticator
+import com.example.data.Finance.datasource.remote.api.FinanceApiService
 import com.example.data.Hints.datasource.remote.api.ArticleApiService
 import com.example.data.Recipes.datasource.remote.api.RecipeApiService
 import com.example.data.Recipes.datasource.remote.api.ShoppingListApiService
@@ -18,7 +19,7 @@ object RetrofitClient {
      //Для эмулятора Android — 10.0.2.2:8080,
      //для реального устройства — IP компьютера в локальной сети.
 
-    private const val BASE_URL = "http://192.168.0.104:8080/"
+    private const val BASE_URL = "http://192.168.0.102:8080/"
 
     private lateinit var okHttpClient: OkHttpClient
     private lateinit var retrofit: Retrofit
@@ -28,6 +29,9 @@ object RetrofitClient {
     lateinit var shoppingListApiService: ShoppingListApiService
         private set
     lateinit var articleApiService: ArticleApiService
+        private set
+
+    lateinit var financeApiService: FinanceApiService
         private set
     lateinit var authApiService: AuthApiService
         private set
@@ -67,5 +71,7 @@ object RetrofitClient {
         recipeApiService = retrofit.create(RecipeApiService::class.java)
         shoppingListApiService = retrofit.create(ShoppingListApiService::class.java)
         articleApiService = retrofit.create(ArticleApiService::class.java)
+        financeApiService = retrofit.create(FinanceApiService::class.java)
+
     }
 }

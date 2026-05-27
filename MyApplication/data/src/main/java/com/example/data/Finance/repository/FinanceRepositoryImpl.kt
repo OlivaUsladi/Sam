@@ -1,121 +1,170 @@
 package com.example.data.Finance.repository
 
-import com.example.data.Finance.datasource.local.FinanceLocalDataSource
-import com.example.data.Finance.parsing.MockBankStatementParser
+import com.example.data.Finance.datasource.remote.FinanceRemoteDataSource
+import com.example.data.Finance.datasource.remote.dto.*
+import com.example.data.Finance.datasource.remote.mapper.FinanceMappers.toDomain
 import com.example.domain.Finance.model.*
 import com.example.domain.Finance.repository.FinanceRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
-
+import java.time.format.DateTimeFormatter
+import java.util.concurrent.atomic.AtomicLong
 
 class FinanceRepositoryImpl(
-    private val local: FinanceLocalDataSource
+    private val remote: FinanceRemoteDataSource
 ) : FinanceRepository {
 
-    override fun observeDataVersion(): Flow<Long> = local.dataVersion
+    private val isoDate: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+    private val ymFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM")
 
-    override suspend fun getSources(): List<Source> = local.listSources()
+    private val _dataVersion = MutableStateFlow(0L)
+    private val versionCounter = AtomicLong(0L)
+    private fun bump() { _dataVersion.value = versionCounter.incrementAndGet() }
+
+    override fun observeDataVersion(): Flow<Long> = _dataVersion.asStateFlow()
+
+    override suspend fun getSources(): List<Source> =
+        remote.listSources().map { it.toDomain() }
+
     override suspend fun createSource(name: String, type: SourceType): Source =
-        local.createSource(name, type)
-    override suspend fun updateSource(id: Int, name: String, type: SourceType): Source =
-        local.updateSource(id, name, type)
-    override suspend fun deleteSource(id: Int) = local.deleteSource(id)
+        remote.createSource(name, type.raw).toDomain().also { bump() }
 
-    override suspend fun getTags(): List<Tag> = local.listTags()
-    override suspend fun createTag(name: String): Tag = local.createTag(name)
-    override suspend fun updateTag(id: Int, name: String): Tag = local.updateTag(id, name)
-    override suspend fun deleteTag(id: Int) = local.deleteTag(id)
+    override suspend fun updateSource(id: Int, name: String, type: SourceType): Source =
+        remote.updateSource(id, name, type.raw).toDomain().also { bump() }
+
+    override suspend fun deleteSource(id: Int) {
+        remote.deleteSource(id); bump()
+    }
+
+    override suspend fun getTags(): List<Tag> = remote.listTags().map { it.toDomain() }
+    override suspend fun createTag(name: String): Tag =
+        remote.createTag(name).toDomain().also { bump() }
+    override suspend fun updateTag(id: Int, name: String): Tag =
+        remote.updateTag(id, name).toDomain().also { bump() }
+
+    override suspend fun deleteTag(id: Int) {
+        remote.deleteTag(id); bump()
+    }
 
     override suspend fun getTransactions(
-        type: TransactionType?, from: LocalDate?, to: LocalDate?,
-    ): List<Transaction> = local.listTransactions(type, from, to)
+        type: TransactionType?,
+        from: LocalDate?,
+        to: LocalDate?
+    ): List<Transaction> = remote.listTransactions(
+        type?.raw,
+        from?.format(isoDate),
+        to?.format(isoDate),
+    ).map { it.toDomain() }
 
     override suspend fun getTransactionsByTag(tagId: Int): List<Transaction> =
-        local.listTransactionsByTag(tagId)
+        remote.listTagTransactions(tagId).map { it.toDomain() }
 
     override suspend fun createTransaction(
-        name: String, amount: BigDecimal, type: TransactionType,
-        description: String?, date: LocalDate, sourceId: Int, tagId: Int?,
-    ): Transaction = local.createTransaction(
-        name, amount, type, description, date, sourceId, tagId)
+        name: String,
+        amount: BigDecimal,
+        type: TransactionType,
+        description: String?,
+        date: LocalDate,
+        sourceId: Int,
+        tagId: Int?,
+    ): Transaction = remote.createTransaction(
+        CreateTransactionRequestDto(
+            name = name,
+            amount = amount,
+            type = type.raw,
+            description = description,
+            transactionDate = date.format(isoDate),
+            sourceId = sourceId,
+            tagId = tagId,
+        )
+    ).toDomain().also { bump() }
 
     override suspend fun updateTransaction(
-        id: Int, name: String, amount: BigDecimal, type: TransactionType,
-        description: String?, date: LocalDate, sourceId: Int, tagId: Int?,
-    ): Transaction = local.updateTransaction(
-        id, name, amount, type, description, date, sourceId, tagId)
+        id: Int,
+        name: String,
+        amount: BigDecimal,
+        type: TransactionType,
+        description: String?,
+        date: LocalDate,
+        sourceId: Int,
+        tagId: Int?,
+    ): Transaction = remote.updateTransaction(
+        id,
+        UpdateTransactionRequestDto(
+            name = name,
+            amount = amount,
+            type = type.raw,
+            description = description,
+            transactionDate = date.format(isoDate),
+            sourceId = sourceId,
+            tagId = tagId,
+        )
+    ).toDomain().also { bump() }
 
-    override suspend fun deleteTransaction(id: Int) = local.deleteTransaction(id)
+    override suspend fun deleteTransaction(id: Int) {
+        remote.deleteTransaction(id); bump()
+    }
 
-    override suspend fun assignTagToTransactions(tagId: Int, transactionIds: List<Int>) =
-        local.assignTagToTransactions(tagId, transactionIds)
+    override suspend fun assignTagToTransactions(tagId: Int, transactionIds: List<Int>) {
+        remote.assignTagToTransactions(tagId, transactionIds); bump()
+    }
 
-    override suspend fun getGoals(): List<Goal> = local.listGoals()
-    override suspend fun getGoal(id: Int): Goal = local.getGoal(id)
+    override suspend fun getGoals(): List<Goal> = remote.listGoals().map { it.toDomain() }
+
+    override suspend fun getGoal(id: Int): Goal = remote.getGoal(id).toDomain()
+
     override suspend fun createGoal(
-        name: String, description: String?, targetAmount: BigDecimal,
-        targetDate: LocalDate?, monthlyAmount: BigDecimal?,
-    ): Goal = local.createGoal(name, description, targetAmount, targetDate, monthlyAmount)
+        name: String,
+        description: String?,
+        targetAmount: BigDecimal,
+        targetDate: LocalDate?,
+        monthlyAmount: BigDecimal?,
+    ): Goal = remote.createGoal(
+        CreateGoalRequestDto(
+            name = name,
+            description = description,
+            targetAmount = targetAmount,
+            targetDate = targetDate?.format(isoDate),
+            monthlyAmount = monthlyAmount,
+        )
+    ).toDomain().also { bump() }
 
     override suspend fun updateGoal(
-        id: Int, name: String, description: String?,
-        targetAmount: BigDecimal, currentAmount: BigDecimal,
-        targetDate: LocalDate?, monthlyAmount: BigDecimal?,
-    ): Goal = local.updateGoal(
-        id, name, description, targetAmount, currentAmount, targetDate, monthlyAmount)
-
-    override suspend fun deleteGoal(id: Int) = local.deleteGoal(id)
-
-    override suspend fun getAnalytics(month: YearMonth, type: TransactionType): Analytics {
-        val from = month.atDay(1)
-        val to = month.atEndOfMonth()
-        val (txs, sources, tags) = local.snapshotForAnalytics(from, to, type)
-
-
-        val dailyMap = generateSequence(from) { d -> if (d.isBefore(to)) d.plusDays(1) else null }
-            .associateWithTo(linkedMapOf()) { BigDecimal.ZERO }
-        var total = BigDecimal.ZERO
-        for (t in txs) {
-            dailyMap.merge(t.date, t.amount, BigDecimal::add)
-            total = total.add(t.amount)
-        }
-        val daily = dailyMap.map { (d, amt) -> DailyTotal(d, amt) }
-
-        val sourceNames = sources.associate { it.id to it.name }
-        val bySourceMap = mutableMapOf<Int, BigDecimal>()
-        for (t in txs) bySourceMap.merge(t.sourceId, t.amount, BigDecimal::add)
-        val bySource = bySourceMap.entries
-            .map { (id, amt) -> SourceBucket(id, sourceNames[id] ?: "—", amt) }
-            .sortedByDescending { it.amount }
-
-        val byTag = if (type == TransactionType.EXPENSE) {
-            val tagNames = tags.associate { it.id to it.name }
-            val byTagMap = mutableMapOf<Int, BigDecimal>()
-            for (t in txs) t.tagId?.let { byTagMap.merge(it, t.amount, BigDecimal::add) }
-            byTagMap.entries
-                .map { (id, amt) -> TagBucket(id, tagNames[id] ?: "—", amt) }
-                .sortedByDescending { it.amount }
-        } else null
-
-        return Analytics(
-            periodStart = from, periodEnd = to, type = type,
-            total = total, daily = daily, bySource = bySource, byTag = byTag,
+        id: Int,
+        name: String,
+        description: String?,
+        targetAmount: BigDecimal,
+        currentAmount: BigDecimal,
+        targetDate: LocalDate?,
+        monthlyAmount: BigDecimal?,
+    ): Goal = remote.updateGoal(
+        id,
+        UpdateGoalRequestDto(
+            name = name,
+            description = description,
+            targetAmount = targetAmount,
+            currentAmount = currentAmount,
+            targetDate = targetDate?.format(isoDate),
+            monthlyAmount = monthlyAmount,
         )
+    ).toDomain().also { bump() }
+
+    override suspend fun deleteGoal(id: Int) {
+        remote.deleteGoal(id); bump()
     }
+
+    override suspend fun getAnalytics(month: YearMonth, type: TransactionType): Analytics =
+        remote.getAnalytics(month.format(ymFormat), type.raw).toDomain()
 
     override suspend fun importBankReport(
-        fileName: String, sourceId: Int, content: ByteArray,
-    ): ImportReport {
-        val parsed = MockBankStatementParser.parse(fileName, content)
-        val result = local.importTransactions(sourceId, parsed)
-        return ImportReport(
-            fileName = fileName,
-            sourceId = sourceId,
-            imported = result.imported,
-            skipped = result.skipped,
-            total = parsed.size,
-        )
-    }
+        fileName: String,
+        sourceId: Int,
+        content: ByteArray,
+    ): ImportReport = remote.importBankReport(fileName, sourceId, content)
+        .toDomain()
+        .also { bump() }
 }
