@@ -180,26 +180,40 @@ class HomeViewModel(
     private fun toggleLike(articleId: Int) {
         viewModelScope.launch {
             val userId = _uiState.value.userId
-            val isCurrentlyLiked = isArticleLikedUseCase(userId, articleId)
-
-            if (isCurrentlyLiked) {
-                removeLikeUseCase(userId, articleId)
-            } else {
-                addLikeUseCase(userId, articleId)
-            }
-
-            val newLikesCount = getLikesCountUseCase(articleId)
+            val currentArticle = _uiState.value.articles.find { it.id == articleId } ?: return@launch
+            val isCurrentlyLiked = currentArticle.isLiked
+            val currentCount = currentArticle.likesCount
 
             _uiState.update { state ->
                 val updatedArticles = state.articles.map { article ->
                     if (article.id == articleId) {
                         article.copy(
                             isLiked = !isCurrentlyLiked,
-                            likesCount = newLikesCount
+                            likesCount = if (isCurrentlyLiked) currentCount - 1 else currentCount + 1
                         )
                     } else article
                 }
                 state.copy(articles = updatedArticles)
+            }
+
+            try {
+                if (isCurrentlyLiked) {
+                    removeLikeUseCase(userId, articleId)
+                } else {
+                    addLikeUseCase(userId, articleId)
+                }
+            } catch (e: Exception) {
+                _uiState.update { state ->
+                    val revertedArticles = state.articles.map { article ->
+                        if (article.id == articleId) {
+                            article.copy(
+                                isLiked = isCurrentlyLiked,
+                                likesCount = currentCount
+                            )
+                        } else article
+                    }
+                    state.copy(articles = revertedArticles, error = e.message)
+                }
             }
         }
     }

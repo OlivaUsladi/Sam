@@ -23,6 +23,11 @@ class ArticleRepositoryImpl(
         return ArticleNetworkMapper.mapDetailToContent(detail)
     }
 
+    override suspend fun getArticle(articleId: Int): Article {
+        val article = remoteDataSource.getArticle(articleId, userId)
+        return ArticleNetworkMapper.mapToDomain(article)
+    }
+
     override suspend fun getArticlesByCategory(categoryId: Int): List<Article> =
         remoteDataSource.getArticlesByCategory(categoryId, userId)
             .map { ArticleNetworkMapper.mapToDomain(it) }

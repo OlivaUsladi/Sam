@@ -14,6 +14,12 @@ interface ArticleApiService {
     @GET("/api/articles")
     suspend fun getAll(@Header("userId") userId: Int): List<ArticleResponseDto>
 
+    @GET("/api/articles/article/{id}")
+    suspend fun getArticle(@Path("id") id: Int,
+                           @Header("userId") userId: Int
+    ): ArticleResponseDto
+
+
     @GET("/api/articles/{id}")
     suspend fun getById(
         @Path("id") id: Int,

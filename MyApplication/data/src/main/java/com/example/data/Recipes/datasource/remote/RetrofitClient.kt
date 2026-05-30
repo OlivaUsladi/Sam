@@ -19,7 +19,7 @@ object RetrofitClient {
      //Для эмулятора Android — 10.0.2.2:8080,
      //для реального устройства — IP компьютера в локальной сети.
 
-    private const val BASE_URL = "http://192.168.0.102:8080/"
+    private const val BASE_URL = "http://192.168.0.104:8080/"
 
     private lateinit var okHttpClient: OkHttpClient
     private lateinit var retrofit: Retrofit

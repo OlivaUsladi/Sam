@@ -4,6 +4,7 @@ import com.example.data.Hints.datasource.remote.api.ArticleApiService
 import com.example.data.Hints.datasource.remote.dto.ArticleCategoryDto
 import com.example.data.Hints.datasource.remote.dto.ArticleDetailResponseDto
 import com.example.data.Hints.datasource.remote.dto.ArticleResponseDto
+import com.example.domain.Hints.model.Article
 
 class ArticleRemoteDataSource(
     private val apiService: ArticleApiService
@@ -14,6 +15,11 @@ class ArticleRemoteDataSource(
 
     suspend fun getArticles(userId: Int): List<ArticleResponseDto> =
         apiService.getAll(userId)
+
+    suspend fun getArticle(articleId: Int, userId: Int): ArticleResponseDto =
+        apiService.getArticle(
+            articleId,
+            userId)
 
     suspend fun getArticleById(articleId: Int, userId: Int): ArticleDetailResponseDto =
         apiService.getById(articleId, userId)

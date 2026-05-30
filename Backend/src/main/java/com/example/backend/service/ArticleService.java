@@ -62,7 +62,18 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public ArticleDetailResponseDto getArticle(Integer userId, Integer articleId) {
+    public ArticleResponseDto getArticle(Integer userId, Integer articleId) {
+        ArticleEntity article = requireArticle(articleId);
+        ArticleCategoryEntity category = requireCategory(article.getCategoryId());
+        return mapper.toDto(article,
+                category,
+                favouriteRepository.existsByUserIdAndArticleId(userId, articleId),
+                likeRepository.existsByUserIdAndArticleId(userId, articleId)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public ArticleDetailResponseDto getArticleContent(Integer userId, Integer articleId) {
         ArticleEntity article = requireArticle(articleId);
         ArticleCategoryEntity category = requireCategory(article.getCategoryId());
         ArticleContentEntity content = contentRepository.findById(articleId).orElse(null);

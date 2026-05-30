@@ -5,6 +5,7 @@ import org.koin.dsl.module
 
 val hintsDomainModule = module {
     factory { GetArticlesUseCase(get()) }
+    factory { GetArticleUseCase(get()) }
     factory { GetArticlesByCategoryUseCase(get()) }
     factory { GetArticleContentUseCase(get()) }
     factory { SearchArticlesUseCase(get()) }

@@ -10,6 +10,7 @@ interface ArticleRepository {
     suspend fun getArticles(): List<Article>
     suspend fun getArticleContent(articleId: Int): ArticleContent
     suspend fun getArticlesByCategory(categoryId: Int): List<Article>
+    suspend fun getArticle(articleId: Int): Article
     //Поиск статей по названию и ключевым словам
     suspend fun searchArticles(query: String): List<Article>
 

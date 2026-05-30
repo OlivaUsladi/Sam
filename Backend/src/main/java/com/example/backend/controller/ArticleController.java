@@ -22,10 +22,16 @@ public class ArticleController {
         return service.getArticles(principal.id());
     }
 
-    @GetMapping("/{articleId}")
-    public ArticleDetailResponseDto getArticle(@AuthenticationPrincipal AuthenticatedUser principal,
-                                               @PathVariable Integer articleId) {
+    @GetMapping("/article/{articleId}")
+    public ArticleResponseDto getArticle(@AuthenticationPrincipal AuthenticatedUser principal,
+                                         @PathVariable Integer articleId) {
         return service.getArticle(principal.id(), articleId);
+    }
+
+    @GetMapping("/{articleId}")
+    public ArticleDetailResponseDto getArticleContent(@AuthenticationPrincipal AuthenticatedUser principal,
+                                               @PathVariable Integer articleId) {
+        return service.getArticleContent(principal.id(), articleId);
     }
 
     @GetMapping("/search")

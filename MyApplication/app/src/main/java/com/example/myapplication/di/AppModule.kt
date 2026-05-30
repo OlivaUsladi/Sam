@@ -46,6 +46,7 @@ val appModule = module {
 
     viewModel { ArticleViewModel(
         getArticleContentUseCase = get(),
+        getArticleUseCase = get(),
         addToFavoriteUseCase = get(),
         removeFromFavoriteUseCase = get(),
         isArticleFavoriteUseCase = get(),
