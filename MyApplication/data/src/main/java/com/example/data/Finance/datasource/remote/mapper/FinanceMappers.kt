@@ -3,6 +3,7 @@ package com.example.data.Finance.datasource.remote.mapper
 import com.example.data.Finance.datasource.remote.dto.*
 import com.example.domain.Finance.model.*
 import java.time.LocalDate
+import java.time.YearMonth
 
 internal object FinanceMappers {
 
@@ -39,6 +40,11 @@ internal object FinanceMappers {
         imported = imported,
         skipped = skipped,
         total = total,
+        firstDate = firstDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+        lastDate  = lastDate?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+        suggestedMonth = suggestedMonth?.let {
+            runCatching { YearMonth.parse(it) }.getOrNull()
+        },
     )
 
     fun AnalyticsResponseDto.toDomain(): Analytics = Analytics(

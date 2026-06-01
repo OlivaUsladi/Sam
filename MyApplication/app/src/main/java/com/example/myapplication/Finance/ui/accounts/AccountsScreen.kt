@@ -54,10 +54,10 @@ fun AccountsScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         //Вот тут пока непонятно, успею добавить или нет
-        TipBanner(
-            text = "Привет! Здесь может быть какой-то важный совет от системы " +
-                "приложения, например что налоги надо платить вовремя :)"
-        )
+//        TipBanner(
+//            text = "Привет! Здесь может быть какой-то важный совет от системы " +
+//                "приложения, например что налоги надо платить вовремя :)"
+//        )
 
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(

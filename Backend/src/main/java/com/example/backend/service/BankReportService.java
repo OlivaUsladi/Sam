@@ -12,6 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +25,8 @@ public class BankReportService {
     private final TransactionRepository transactionRepository;
     private final SourceRepository sourceRepository;
     private final BankStatementParser parser;
+
+    private static final DateTimeFormatter YM = DateTimeFormatter.ofPattern("yyyy-MM");
 
     @Transactional
     public ImportReportResponse importReport(
@@ -52,6 +59,11 @@ public class BankReportService {
         var parsed = parser.parse(original, bytes);
         int imported = 0, skipped = 0;
 
+        LocalDate firstDate = null;
+        LocalDate lastDate  = null;
+
+        Map<String, Integer> perMonth = new HashMap<>();
+
         for (var p : parsed) {
             boolean dup = transactionRepository.existsDuplicate(
                     userId, sourceId, p.type(), p.date(), p.name(), p.amount());
@@ -70,8 +82,21 @@ public class BankReportService {
             e.setTagId(null);
             transactionRepository.save(e);
             imported++;
+
+            if (firstDate == null || p.date().isBefore(firstDate)) firstDate = p.date();
+            if (lastDate  == null || p.date().isAfter(lastDate))  lastDate  = p.date();
+
+            String ym = YearMonth.from(p.date()).format(YM);
+            perMonth.merge(ym, 1, Integer::sum);
         }
 
-        return new ImportReportResponse(original, sourceId, imported, skipped, parsed.size());
+        String suggestedMonth = perMonth.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        return new ImportReportResponse(
+                original, sourceId, imported, skipped, parsed.size(),
+                firstDate, lastDate, suggestedMonth);
     }
 }

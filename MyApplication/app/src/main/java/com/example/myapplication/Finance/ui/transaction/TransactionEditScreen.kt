@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,8 +25,12 @@ import com.example.domain.Finance.model.TransactionType
 import com.example.myapplication.Finance.components.*
 import com.example.myapplication.Finance.theme.FinanceColors
 import org.koin.androidx.compose.koinViewModel
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionEditScreen(
     navController: NavController,
@@ -38,6 +43,8 @@ fun TransactionEditScreen(
     LaunchedEffect(state.saved) {
         if (state.saved) navController.navigateUp()
     }
+
+    var showDatePicker by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -93,6 +100,30 @@ fun TransactionEditScreen(
                 maxLines = 4,
             )
 
+            Text("Дата операции", color = FinanceColors.TextSecondary, fontSize = 12.sp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color.White)
+                    .clickable { showDatePicker = true }
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    state.date.format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
+                    fontSize = 14.sp,
+                    color = FinanceColors.TextPrimary,
+                    fontWeight = FontWeight.Medium,
+                )
+                Icon(
+                    Icons.Default.CalendarMonth,
+                    contentDescription = "Выбрать дату",
+                    tint = FinanceColors.PrimaryDark,
+                )
+            }
+
             // Источник
             Text("Источник", color = FinanceColors.TextSecondary, fontSize = 12.sp)
             if (state.sources.isEmpty()) {
@@ -134,6 +165,34 @@ fun TransactionEditScreen(
                 onClick = { vm.onEvent(TransactionEditEvent.Save) },
                 modifier = Modifier.fillMaxWidth(),
             )
+        }
+    }
+
+    if (showDatePicker) {
+        val initialMillis = state.date.atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+        val pickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
+
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val millis = pickerState.selectedDateMillis
+                    if (millis != null) {
+                        val newDate = Instant.ofEpochMilli(millis)
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate()
+                        vm.onEvent(TransactionEditEvent.SetDate(newDate))
+                    }
+                    showDatePicker = false
+                }) { Text("ОК") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) { Text("Отмена") }
+            },
+        ) {
+            DatePicker(state = pickerState)
         }
     }
 }

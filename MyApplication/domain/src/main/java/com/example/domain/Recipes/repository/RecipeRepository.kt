@@ -61,4 +61,6 @@ interface RecipeRepository {
     suspend fun removeShoppingListItem(itemId: Int): Boolean
     suspend fun mergeShoppingLists(targetListId: Int, sourceListIds: List<Int>): ShoppingList?
     suspend fun clearCompletedItems(listId: Int): Boolean
+
+    suspend fun syncShoppingListsNow() {}
 }

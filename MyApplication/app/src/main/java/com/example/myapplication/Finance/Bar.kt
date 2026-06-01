@@ -1,6 +1,7 @@
 package com.example.myapplication.Finance
 
 import android.content.Intent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Notifications
+import com.example.myapplication.R
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -23,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -77,42 +80,36 @@ fun FinanceTopAppBar(navController: NavController) {
                         .fillMaxSize()
                         .background(FinanceColors.HeaderBackground)
                 ) {
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
+                        Box(Modifier.padding(start = 5.dp).clickable() {
+                            scope.launch { drawerState.open() }
+                        }) {
+                            Image(
+                                painter = painterResource(R.drawable.finane_ball),
                                 contentDescription = "menu",
-                                tint = Color.White,
-                                modifier = Modifier.size(28.dp),
+                                modifier = Modifier.size(30.dp)
                             )
                         }
-                        Text(
-                            text = "Финансы",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 4.dp)
-                                .size(36.dp)
-                                .clip(RoundedCornerShape(18.dp))
-                                .background(FinanceColors.HeaderAccentDot)
-                                .clickable { /* уведомления для связи между модулями */ },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Уведомления",
-                                tint = Color.White,
-                                modifier = Modifier.size(18.dp),
+                        Box() {
+                            Column() {
+                                Spacer(modifier = Modifier.height(5.dp))
+                                Text(
+                                    text = "Финансы",
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                        Box() {
+                            Image(
+                                painter = painterResource(R.drawable.img),
+                                contentDescription = "man icon",
+                                modifier = Modifier.size(30.dp)
                             )
                         }
                     }

@@ -24,7 +24,7 @@ class ArticleLocalDataSourceImpl : ArticleLocalDataSource {
         "https://i.ibb.co/274TSKSf/close-up-person-meditating-home.jpg",
         "https://i.ibb.co/Ld1K3vgj/tea-book-relax.jpg",
         "https://i.ibb.co/gMNnL2Yp/ceramic-mug-with-coffee-silver-dollar-gum-leaves.jpg",
-        "https://i.ibb.co/YF85HrRg/doctor-doing-their-work-pediatrics-office.jpg"
+//        "https://i.ibb.co/YF85HrRg/doctor-doing-their-work-pediatrics-office.jpg"
     )
 
     private val articles = listOf(
@@ -78,16 +78,16 @@ class ArticleLocalDataSourceImpl : ArticleLocalDataSource {
             createdAt = LocalDateTime.now().minusDays(3),
             updatedAt = LocalDateTime.now().minusDays(2)
         ),
-        ArticleEntity(
-            id = 6,
-            title = "Как прикрепиться в поликлинике",
-            categoryId = 4,
-            mainWords = listOf("здоровье", "документы", "поликлиника", "больница"),
-            author = "Александра Майснер",
-            imageUrl = imageUrls[5],
-            createdAt = LocalDateTime.now().minusDays(21),
-            updatedAt = LocalDateTime.now().minusDays(13)
-        )
+//        ArticleEntity(
+//            id = 6,
+//            title = "Как прикрепиться в поликлинике",
+//            categoryId = 4,
+//            mainWords = listOf("здоровье", "документы", "поликлиника", "больница"),
+//            author = "Александра Майснер",
+//            imageUrl = imageUrls[5],
+//            createdAt = LocalDateTime.now().minusDays(21),
+//            updatedAt = LocalDateTime.now().minusDays(13)
+//        )
     )
 
     private val articleContents = listOf(

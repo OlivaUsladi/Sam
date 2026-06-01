@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.ksp)
 
     kotlin("plugin.serialization") version "2.2.10"
 }
@@ -52,6 +53,10 @@ dependencies {
     implementation("io.insert-koin:koin-android:3.5.6")
 
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    api(libs.androidx.room.runtime)
+    api(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     implementation(project(":domain"))
 

@@ -33,12 +33,12 @@ fun FinanceNavHost(navController: NavHostController) {
             arguments = listOf(
                 navArgument(FinanceRoutes.History.ARG_SOURCE_ID) {
                     type = NavType.IntType
-                    defaultValue = -1
+                    defaultValue = Int.MIN_VALUE
                 },
             ),
         ) {
-            val raw = it.arguments?.getInt(FinanceRoutes.History.ARG_SOURCE_ID) ?: -1
-            HistoryScreen(navController, sourceId = raw.takeIf { v -> v > 0 })
+            val raw = it.arguments?.getInt(FinanceRoutes.History.ARG_SOURCE_ID) ?: Int.MIN_VALUE
+            HistoryScreen(navController, sourceId = raw.takeIf { v -> v != Int.MIN_VALUE })
         }
 
         composable(FinanceRoutes.Sources.route)    { SourcesScreen(navController) }
@@ -74,15 +74,15 @@ fun FinanceNavHost(navController: NavHostController) {
             FinanceRoutes.EditGoal.route,
             arguments = listOf(navArgument("id") { type = NavType.IntType }),
         ) {
-            val id = it.arguments?.getInt("id")?.takeIf { v -> v > 0 }
+            val id = it.arguments?.getInt("id")
             GoalEditScreen(navController, id = id)
         }
         composable(
             FinanceRoutes.GoalDetail.route,
             arguments = listOf(navArgument("id") { type = NavType.IntType }),
         ) {
-            val id = it.arguments?.getInt("id")?.takeIf { v -> v > 0 }
-            id?.let { it1 -> GoalDetailScreen(navController, id = it1) }
+            val id = it.arguments?.getInt("id")
+            GoalDetailScreen(navController, id = id)
         }
     }
 }

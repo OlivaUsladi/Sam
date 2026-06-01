@@ -45,7 +45,7 @@ fun TagEditScreen(
             .background(FinanceColors.Background),
     ) {
         FinanceHeader(
-            title = if (id == null) "Новый тэг" else "Изменить тэг",
+            title = if (id == null) "Новый тег" else "Изменить тег",
             subtitle = "Категория расходов",
             actionIcon = Icons.AutoMirrored.Filled.ArrowBack,
             onAction = { navController.navigateUp() },
@@ -59,7 +59,7 @@ fun TagEditScreen(
         ) {
             FinanceTextField(value = state.name,
                 onValueChange = { vm.onEvent(TagEditEvent.SetName(it)) },
-                label = "Название тэга")
+                label = "Название тега")
 
             if (id != null) {
                 FinanceCard {

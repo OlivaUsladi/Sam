@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.Finance.model.Analytics
 import com.example.domain.Finance.model.TransactionType
+import com.example.domain.Finance.use_case.ConsumeAnalyticsTargetUseCase
 import com.example.domain.Finance.use_case.GetAnalyticsUseCase
+import com.example.domain.Finance.use_case.ObserveAnalyticsTargetUseCase
 import com.example.domain.Finance.use_case.ObserveFinanceChangesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +34,8 @@ sealed class AnalyticsEvent {
 class AnalyticsViewModel(
     private val getAnalytics: GetAnalyticsUseCase,
     private val observeChanges: ObserveFinanceChangesUseCase,
+    private val observeAnalyticsTarget: ObserveAnalyticsTargetUseCase,
+    private val consumeAnalyticsTarget: ConsumeAnalyticsTargetUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AnalyticsUiState())
@@ -39,6 +43,16 @@ class AnalyticsViewModel(
 
     init {
         viewModelScope.launch { observeChanges().collectLatest { load() } }
+
+        viewModelScope.launch {
+            observeAnalyticsTarget().collectLatest { target ->
+                if (target != null && target != _state.value.month) {
+                    _state.update { it.copy(month = target) }
+                    load()
+                    consumeAnalyticsTarget()
+                }
+            }
+        }
     }
 
     fun onEvent(e: AnalyticsEvent) {

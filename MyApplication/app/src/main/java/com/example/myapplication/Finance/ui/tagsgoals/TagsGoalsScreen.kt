@@ -45,7 +45,7 @@ fun TagsGoalsScreen(
             .fillMaxSize()
             .background(FinanceColors.Background),
     ) {
-        FinanceHeader(title = "Категории", subtitle = "Тэги расходов, цели и калькулятор")
+        FinanceHeader(title = "Категории", subtitle = "Теги расходов, цели и калькулятор")
 
         if (state.isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -61,13 +61,13 @@ fun TagsGoalsScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                //тэги
+                //теги
 
-                SectionTitle(title = "Тэги (категории расходов)")
+                SectionTitle(title = "Теги (категории расходов)")
                 if (state.tags.isEmpty()) {
                     FinanceCard {
                         Text(
-                            "Ещё нет тэгов. Создайте первый.",
+                            "Ещё нет тегов. Создайте первый.",
                             color = FinanceColors.TextSecondary, fontSize = 13.sp
                         )
                     }
@@ -81,7 +81,7 @@ fun TagsGoalsScreen(
                     }
                 }
                 PrimaryButton(
-                    text = "Создать тэг",
+                    text = "Создать тег",
                     onClick = { navController.navigate(FinanceRoutes.NewTag.route) },
                     modifier = Modifier.fillMaxWidth(),
                 )

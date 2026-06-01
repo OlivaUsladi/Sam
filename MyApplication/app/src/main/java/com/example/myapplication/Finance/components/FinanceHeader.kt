@@ -28,11 +28,11 @@ fun FinanceHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(FinanceColors.Background)
-            .padding(horizontal = 20.dp, vertical = 14.dp)
+            .padding(horizontal = 20.dp, vertical = 14.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Column(Modifier.weight(1f)) {
                 Text(

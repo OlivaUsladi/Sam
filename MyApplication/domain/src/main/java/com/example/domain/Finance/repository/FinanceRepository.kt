@@ -9,6 +9,12 @@ import java.time.YearMonth
 interface FinanceRepository {
 
     fun observeDataVersion(): Flow<Long>
+    fun observeOfflineMode(): Flow<Boolean>
+
+    fun observeAnalyticsTarget(): Flow<YearMonth?>
+    suspend fun consumeAnalyticsTarget()
+
+    suspend fun syncNow()
 
     suspend fun getSources(): List<Source>
     suspend fun createSource(name: String, type: SourceType): Source

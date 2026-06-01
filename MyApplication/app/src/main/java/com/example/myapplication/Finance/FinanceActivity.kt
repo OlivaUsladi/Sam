@@ -4,11 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.Finance.components.OfflineBanner
 import com.example.myapplication.Finance.navigation.FinanceNavHost
 
 class FinanceActivity : ComponentActivity() {
@@ -21,10 +22,11 @@ class FinanceActivity : ComponentActivity() {
                 topBar = { FinanceTopAppBar(navController = navController) },
                 bottomBar = { FinanceBottomAppBar(navController) },
                 content = { paddingValues ->
-                    Box(modifier = Modifier.padding(paddingValues)) {
+                    Column(modifier = Modifier.padding(paddingValues)) {
+                        OfflineBanner()
                         FinanceNavHost(navController = navController)
                     }
-                }
+                },
             )
         }
     }

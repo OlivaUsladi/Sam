@@ -23,41 +23,37 @@ public class RecipeService {
     private final UserRepository userRepository;
     private final RecipeMapper recipeMapper;
 
-    //Для неавторизованных пользователей
     @Transactional(readOnly = true)
     public List<RecipeResponseDto> getAllRecipesPublic() {
-        return recipeMapper.toResponseDtoList(recipeRepository.findAll());
+        return recipeMapper.toResponseDtoList(recipeRepository.findAllByOrderByIdAsc());
     }
 
-    //Для неавторизованных пользователей
     @Transactional(readOnly = true)
     public RecipeDetailResponseDto getRecipeByIdPublic(Integer id) {
         RecipeEntity recipe = recipeRepository.findById(id).orElse(null);
         return recipeMapper.toDetailResponseDto(recipe);
     }
 
-    //Для неавторизованных пользователей
     @Transactional(readOnly = true)
     public List<RecipeResponseDto> searchRecipesPublic(String query) {
-        return recipeMapper.toResponseDtoList(recipeRepository.findByTitleContainingIgnoreCase(query));
+        return recipeMapper.toResponseDtoList(
+                recipeRepository.findByTitleContainingIgnoreCaseOrderByIdAsc(query));
     }
 
-    //Для неавторизованных пользователей
     @Transactional(readOnly = true)
     public List<RecipeResponseDto> getRecipesByCategoryPublic(Integer categoryId) {
-        return recipeMapper.toResponseDtoList(recipeRepository.findByCategoriesId(categoryId));
+        return recipeMapper.toResponseDtoList(
+                recipeRepository.findByCategoriesIdOrderByIdAsc(categoryId));
     }
 
-    //Для неавторизованных пользователей
     @Transactional(readOnly = true)
     public List<RecipeResponseDto> getRecipesByGroceryItemsPublic(List<Integer> groceryItemIds) {
         return recipeMapper.toResponseDtoList(recipeRepository.findByGroceryItemIds(groceryItemIds));
     }
 
-    //Для неавторизованных пользователей
     @Transactional(readOnly = true)
     public List<RecipeResponseDto> getRecipesByExactGroceryItemsPublic(List<Integer> groceryItemIds) {
-        List<RecipeEntity> allRecipes = recipeRepository.findAll();
+        List<RecipeEntity> allRecipes = recipeRepository.findAllByOrderByIdAsc();
 
         List<RecipeEntity> filtered = allRecipes.stream()
                 .filter(recipe -> {
@@ -71,11 +67,12 @@ public class RecipeService {
         return recipeMapper.toResponseDtoList(filtered);
     }
 
-    // ДАЛЬШЕ ДЛЯ АВТОРИЗОВАННЫХ ПОЛЬЗОВАТЕЛЕЙ
+
+
 
     @Transactional(readOnly = true)
     public List<RecipeResponseDto> getAllRecipesForUser(Integer userId) {
-        List<RecipeEntity> recipes = recipeRepository.findAll();
+        List<RecipeEntity> recipes = recipeRepository.findAllByOrderByIdAsc();
 
         if (userId == null) {
             return getAllRecipesPublic();
@@ -86,7 +83,6 @@ public class RecipeService {
             return getAllRecipesPublic();
         }
 
-        // лайк и избранное проверяем
         return recipes.stream()
                 .map(recipe -> enrichResponseDtoWithUserData(recipe, user))
                 .collect(Collectors.toList());
@@ -118,7 +114,7 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public List<RecipeResponseDto> searchRecipesForUser(String query, Integer userId) {
-        List<RecipeEntity> recipes = recipeRepository.findByTitleContainingIgnoreCase(query);
+        List<RecipeEntity> recipes = recipeRepository.findByTitleContainingIgnoreCaseOrderByIdAsc(query);
 
         if (userId == null) {
             return recipeMapper.toResponseDtoList(recipes);
@@ -136,7 +132,7 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public List<RecipeResponseDto> getRecipesByCategoryForUser(Integer categoryId, Integer userId) {
-        List<RecipeEntity> recipes = recipeRepository.findByCategoriesId(categoryId);
+        List<RecipeEntity> recipes = recipeRepository.findByCategoriesIdOrderByIdAsc(categoryId);
 
         if (userId == null) {
             return recipeMapper.toResponseDtoList(recipes);
@@ -172,7 +168,7 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public List<RecipeResponseDto> getRecipesByExactGroceryItemsForUser(List<Integer> groceryItemIds, Integer userId) {
-        List<RecipeEntity> allRecipes = recipeRepository.findAll();
+        List<RecipeEntity> allRecipes = recipeRepository.findAllByOrderByIdAsc();
 
         // нереально крутой запрос для фильтрации рецептов ТОЛЬКО по заданным продуктам
         //но возможно надо оптимизировать (ищет по всем продуктам каждого рецепта)
@@ -197,7 +193,6 @@ public class RecipeService {
     }
 
 
-
     @Transactional
     public void addLike(Integer recipeId, Integer userId) {
         if (userId == null) {
@@ -215,9 +210,7 @@ public class RecipeService {
             like.setRecipe(recipe);
             likeRecipeRepository.save(like);
 
-            int currentLikes = recipe.getLikesCount() == null ? 0 : recipe.getLikesCount();
-            recipe.setLikesCount(currentLikes + 1);
-            recipeRepository.save(recipe);
+            recipeRepository.adjustLikesCount(recipeId, 1);
         }
     }
 
@@ -232,11 +225,10 @@ public class RecipeService {
         RecipeEntity recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new RuntimeException("Рецепт не найден"));
 
-        likeRecipeRepository.deleteByUserAndRecipe(user, recipe);
-
-        int currentLikes = recipe.getLikesCount() == null ? 0 : recipe.getLikesCount();
-        recipe.setLikesCount(Math.max(0, currentLikes - 1));
-        recipeRepository.save(recipe);
+        if (likeRecipeRepository.existsByUserAndRecipe(user, recipe)) {
+            likeRecipeRepository.deleteByUserAndRecipe(user, recipe);
+            recipeRepository.adjustLikesCount(recipeId, -1);
+        }
     }
 
     @Transactional
@@ -284,9 +276,11 @@ public class RecipeService {
         List<FavouriteRecipeEntity> favourites = favouriteRecipeRepository.findByUser(user);
 
         return favourites.stream()
+                .sorted(java.util.Comparator.comparingInt(f -> f.getRecipe().getId()))
                 .map(fav -> enrichResponseDtoWithUserData(fav.getRecipe(), user))
                 .collect(Collectors.toList());
     }
+
 
     @Transactional(readOnly = true)
     public boolean isRecipeFavourite(Integer recipeId, Integer userId) {

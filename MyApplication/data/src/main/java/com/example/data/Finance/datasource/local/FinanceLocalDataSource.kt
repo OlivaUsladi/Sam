@@ -1,347 +1,68 @@
 package com.example.data.Finance.datasource.local
 
-import com.example.domain.Finance.model.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.atomic.AtomicLong
+import com.example.data.Finance.datasource.local.model.GoalLocalEntity
+import com.example.data.Finance.datasource.local.model.SourceLocalEntity
+import com.example.data.Finance.datasource.local.model.TagLocalEntity
+import com.example.data.Finance.datasource.local.model.TransactionLocalEntity
 
-class FinanceLocalDataSource {
+interface FinanceLocalDataSource {
 
-    private val sources = mutableListOf<Source>()
-    private val tags = mutableListOf<Tag>()
-    private val transactions = mutableListOf<Transaction>()
-    private val goals = mutableListOf<Goal>()
+    suspend fun getSources(userId: Int): List<SourceLocalEntity>
+    suspend fun findSource(id: Int): SourceLocalEntity?
+    suspend fun findSourceByName(userId: Int, name: String): SourceLocalEntity?
+    suspend fun upsertSource(entity: SourceLocalEntity)
+    suspend fun upsertSources(entities: List<SourceLocalEntity>)
+    suspend fun deleteSource(id: Int)
+    suspend fun pendingCreateSources(userId: Int): List<SourceLocalEntity>
+    suspend fun pendingUpdateSources(userId: Int): List<SourceLocalEntity>
+    suspend fun pendingDeleteSources(userId: Int): List<SourceLocalEntity>
+    suspend fun replaceAllSyncedSources(userId: Int, newRows: List<SourceLocalEntity>)
 
-    private val sourceIds = AtomicInteger(0)
-    private val tagIds = AtomicInteger(0)
-    private val transactionIds = AtomicInteger(0)
-    private val goalIds = AtomicInteger(0)
+    suspend fun getTags(userId: Int): List<TagLocalEntity>
+    suspend fun findTag(id: Int): TagLocalEntity?
+    suspend fun findTagByName(userId: Int, name: String): TagLocalEntity?
+    suspend fun upsertTag(entity: TagLocalEntity)
+    suspend fun upsertTags(entities: List<TagLocalEntity>)
+    suspend fun deleteTag(id: Int)
+    suspend fun pendingCreateTags(userId: Int): List<TagLocalEntity>
+    suspend fun pendingUpdateTags(userId: Int): List<TagLocalEntity>
+    suspend fun pendingDeleteTags(userId: Int): List<TagLocalEntity>
+    suspend fun replaceAllSyncedTags(userId: Int, newRows: List<TagLocalEntity>)
 
-    private val mutex = Mutex()
+    suspend fun getGoals(userId: Int): List<GoalLocalEntity>
+    suspend fun findGoal(id: Int): GoalLocalEntity?
+    suspend fun upsertGoal(entity: GoalLocalEntity)
+    suspend fun upsertGoals(entities: List<GoalLocalEntity>)
+    suspend fun deleteGoal(id: Int)
+    suspend fun pendingCreateGoals(userId: Int): List<GoalLocalEntity>
+    suspend fun pendingUpdateGoals(userId: Int): List<GoalLocalEntity>
+    suspend fun pendingDeleteGoals(userId: Int): List<GoalLocalEntity>
+    suspend fun replaceAllSyncedGoals(userId: Int, newRows: List<GoalLocalEntity>)
 
-    private val _dataVersion = MutableStateFlow(0L)
-    val dataVersion: StateFlow<Long> = _dataVersion.asStateFlow()
-    private val versionCounter = AtomicLong(0L)
-    private fun bumpVersion() { _dataVersion.value = versionCounter.incrementAndGet() }
+    suspend fun getTransactions(
+        userId: Int, type: String?, from: String?, to: String?,
+    ): List<TransactionLocalEntity>
 
-    init { seed() }
+    suspend fun getTransactionsByTag(userId: Int, tagId: Int): List<TransactionLocalEntity>
+    suspend fun findTransaction(id: Int): TransactionLocalEntity?
+    suspend fun upsertTransaction(entity: TransactionLocalEntity)
+    suspend fun upsertTransactions(entities: List<TransactionLocalEntity>)
+    suspend fun deleteTransaction(id: Int)
+    suspend fun pendingCreateTransactions(userId: Int): List<TransactionLocalEntity>
+    suspend fun pendingUpdateTransactions(userId: Int): List<TransactionLocalEntity>
+    suspend fun pendingDeleteTransactions(userId: Int): List<TransactionLocalEntity>
+    suspend fun replaceAllSyncedTransactions(userId: Int, newRows: List<TransactionLocalEntity>)
 
-    private fun seed() {
-        sources += Source(sourceIds.incrementAndGet(), "Наличные", SourceType.CASH)
-        sources += Source(sourceIds.incrementAndGet(), "Сбер дебетовая", SourceType.CARD)
-        sources += Source(sourceIds.incrementAndGet(), "Т-Банк", SourceType.BANK)
+    suspend fun listForAnalytics(
+        userId: Int, type: String, from: String, to: String,
+    ): List<TransactionLocalEntity>
 
-        tags += Tag(tagIds.incrementAndGet(), "Продукты", BigDecimal.ZERO)
-        tags += Tag(tagIds.incrementAndGet(), "Кафе", BigDecimal.ZERO)
-        tags += Tag(tagIds.incrementAndGet(), "Транспорт", BigDecimal.ZERO)
-        tags += Tag(tagIds.incrementAndGet(), "Кино", BigDecimal.ZERO)
-
-        val today = LocalDate.now()
-        addTxInternal("Стипендия", BigDecimal(8500), TransactionType.INCOME,
-            "за май", today.withDayOfMonth(1), 2, null)
-        addTxInternal("Магнит", BigDecimal(750), TransactionType.EXPENSE,
-            "продукты на 3 дня", today.minusDays(2), 2, 1)
-        addTxInternal("Перекрёсток", BigDecimal(1280), TransactionType.EXPENSE,
-            null, today.minusDays(5), 2, 1)
-        addTxInternal("Starbucks", BigDecimal(420), TransactionType.EXPENSE,
-            "латте утром", today.minusDays(3), 1, 2)
-        addTxInternal("Метро", BigDecimal(80), TransactionType.EXPENSE,
-            null, today.minusDays(1), 1, 3)
-        addTxInternal("Билет в кино", BigDecimal(550), TransactionType.EXPENSE,
-            "вечер пятницы", today.minusDays(7), 2, 4)
-        addTxInternal("Подработка", BigDecimal(3500), TransactionType.INCOME,
-            "репетиторство", today.minusDays(4), 3, null)
-
-        goals += Goal(
-            id = goalIds.incrementAndGet(),
-            name = "Поездка в Питер",
-            description = "Лето, 5 дней",
-            targetAmount = BigDecimal(40000),
-            currentAmount = BigDecimal(8000),
-            targetDate = today.plusMonths(3),
-            monthlyAmount = BigDecimal(11000),
-        )
-        goals += Goal(
-            id = goalIds.incrementAndGet(),
-            name = "Ноутбук",
-            description = "Подкопить на учёбу",
-            targetAmount = BigDecimal(95000),
-            currentAmount = BigDecimal(15000),
-            targetDate = today.plusMonths(8),
-            monthlyAmount = BigDecimal(10000),
-        )
-
-        recomputeTagTotals()
-    }
-
-    private fun addTxInternal(
-        name: String, amount: BigDecimal, type: TransactionType,
-        description: String?, date: LocalDate, sourceId: Int, tagId: Int?,
-    ) {
-        transactions += Transaction(
-            id = transactionIds.incrementAndGet(),
-            name = name,
-            amount = amount,
-            type = type,
-            description = description,
-            date = date,
-            sourceId = sourceId,
-            tagId = tagId,
-        )
-    }
-
-    private fun recomputeTagTotals() {
-        val sums = transactions
-            .filter { it.type == TransactionType.EXPENSE && it.tagId != null }
-            .groupBy { it.tagId!! }
-            .mapValues { (_, txs) ->
-                txs.fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
-            }
-        for (i in tags.indices) {
-            val tag = tags[i]
-            tags[i] = tag.copy(totalAmountSpent = sums[tag.id] ?: BigDecimal.ZERO)
-        }
-    }
-
-    suspend fun listSources(): List<Source> = mutex.withLock { sources.sortedBy { it.name } }
-
-    suspend fun createSource(name: String, type: SourceType): Source = mutex.withLock {
-        require(sources.none { it.name.equals(name, ignoreCase = true) }) {
-            "Источник с таким именем уже есть"
-        }
-        Source(sourceIds.incrementAndGet(), name.trim(), type).also { sources += it; bumpVersion() }
-    }
-
-    suspend fun updateSource(id: Int, name: String, type: SourceType): Source = mutex.withLock {
-        val idx = sources.indexOfFirst { it.id == id }
-        require(idx >= 0) { "Источник не найден" }
-        Source(id, name.trim(), type).also { sources[idx] = it; bumpVersion() }
-    }
-
-    suspend fun deleteSource(id: Int) = mutex.withLock {
-        require(transactions.none { it.sourceId == id }) {
-            "У источника есть транзакции — сначала удалите их"
-        }
-        sources.removeAll { it.id == id }
-        bumpVersion()
-        Unit
-    }
-
-    suspend fun listTags(): List<Tag> = mutex.withLock { tags.sortedBy { it.name } }
-
-    suspend fun createTag(name: String): Tag = mutex.withLock {
-        require(tags.none { it.name.equals(name, ignoreCase = true) }) {
-            "Тэг с таким именем уже есть"
-        }
-        Tag(tagIds.incrementAndGet(), name.trim(), BigDecimal.ZERO).also {
-            tags += it; bumpVersion()
-        }
-    }
-
-    suspend fun updateTag(id: Int, name: String): Tag = mutex.withLock {
-        val idx = tags.indexOfFirst { it.id == id }
-        require(idx >= 0) { "Тэг не найден" }
-        tags[idx].copy(name = name.trim()).also { tags[idx] = it; bumpVersion() }
-    }
-
-    suspend fun deleteTag(id: Int) = mutex.withLock {
-        for (i in transactions.indices) {
-            if (transactions[i].tagId == id) transactions[i] = transactions[i].copy(tagId = null)
-        }
-        tags.removeAll { it.id == id }
-        recomputeTagTotals()
-        bumpVersion()
-        Unit
-    }
-
-    suspend fun assignTagToTransactions(tagId: Int, ids: List<Int>) = mutex.withLock {
-        require(tags.any { it.id == tagId }) { "Тэг не найден" }
-        for (i in transactions.indices) {
-            val tx = transactions[i]
-            transactions[i] = when {
-                tx.id in ids && tx.type == TransactionType.EXPENSE -> tx.copy(tagId = tagId)
-                tx.tagId == tagId -> tx.copy(tagId = null)
-                else -> tx
-            }
-        }
-        recomputeTagTotals()
-        bumpVersion()
-        Unit
-    }
-
-    suspend fun listTransactions(
-        type: TransactionType?, from: LocalDate?, to: LocalDate?
-    ): List<Transaction> = mutex.withLock {
-        transactions
-            .asSequence()
-            .filter { type == null || it.type == type }
-            .filter { from == null || !it.date.isBefore(from) }
-            .filter { to == null || !it.date.isAfter(to) }
-            .sortedWith(compareByDescending<Transaction> { it.date }.thenByDescending { it.id })
-            .toList()
-    }
-
-    suspend fun listTransactionsByTag(tagId: Int): List<Transaction> = mutex.withLock {
-        transactions.filter { it.tagId == tagId }
-            .sortedWith(compareByDescending<Transaction> { it.date }.thenByDescending { it.id })
-    }
-
-    suspend fun createTransaction(
-        name: String, amount: BigDecimal, type: TransactionType,
-        description: String?, date: LocalDate, sourceId: Int, tagId: Int?,
-    ): Transaction = mutex.withLock {
-        require(sources.any { it.id == sourceId }) { "Источник не найден" }
-        if (tagId != null) {
-            require(type == TransactionType.EXPENSE) { "Тэг можно ставить только на расход" }
-            require(tags.any { it.id == tagId }) { "Тэг не найден" }
-        }
-        Transaction(
-            id = transactionIds.incrementAndGet(),
-            name = name.trim(), amount = amount, type = type,
-            description = description, date = date,
-            sourceId = sourceId, tagId = tagId,
-        ).also {
-            transactions += it
-            recomputeTagTotals()
-            bumpVersion()
-        }
-    }
-
-    suspend fun updateTransaction(
-        id: Int, name: String, amount: BigDecimal, type: TransactionType,
-        description: String?, date: LocalDate, sourceId: Int, tagId: Int?,
-    ): Transaction = mutex.withLock {
-        val idx = transactions.indexOfFirst { it.id == id }
-        require(idx >= 0) { "Транзакция не найдена" }
-        require(sources.any { it.id == sourceId }) { "Источник не найден" }
-        if (tagId != null) {
-            require(type == TransactionType.EXPENSE) { "Тэг можно ставить только на расход" }
-            require(tags.any { it.id == tagId }) { "Тэг не найден" }
-        }
-        Transaction(
-            id = id, name = name.trim(), amount = amount, type = type,
-            description = description, date = date,
-            sourceId = sourceId, tagId = tagId,
-        ).also {
-            transactions[idx] = it
-            recomputeTagTotals()
-            bumpVersion()
-        }
-    }
-
-    suspend fun deleteTransaction(id: Int) = mutex.withLock {
-        transactions.removeAll { it.id == id }
-        recomputeTagTotals()
-        bumpVersion()
-        Unit
-    }
-
-    suspend fun listGoals(): List<Goal> = mutex.withLock { goals.toList() }
-
-    suspend fun getGoal(id: Int): Goal = mutex.withLock {
-        goals.firstOrNull { it.id == id } ?: error("Цель не найдена")
-    }
-
-    suspend fun createGoal(
-        name: String, description: String?, targetAmount: BigDecimal,
-        targetDate: LocalDate?, monthlyAmount: BigDecimal?,
-    ): Goal = mutex.withLock {
-        Goal(
-            id = goalIds.incrementAndGet(),
-            name = name.trim(),
-            description = description,
-            targetAmount = targetAmount,
-            currentAmount = BigDecimal.ZERO,
-            targetDate = targetDate,
-            monthlyAmount = monthlyAmount ?: recommendedMonthly(
-                targetAmount, BigDecimal.ZERO, targetDate),
-        ).also { goals += it; bumpVersion() }
-    }
-
-    suspend fun updateGoal(
-        id: Int, name: String, description: String?,
-        targetAmount: BigDecimal, currentAmount: BigDecimal,
-        targetDate: LocalDate?, monthlyAmount: BigDecimal?,
-    ): Goal = mutex.withLock {
-        val idx = goals.indexOfFirst { it.id == id }
-        require(idx >= 0) { "Цель не найдена" }
-        Goal(
-            id = id,
-            name = name.trim(),
-            description = description,
-            targetAmount = targetAmount,
-            currentAmount = currentAmount,
-            targetDate = targetDate,
-            monthlyAmount = monthlyAmount ?: recommendedMonthly(
-                targetAmount, currentAmount, targetDate),
-        ).also { goals[idx] = it; bumpVersion() }
-    }
-
-    suspend fun deleteGoal(id: Int) = mutex.withLock {
-        goals.removeAll { it.id == id }
-        bumpVersion()
-        Unit
-    }
-
-    private fun recommendedMonthly(
-        target: BigDecimal, current: BigDecimal, targetDate: LocalDate?,
-    ): BigDecimal? {
-        if (targetDate == null) return null
-        val months = java.time.temporal.ChronoUnit.MONTHS.between(
-            LocalDate.now().withDayOfMonth(1), targetDate.withDayOfMonth(1)
-        )
-        if (months <= 0) return null
-        val remaining = target.subtract(current)
-        if (remaining.signum() <= 0) return BigDecimal.ZERO
-        return remaining.divide(BigDecimal.valueOf(months), 0, java.math.RoundingMode.CEILING)
-    }
-
-    suspend fun importTransactions(
+    suspend fun findDuplicateTransactions(
+        userId: Int,
         sourceId: Int,
-        parsed: List<ParsedTransaction>,
-    ): ImportResult = mutex.withLock {
-        require(sources.any { it.id == sourceId }) { "Источник не найден" }
-        var imported = 0
-        var skipped = 0
-        for (p in parsed) {
-            val isDup = transactions.any {
-                it.sourceId == sourceId &&
-                        it.type == p.type &&
-                        it.date == p.date &&
-                        it.name.equals(p.name, ignoreCase = true) &&
-                        it.amount.compareTo(p.amount) == 0
-            }
-            if (isDup) { skipped++; continue }
-            transactions += Transaction(
-                id = transactionIds.incrementAndGet(),
-                name = p.name.trim(),
-                amount = p.amount,
-                type = p.type,
-                description = p.description,
-                date = p.date,
-                sourceId = sourceId,
-                tagId = null,
-            )
-            imported++
-        }
-        recomputeTagTotals()
-        if (imported > 0) bumpVersion()
-        ImportResult(imported, skipped)
-    }
-
-    suspend fun snapshotForAnalytics(
-        from: LocalDate, to: LocalDate, type: TransactionType,
-    ): Triple<List<Transaction>, List<Source>, List<Tag>> = mutex.withLock {
-        Triple(
-            transactions.filter { it.type == type && !it.date.isBefore(from) && !it.date.isAfter(to) },
-            sources.toList(),
-            tags.toList(),
-        )
-    }
+        type: String,
+        transactionDate: String,
+        name: String,
+        amount: String,
+    ): List<TransactionLocalEntity>
 }

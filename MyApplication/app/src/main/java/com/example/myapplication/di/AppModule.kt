@@ -194,7 +194,8 @@ val appModule = module {
     viewModel { TransactionEditViewModel(get(), get(), get(), get(),
         get(), get(), get()) }
     viewModel { BankReportsViewModel(get(), get(), get()) }
-    viewModel { AnalyticsViewModel(get(), get()) }
+
+    viewModel { AnalyticsViewModel(get(), get(), get(), get()) }
     viewModel { TagsGoalsViewModel(get(), get(), get(), get(), get()) }
     viewModel { TagEditViewModel(get(), get(), get(), get(),
         get(), get()) }

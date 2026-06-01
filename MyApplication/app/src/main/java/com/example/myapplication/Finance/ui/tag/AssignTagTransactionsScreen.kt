@@ -43,7 +43,7 @@ fun AssignTagTransactionsScreen(
     ) {
         FinanceHeader(
             title = "Транзакции",
-            subtitle = state.tagName.ifBlank { "Прикрепить к тэгу" },
+            subtitle = state.tagName.ifBlank { "Прикрепить к тегу" },
             actionIcon = Icons.AutoMirrored.Filled.ArrowBack,
             onAction = { navController.navigateUp() },
         )
