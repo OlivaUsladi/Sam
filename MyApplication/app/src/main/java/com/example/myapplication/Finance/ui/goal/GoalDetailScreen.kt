@@ -22,6 +22,7 @@ import com.example.myapplication.Finance.components.*
 import com.example.myapplication.Finance.navigation.FinanceRoutes
 import com.example.myapplication.Finance.theme.FinanceColors
 import org.koin.androidx.compose.koinViewModel
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -69,6 +70,13 @@ fun GoalDetailScreen(
             (g.currentAmount.toDouble() / g.targetAmount.toDouble())
                 .coerceIn(0.0, 1.0).toFloat()
         else 0f
+        val isReached = g.currentAmount >= g.targetAmount
+        val isExpired = g.targetDate != null && g.targetDate!!.isBefore(LocalDate.now()) && !isReached
+        val progressColor = when {
+            isReached -> FinanceColors.Income
+            isExpired -> FinanceColors.Expense
+            else -> FinanceColors.PrimaryDark
+        }
 
         Column(
             modifier = Modifier
@@ -77,11 +85,23 @@ fun GoalDetailScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (isReached) {
+                FinanceCard {
+                    Text("Цель достигнута!",
+                        color = FinanceColors.Income, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                }
+            } else if (isExpired) {
+                FinanceCard {
+                    Text("Срок цели истёк",
+                        color = FinanceColors.Expense, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+
             FinanceCard {
                 Text("Прогресс", color = FinanceColors.TextSecondary, fontSize = 12.sp)
                 LinearProgressIndicator(
                     progress = { progress },
-                    color = FinanceColors.PrimaryDark,
+                    color = progressColor,
                     trackColor = FinanceColors.Divider,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -109,7 +129,7 @@ fun GoalDetailScreen(
                     Text(g.targetDate!!.format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
                         color = FinanceColors.TextPrimary, fontWeight = FontWeight.SemiBold)
                 }
-                if (g.monthlyAmount != null) {
+                if (g.monthlyAmount != null && !isExpired) {
                     Spacer(Modifier.height(8.dp))
                     Text("Ежемесячное внесение", color = FinanceColors.TextSecondary, fontSize = 12.sp)
                     Text("${formatMoney(g.monthlyAmount!!)} ₽",

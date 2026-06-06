@@ -16,29 +16,35 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="true">
-
+        <activity
+            android:name=".Profile.Profile"
+            android:exported="false"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/Theme.MyApplication" />
         <activity
             android:name=".Auth.AuthActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Recipes.RecipeActivity"
             android:exported="false"
             android:label="@string/title_activity_recipe"
             android:theme="@style/Theme.MyApplication" />
-
         <activity
             android:name=".Hints.MainActivity"
             android:exported="false" />
         <activity
             android:name=".Finance.FinanceActivity"
-            android:exported="false"/>
+            android:exported="false" />
+        <activity
+            android:name=".Profile.ProfileActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

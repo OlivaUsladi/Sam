@@ -88,30 +88,29 @@ class RecipeRepositoryImpl(
 
 
     override suspend fun getRecipes(): List<Recipe> {
-        return try {
-            val recipesDto = remoteDataSource.getAllRecipesForUser(userId)
-            recipesDto.map { RecipeNetworkMapper.mapToDomain(it) }
-        } catch (e: Exception) {
-            val recipeEntities = localDataSource.getRecipes()
-            recipeEntities.map { entity ->
-                val categories = getCategoriesForRecipe(entity.id)
-                val ingredients = getIngredientsForRecipe(entity.id)
-                Recipe(
-                    id = entity.id,
-                    title = entity.title,
-                    description = entity.description,
-                    categories = categories.map { it.toDomain() },
-                    ingredients = ingredients,
-                    author = entity.author,
-                    previewImageUrl = entity.previewImageUrl,
-                    cookingTimeMinutes = entity.cookingTimeMinutes,
-                    createdAt = entity.createdAt,
-                    updatedAt = entity.updatedAt,
-                    likesCount = entity.likesCount,
-                    isFavorite = isRecipeFavorite(userId,entity.id),
-                    isLiked = isRecipeLiked(userId,entity.id)
-                )
-            }
+        val recipesDto = remoteDataSource.getAllRecipesForUser(userId)
+        if (recipesDto.isNotEmpty()) {
+            return recipesDto.map { RecipeNetworkMapper.mapToDomain(it) }
+        }
+        val recipeEntities = localDataSource.getRecipes()
+        return recipeEntities.map { entity ->
+            val categories = getCategoriesForRecipe(entity.id)
+            val ingredients = getIngredientsForRecipe(entity.id)
+            Recipe(
+                id = entity.id,
+                title = entity.title,
+                description = entity.description,
+                categories = categories.map { it.toDomain() },
+                ingredients = ingredients,
+                author = entity.author,
+                previewImageUrl = entity.previewImageUrl,
+                cookingTimeMinutes = entity.cookingTimeMinutes,
+                createdAt = entity.createdAt,
+                updatedAt = entity.updatedAt,
+                likesCount = entity.likesCount,
+                isFavorite = isRecipeFavorite(userId, entity.id),
+                isLiked = isRecipeLiked(userId, entity.id)
+            )
         }
     }
 
@@ -736,12 +735,29 @@ class RecipeRepositoryImpl(
             )
         } catch (e: Exception) {
             val target = shoppingLocal.findList(targetListId) ?: return null
+            val existingItems = shoppingLocal.getItems(targetListId).toMutableList()
             for (sid in sourceListIds) {
                 shoppingLocal.getItems(sid).forEach { item ->
-                    shoppingLocal.upsertItem(item.copy(
-                        listId = targetListId,
-                        pendingUpdate = !item.pendingCreate,
-                    ))
+                    val match = existingItems.find {
+                        it.description.equals(item.description, ignoreCase = true) &&
+                                it.unit.equals(item.unit, ignoreCase = true)
+                    }
+                    if (match != null) {
+                        val merged = match.copy(
+                            quantity = (match.quantity ?: 0.0) + (item.quantity ?: 0.0),
+                            pendingUpdate = !match.pendingCreate,
+                        )
+                        shoppingLocal.upsertItem(merged)
+                        existingItems[existingItems.indexOf(match)] = merged
+                        shoppingLocal.deleteItem(item.id)
+                    } else {
+                        val moved = item.copy(
+                            listId = targetListId,
+                            pendingUpdate = !item.pendingCreate,
+                        )
+                        shoppingLocal.upsertItem(moved)
+                        existingItems.add(moved)
+                    }
                 }
                 shoppingLocal.findList(sid)?.let { src ->
                     if (src.pendingCreate) shoppingLocal.deleteList(sid)
@@ -771,8 +787,12 @@ class RecipeRepositoryImpl(
                 val server = ShoppingListNetworkMapper.mapToDomain(
                     shoppingListRemoteDataSource.createShoppingList(row.userId, row.name)
                 )
+                val orphanedItems = shoppingLocal.getItems(row.id)
                 shoppingLocal.deleteList(row.id)
                 shoppingLocal.upsertList(server.toLocalEntity())
+                orphanedItems.forEach { item ->
+                    shoppingLocal.upsertItem(item.copy(listId = server.id))
+                }
             }
         }
         shoppingLocal.pendingUpdateLists(userId).forEach { row ->

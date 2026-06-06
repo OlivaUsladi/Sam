@@ -76,7 +76,7 @@ class GoalDetailViewModel(
         val delta = s.addAmount.replace(',', '.').toBigDecimalOrNull() ?: return@launch
         if (delta.signum() <= 0) return@launch
         try {
-            val newCurrent = (g.currentAmount + delta).min(g.targetAmount)
+            val newCurrent = g.currentAmount + delta
             val updated = updateGoal(g.id, g.name, g.description, g.targetAmount,
                 newCurrent, g.targetDate, g.monthlyAmount)
             _state.update { it.copy(goal = updated, addAmount = "") }

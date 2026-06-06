@@ -388,6 +388,7 @@ class FinanceRepositoryImpl(
             pendingCreate = true,
         ))
         bump()
+        var serverGoal: Goal? = null
         tryRemote {
             remote.createGoal(CreateGoalRequestDto(
                 name = name, description = description,
@@ -398,9 +399,11 @@ class FinanceRepositoryImpl(
         }.onSuccess { upd ->
             local.deleteGoal(localId)
             local.upsertGoal(upd.toLocal(uid))
+            serverGoal = upd
             bump()
         }
-        return local.findGoal(localId)?.toDomain()
+        return serverGoal
+            ?: local.findGoal(localId)?.toDomain()
             ?: Goal(localId, name, description, targetAmount, BigDecimal.ZERO, targetDate, monthlyAmount)
     }
 

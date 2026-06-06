@@ -27,6 +27,7 @@ import com.example.myapplication.Recipes.ui.grocery.GroceriesViewModel
 import com.example.myapplication.Recipes.ui.groceryrecipes.GroceryRecipeViewModel
 import com.example.myapplication.Recipes.ui.recipe.RecipeScreenViewModel
 import com.example.myapplication.Recipes.ui.shoppinglist.ShoppingListViewModel
+import com.example.myapplication.Profile.ProfileViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -202,4 +203,6 @@ val appModule = module {
     viewModel { AssignTagTransactionsViewModel(get(), get(), get()) }
     viewModel { GoalDetailViewModel(get(), get(), get(), get()) }
     viewModel { GoalEditViewModel(get(), get(), get()) }
+
+    viewModel { ProfileViewModel(get(), get(), get()) }
 }

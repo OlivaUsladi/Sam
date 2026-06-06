@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication.Finance.FinanceActivity
 import com.example.myapplication.Hints.MainActivity
+import com.example.myapplication.Profile.ProfileActivity
 import com.example.myapplication.R
 import com.example.myapplication.Recipes.navigation.Routes
 import kotlinx.coroutines.launch
@@ -115,7 +116,9 @@ fun RecipeTopAppBar(navController: NavController) {
                                 )
                             }
                         }
-                        Box() {
+                        Box(Modifier.padding(end = 5.dp).clickable {
+                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                        }) {
                             Image(
                                 painter = painterResource(R.drawable.img),
                                 contentDescription = "man icon",

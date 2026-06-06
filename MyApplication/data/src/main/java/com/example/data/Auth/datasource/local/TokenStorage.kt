@@ -24,6 +24,17 @@ class TokenStorage(context: Context) {
         prefs.edit().putInt(KEY_USER_ID, userId).apply()
     }
 
+    fun saveUserInfo(name: String, email: String) {
+        prefs.edit()
+            .putString(KEY_USER_NAME, name)
+            .putString(KEY_USER_EMAIL, email)
+            .apply()
+    }
+
+    fun getUserName(): String? = prefs.getString(KEY_USER_NAME, null)
+
+    fun getUserEmail(): String? = prefs.getString(KEY_USER_EMAIL, null)
+
     fun getUserId(): Int? {
         val v = prefs.getInt(KEY_USER_ID, -1)
         return if (v == -1) null else v
@@ -40,6 +51,8 @@ class TokenStorage(context: Context) {
         private const val KEY_ACCESS = "access_token"
         private const val KEY_REFRESH = "refresh_token"
         private const val KEY_USER_ID = "user_id"
+        private const val KEY_USER_NAME = "user_name"
+        private const val KEY_USER_EMAIL = "user_email"
 
         private fun build(context: Context): SharedPreferences {
             val masterKey = MasterKey.Builder(context)
