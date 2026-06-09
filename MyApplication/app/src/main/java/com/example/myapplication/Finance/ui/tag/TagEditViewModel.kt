@@ -20,6 +20,7 @@ import java.math.BigDecimal
 data class TagEditUiState(
     val id: Int? = null,
     val name: String = "",
+    val monthlyLimit: String = "",
     val totalSpent: BigDecimal = BigDecimal.ZERO,
     val transactions: List<Transaction> = emptyList(),
     val isLoading: Boolean = false,
@@ -30,6 +31,7 @@ data class TagEditUiState(
 sealed class TagEditEvent {
     data class Init(val id: Int?) : TagEditEvent()
     data class SetName(val v: String) : TagEditEvent()
+    data class SetMonthlyLimit(val v: String) : TagEditEvent()
     data object Save : TagEditEvent()
     data object Delete : TagEditEvent()
 }
@@ -50,6 +52,7 @@ class TagEditViewModel(
         when (e) {
             is TagEditEvent.Init    -> load(e.id)
             is TagEditEvent.SetName -> _state.update { it.copy(name = e.v) }
+            is TagEditEvent.SetMonthlyLimit -> _state.update { it.copy(monthlyLimit = e.v) }
             TagEditEvent.Save       -> save()
             TagEditEvent.Delete     -> remove()
         }
@@ -59,7 +62,7 @@ class TagEditViewModel(
         _state.update { it.copy(isLoading = true, error = null) }
         try {
             if (id == null) {
-                _state.update { it.copy(id = null, name = "", totalSpent = BigDecimal.ZERO,
+                _state.update { it.copy(id = null, name = "", monthlyLimit = "", totalSpent = BigDecimal.ZERO,
                     transactions = emptyList(), isLoading = false) }
             } else {
                 val tag: Tag? = getTags().firstOrNull { it.id == id }
@@ -68,6 +71,7 @@ class TagEditViewModel(
                     it.copy(
                         id = tag?.id,
                         name = tag?.name.orEmpty(),
+                        monthlyLimit = tag?.monthlyLimit?.toPlainString().orEmpty(),
                         totalSpent = tag?.totalAmountSpent ?: BigDecimal.ZERO,
                         transactions = txs,
                         isLoading = false,
@@ -85,8 +89,16 @@ class TagEditViewModel(
             _state.update { it.copy(error = "Введите название тэга") }
             return@launch
         }
+        val limit = s.monthlyLimit.trim().let { raw ->
+            if (raw.isEmpty()) null else raw.replace(',', '.').toBigDecimalOrNull()
+        }
+        if (s.monthlyLimit.isNotBlank() && limit == null) {
+            _state.update { it.copy(error = "Некорректный лимит") }
+            return@launch
+        }
         try {
-            val saved = if (s.id == null) createTag(s.name.trim()) else updateTag(s.id, s.name.trim())
+            val saved = if (s.id == null) createTag(s.name.trim(), limit)
+            else updateTag(s.id, s.name.trim(), limit)
             _state.update { it.copy(saved = true, id = saved.id, error = null) }
         } catch (t: Throwable) {
             _state.update { it.copy(error = t.message ?: "Не удалось сохранить") }

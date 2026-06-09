@@ -14,11 +14,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.domain.Finance.model.Transaction
+import com.example.domain.Finance.model.TransactionType
+import java.math.BigDecimal
 import com.example.myapplication.Finance.components.*
 import com.example.myapplication.Finance.navigation.FinanceRoutes
 import com.example.myapplication.Finance.theme.FinanceColors
@@ -60,6 +63,48 @@ fun TagEditScreen(
             FinanceTextField(value = state.name,
                 onValueChange = { vm.onEvent(TagEditEvent.SetName(it)) },
                 label = "Название тега")
+
+            FinanceTextField(value = state.monthlyLimit,
+                onValueChange = { vm.onEvent(TagEditEvent.SetMonthlyLimit(it)) },
+                label = "Лимит на месяц (необязательно)",
+                keyboardType = KeyboardType.Decimal)
+
+            val limitValue = state.monthlyLimit.trim().replace(',', '.').toBigDecimalOrNull()
+            if (limitValue != null && limitValue.signum() > 0) {
+                val now = LocalDate.now()
+                val spentThisMonth = state.transactions
+                    .filter {
+                        it.date.year == now.year && it.date.monthValue == now.monthValue &&
+                                it.type == TransactionType.EXPENSE
+                    }
+                    .fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
+                val ratio = (spentThisMonth.toDouble() / limitValue.toDouble())
+                    .coerceIn(0.0, 1.0).toFloat()
+                val over = spentThisMonth > limitValue
+                val barColor = if (over) FinanceColors.Expense else FinanceColors.Income
+                FinanceCard {
+                    Text("Лимит на месяц", color = FinanceColors.TextSecondary, fontSize = 12.sp)
+                    Text(
+                        "${formatMoney(spentThisMonth)} из ${formatMoney(limitValue)} Р",
+                        fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                        color = barColor,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    LinearProgressIndicator(
+                        progress = { ratio },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                        color = barColor,
+                        trackColor = FinanceColors.Divider,
+                    )
+                    if (over) {
+                        Spacer(Modifier.height(4.dp))
+                        Text("Лимит превышен", color = FinanceColors.Expense, fontSize = 12.sp)
+                    }
+                }
+            }
 
             if (id != null) {
                 FinanceCard {

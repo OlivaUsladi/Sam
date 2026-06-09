@@ -84,7 +84,7 @@ class TagsGoalsViewModel(
 
     private fun removeTag(id: Int) = viewModelScope.launch {
         try { deleteTag(id) }
-        catch (t: Throwable) { _state.update { it.copy(error = t.message ?: "Не удалось удалить тэг") } }
+        catch (t: Throwable) { _state.update { it.copy(error = t.message ?: "Не удалось удалить тег") } }
     }
 
     private fun removeGoal(id: Int) = viewModelScope.launch {

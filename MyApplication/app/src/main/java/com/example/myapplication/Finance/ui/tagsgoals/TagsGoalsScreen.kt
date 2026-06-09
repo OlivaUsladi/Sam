@@ -157,9 +157,31 @@ private fun TagCard(tag: Tag, onEdit: () -> Unit, onDelete: () -> Unit) {
                 Text(tag.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                     color = FinanceColors.TextPrimary)
                 Text(
-                    "Всего потрачено: ${formatMoney(tag.totalAmountSpent)} ₽",
+                    "Всего потрачено: ${formatMoney(tag.totalAmountSpent)} Р",
                     color = FinanceColors.TextSecondary, fontSize = 12.sp,
                 )
+                val limit = tag.monthlyLimit
+                if (limit != null && limit.signum() > 0) {
+                    val ratio = (tag.totalAmountSpent.toDouble() / limit.toDouble())
+                        .coerceIn(0.0, 1.0).toFloat()
+                    val over = tag.totalAmountSpent > limit
+                    val barColor = if (over) FinanceColors.Expense else FinanceColors.Income
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Лимит: ${formatMoney(limit)} Р",
+                        color = barColor, fontSize = 12.sp,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = { ratio },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = barColor,
+                        trackColor = FinanceColors.Divider,
+                    )
+                }
             }
             IconButton(onClick = onEdit) {
                 Icon(Icons.Default.Edit, contentDescription = "Изменить",

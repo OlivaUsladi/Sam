@@ -27,11 +27,26 @@ import com.example.myapplication.Recipes.ui.grocery.GroceriesViewModel
 import com.example.myapplication.Recipes.ui.groceryrecipes.GroceryRecipeViewModel
 import com.example.myapplication.Recipes.ui.recipe.RecipeScreenViewModel
 import com.example.myapplication.Recipes.ui.shoppinglist.ShoppingListViewModel
+import com.example.myapplication.Recipes.ui.smartmenu.SmartMenuViewModel
+import com.example.myapplication.ai.GigaChatService
 import com.example.myapplication.Profile.ProfileViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
+    single { GigaChatService(androidContext()) }
+
+    viewModel {
+        SmartMenuViewModel(
+            getTagsUseCase = get(),
+            getTransactionsByTagUseCase = get(),
+            createShoppingListUseCase = get(),
+            addItemToListUseCase = get(),
+            gigaChatService = get()
+        )
+    }
+
     viewModel { HomeViewModel(
         getArticlesUseCase = get(),
         getArticlesByCategoryUseCase = get(),

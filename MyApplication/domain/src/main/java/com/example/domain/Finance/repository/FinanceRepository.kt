@@ -22,8 +22,8 @@ interface FinanceRepository {
     suspend fun deleteSource(id: Int)
 
     suspend fun getTags(): List<Tag>
-    suspend fun createTag(name: String): Tag
-    suspend fun updateTag(id: Int, name: String): Tag
+    suspend fun createTag(name: String, monthlyLimit: BigDecimal? = null): Tag
+    suspend fun updateTag(id: Int, name: String, monthlyLimit: BigDecimal? = null): Tag
     suspend fun deleteTag(id: Int)
 
     suspend fun getTransactions(

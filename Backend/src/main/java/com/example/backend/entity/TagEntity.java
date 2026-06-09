@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tags",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "name"}))
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "name"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +28,9 @@ public class TagEntity {
 
     @Column(name = "total_amount_spent", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmountSpent;
+
+    @Column(name = "monthly_limit", precision = 12, scale = 2)
+    private BigDecimal monthlyLimit;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

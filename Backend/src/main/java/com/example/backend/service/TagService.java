@@ -28,26 +28,28 @@ public class TagService {
     @Transactional
     public TagResponse create(Integer userId, CreateTagRequest req) {
         if (tagRepository.existsByUserIdAndNameIgnoreCase(userId, req.name())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Тэг с таким именем уже есть");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Тег с таким именем уже есть");
         }
         TagEntity e = new TagEntity();
         e.setUserId(userId);
         e.setName(req.name().trim());
+        e.setMonthlyLimit(req.monthlyLimit());
         return TagResponse.from(tagRepository.save(e));
     }
 
     @Transactional
     public TagResponse update(Integer userId, Integer tagId, UpdateTagRequest req) {
         TagEntity e = tagRepository.findByIdAndUserId(tagId, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Тэг не найден"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Тег не найден"));
         e.setName(req.name().trim());
+        e.setMonthlyLimit(req.monthlyLimit());
         return TagResponse.from(tagRepository.save(e));
     }
 
     @Transactional
     public void delete(Integer userId, Integer tagId) {
         TagEntity e = tagRepository.findByIdAndUserId(tagId, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Тэг не найден"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Тег не найден"));
         transactionRepository.clearTagFromUserTransactions(tagId, userId);
         tagRepository.delete(e);
     }

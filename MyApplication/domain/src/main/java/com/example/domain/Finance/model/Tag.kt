@@ -6,5 +6,6 @@ import java.math.BigDecimal
 data class Tag(
     val id: Int,
     val name: String,
-    val totalAmountSpent: BigDecimal
+    val totalAmountSpent: BigDecimal,
+    val monthlyLimit: BigDecimal? = null
 )

@@ -25,7 +25,7 @@ import com.example.data.Recipes.datasource.local.room.model.ShoppingListLocalEnt
         ShoppingListLocalEntity::class,
         ShoppingListItemLocalEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
