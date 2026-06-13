@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
+    val passwordVisible: Boolean = false,
     val loading: Boolean = false,
     val error: String? = null,
     val success: Boolean = false
@@ -26,6 +27,8 @@ class LoginViewModel(
 
     fun onEmailChange(v: String) = _state.update { it.copy(email = v, error = null) }
     fun onPasswordChange(v: String) = _state.update { it.copy(password = v, error = null) }
+    fun onPasswordVisibilityChange() =
+        _state.update { it.copy(passwordVisible = !it.passwordVisible) }
 
     fun submit() {
         val s = _state.value
