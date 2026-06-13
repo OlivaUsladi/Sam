@@ -20,7 +20,7 @@ public class BankStatementParser {
     public record ParsedTransaction(
             String name,
             BigDecimal amount,
-            String type,        // "income" | "expense"
+            String type,
             String description,
             LocalDate date
     ) {}
@@ -66,8 +66,6 @@ public class BankStatementParser {
         return BankType.UNKNOWN;
     }
 
-
-    //Альфа банк
     private List<ParsedTransaction> parseAlfa(String text) {
         List<ParsedTransaction> result = new ArrayList<>();
         String[] lines = text.split("\\n");
@@ -140,7 +138,7 @@ public class BankStatementParser {
                     String type = amount.compareTo(BigDecimal.ZERO) >= 0 ? "income" : "expense";
                     String name = truncate(descText.isEmpty() ? "Операция " + dateStr : descText, 100);
                     result.add(new ParsedTransaction(
-                            name, amount.abs(), type, descText,
+                            name, amount.abs(), type, truncate(descText, 200),
                             LocalDate.parse(dateStr, DATE_FMT)));
                 }
                 continue;
@@ -154,12 +152,11 @@ public class BankStatementParser {
         String l = line.trim();
         return l.contains("Страница") || l.contains("Уполномоченное лицо")
                 || l.contains("(подпись") || l.contains("(Ф.И.О")
-                || l.contains("Трофимова") || l.contains("АЛЬФА-БАНК")
+                || l.contains("АЛЬФА-БАНК")
                 || l.equals("Дата проводки Код операции Описание Сумма")
                 || l.equals("в валюте счета") || l.isEmpty();
     }
 
-    //Т-банк
     private List<ParsedTransaction> parseTBank(String text) {
         List<ParsedTransaction> result = new ArrayList<>();
         String[] lines = text.split("\\n");
@@ -221,7 +218,7 @@ public class BankStatementParser {
                 String name = truncate(description.isEmpty() ? "Операция " + opDate : description, 100);
 
                 result.add(new ParsedTransaction(
-                        name, amount.abs(), type, description,
+                        name, amount.abs(), type, truncate(description, 200),
                         LocalDate.parse(opDate, DATE_FMT)));
                 continue;
             }
@@ -233,7 +230,7 @@ public class BankStatementParser {
     private boolean isTBankSkipLine(String line) {
         return line.contains("АКЦИОНЕРНОЕ") || line.contains("РОССИЯ, 127287")
                 || line.contains("ТЕЛ.:") || line.contains("Справка о движении")
-                || line.contains("Майснер") || line.contains("Адрес места")
+                || line.contains("Адрес места")
                 || line.contains("О продукте") || line.contains("Дата заключения")
                 || line.contains("Номер договора") || line.contains("Номер лицевого")
                 || line.contains("Движение средств") || line.equals("Дата и время")
@@ -249,14 +246,12 @@ public class BankStatementParser {
                 || line.contains("Остаток на начало") || line.contains("Остаток на конец");
     }
 
-    //Сбер
     private List<ParsedTransaction> parseSber(String text) {
         List<ParsedTransaction> result = new ArrayList<>();
         String[] lines = text.split("\\n");
 
         Pattern line1P = Pattern.compile(
                 "^(\\d{2}\\.\\d{2}\\.\\d{4})\\s+(\\d{2}:\\d{2})\\s+(.+?)\\s+(\\+?[\\d\\s\u00A0]+,\\d{2})\\s+[\\d\\s\u00A0]+,\\d{2}\\s*$");
-
         Pattern line2P = Pattern.compile(
                 "^(\\d{2}\\.\\d{2}\\.\\d{4})\\s+(\\d{6})\\s+(.+)$");
 
@@ -296,7 +291,7 @@ public class BankStatementParser {
                 String name = truncate(description.isEmpty() ? category : description, 100);
 
                 result.add(new ParsedTransaction(
-                        name, amount, type, description,
+                        name, amount, type, truncate(description, 200),
                         LocalDate.parse(dateStr, DATE_FMT)));
                 continue;
             }
@@ -329,7 +324,7 @@ public class BankStatementParser {
                 || l.contains("отображаются") || l.contains("Согласно статье")
                 || l.contains("электронной подписи") || l.contains("правоотношениях")
                 || l.contains("Скачать электронный") || l.contains("Проверить подпись")
-                || l.startsWith("900 ") //|| l.startsWith("Майснер")
+                || l.startsWith("900 ")
                 || l.matches("^[0-9a-fA-F]{32}$") || l.startsWith("с 02.07");
     }
 
