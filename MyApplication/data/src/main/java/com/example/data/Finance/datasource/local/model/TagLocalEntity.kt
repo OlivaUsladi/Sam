@@ -9,6 +9,7 @@ data class TagLocalEntity(
     val userId: Int,
     val name: String,
     val totalAmountSpent: String,
+    val monthlyLimit: String? = null,
     val pendingCreate: Boolean = false,
     val pendingUpdate: Boolean = false,
     val pendingDelete: Boolean = false,

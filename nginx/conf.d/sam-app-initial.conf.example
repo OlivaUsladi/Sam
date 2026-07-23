@@ -1,0 +1,25 @@
+# USE THIS FILE TEMPORARILY to get SSL certificates.
+# After getting certs, switch back to sam-app.conf
+#
+# Steps:
+# 1. mv sam-app.conf sam-app.conf.bak
+# 2. cp sam-app-initial.conf.example sam-app-initial.conf
+# 3. docker compose up -d nginx
+# 4. Run certbot command (see deployment_guide.md)
+# 5. rm sam-app-initial.conf
+# 6. mv sam-app.conf.bak sam-app.conf
+# 7. docker compose restart nginx
+
+server {
+    listen 80;
+    server_name sam-app.ru api.sam-app.ru;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 200 'SAM is coming soon!';
+        add_header Content-Type text/plain;
+    }
+}

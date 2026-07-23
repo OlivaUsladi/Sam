@@ -14,6 +14,8 @@ import com.example.myapplication.di.finance.financeDataModule
 import com.example.myapplication.di.finance.financeDomainModule
 import com.example.myapplication.di.hints.hintsDataModule
 import com.example.myapplication.di.hints.hintsDomainModule
+import com.example.myapplication.di.feedback.feedbackDataModule
+import com.example.myapplication.di.feedback.feedbackDomainModule
 import com.example.myapplication.di.recipes.recipesDataModule
 import com.example.myapplication.di.recipes.recipesDomainModule
 import org.koin.android.ext.android.get
@@ -43,6 +45,8 @@ class MyApplication : Application() {
                 recipesDomainModule,
                 financeDataModule,
                 financeDomainModule,
+                feedbackDataModule,
+                feedbackDomainModule,
             )
         }
 

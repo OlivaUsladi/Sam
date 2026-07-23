@@ -3,4 +3,5 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_article">Article</string>
     <string name="title_activity_recipe">RecipeActivity</string>
+    <string name="title_activity_profile">Profile</string>
 </resources>

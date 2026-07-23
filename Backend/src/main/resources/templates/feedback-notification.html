@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        h2 { color: #1a1a1a; margin-bottom: 16px; }
+        .field { margin-bottom: 12px; }
+        .label { font-weight: 600; color: #333; }
+        .value { color: #4a4a4a; margin-top: 4px; }
+        .message-box { background: #f9f9f9; border-left: 4px solid #FF6B00; padding: 16px; margin-top: 16px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Новое сообщение обратной связи</h2>
+    <div class="field">
+        <div class="label">Пользователь:</div>
+        <div class="value" th:text="${userName}">Имя</div>
+    </div>
+    <div class="field">
+        <div class="label">Email:</div>
+        <div class="value" th:text="${userEmail}">email@example.com</div>
+    </div>
+    <div class="field">
+        <div class="label">Тема:</div>
+        <div class="value" th:text="${subject}">Тема</div>
+    </div>
+    <div class="message-box">
+        <div class="label">Сообщение:</div>
+        <p th:text="${messageText}">Текст сообщения</p>
+    </div>
+</div>
+</body>
+</html>

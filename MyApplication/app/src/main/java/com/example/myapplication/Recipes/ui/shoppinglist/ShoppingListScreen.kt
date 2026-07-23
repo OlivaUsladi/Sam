@@ -42,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.Recipes.components.ShoppingListCard
+import com.example.myapplication.Recipes.navigation.Routes
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -199,6 +200,23 @@ fun ShoppingListScreen(
             Text(
                 text = "Создать новый список",
                 fontSize = 16.sp,
+                color = Color(0xFF2670CC)
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                .clickable {
+                    navController.navigate(Routes.SmartMenu.route)
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Умное меню на основе бюджета",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
                 color = Color(0xFF2670CC)
             )
         }

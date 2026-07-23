@@ -69,7 +69,8 @@ class FinanceRepositoryImpl(
     }
 
     private fun SourceLocalEntity.toDomain() = Source(id, name, SourceType.fromRaw(type))
-    private fun TagLocalEntity.toDomain() = Tag(id, name, BigDecimal(totalAmountSpent))
+    private fun TagLocalEntity.toDomain() =
+        Tag(id, name, BigDecimal(totalAmountSpent), monthlyLimit?.let { BigDecimal(it) })
     private fun GoalLocalEntity.toDomain() = Goal(
         id = id,
         name = name,
@@ -91,7 +92,8 @@ class FinanceRepositoryImpl(
     )
 
     private fun Source.toLocal(uid: Int) = SourceLocalEntity(id, uid, name, type.raw)
-    private fun Tag.toLocal(uid: Int) = TagLocalEntity(id, uid, name, totalAmountSpent.toPlainString())
+    private fun Tag.toLocal(uid: Int) =
+        TagLocalEntity(id, uid, name, totalAmountSpent.toPlainString(), monthlyLimit = monthlyLimit?.toPlainString())
     private fun Goal.toLocal(uid: Int) = GoalLocalEntity(
         id = id,
         userId = uid,
@@ -179,38 +181,40 @@ class FinanceRepositoryImpl(
         return local.getTags(uid).map { it.toDomain() }
     }
 
-    override suspend fun createTag(name: String): Tag {
+    override suspend fun createTag(name: String, monthlyLimit: BigDecimal?): Tag {
         val uid = userId()
         val localId = nextLocalId()
         local.upsertTag(TagLocalEntity(
             id = localId, userId = uid, name = name,
-            totalAmountSpent = "0", pendingCreate = true,
+            totalAmountSpent = "0", monthlyLimit = monthlyLimit?.toPlainString(),
+            pendingCreate = true,
         ))
         bump()
-        tryRemote { remote.createTag(name).toDomain() }
+        tryRemote { remote.createTag(name, monthlyLimit).toDomain() }
             .onSuccess { upd ->
                 local.deleteTag(localId)
-                local.upsertTag(upd.toLocal(uid))
+                local.upsertTag(upd.copy(monthlyLimit = upd.monthlyLimit ?: monthlyLimit).toLocal(uid))
                 bump()
             }
         val saved = local.findTag(localId) ?: local.findTagByName(uid, name)
-        return saved?.toDomain() ?: Tag(localId, name, BigDecimal.ZERO)
+        return saved?.toDomain() ?: Tag(localId, name, BigDecimal.ZERO, monthlyLimit)
     }
 
-    override suspend fun updateTag(id: Int, name: String): Tag {
+    override suspend fun updateTag(id: Int, name: String, monthlyLimit: BigDecimal?): Tag {
         val uid = userId()
         val current = local.findTag(id)
         if (current != null) {
             local.upsertTag(current.copy(
                 name = name,
+                monthlyLimit = monthlyLimit?.toPlainString(),
                 pendingUpdate = !current.pendingCreate,
             ))
             bump()
         }
-        tryRemote { remote.updateTag(id, name).toDomain() }
-            .onSuccess { upd -> local.upsertTag(upd.toLocal(uid)); bump() }
+        tryRemote { remote.updateTag(id, name, monthlyLimit).toDomain() }
+            .onSuccess { upd -> local.upsertTag(upd.copy(monthlyLimit = upd.monthlyLimit ?: monthlyLimit).toLocal(uid)); bump() }
         return local.findTag(id)?.toDomain()
-            ?: Tag(id, name, current?.totalAmountSpent?.let(::BigDecimal) ?: BigDecimal.ZERO)
+            ?: Tag(id, name, current?.totalAmountSpent?.let(::BigDecimal) ?: BigDecimal.ZERO, monthlyLimit)
     }
 
     override suspend fun deleteTag(id: Int) {
@@ -388,6 +392,7 @@ class FinanceRepositoryImpl(
             pendingCreate = true,
         ))
         bump()
+        var serverGoal: Goal? = null
         tryRemote {
             remote.createGoal(CreateGoalRequestDto(
                 name = name, description = description,
@@ -398,9 +403,11 @@ class FinanceRepositoryImpl(
         }.onSuccess { upd ->
             local.deleteGoal(localId)
             local.upsertGoal(upd.toLocal(uid))
+            serverGoal = upd
             bump()
         }
-        return local.findGoal(localId)?.toDomain()
+        return serverGoal
+            ?: local.findGoal(localId)?.toDomain()
             ?: Goal(localId, name, description, targetAmount, BigDecimal.ZERO, targetDate, monthlyAmount)
     }
 
@@ -531,16 +538,18 @@ class FinanceRepositoryImpl(
         val tagIdMap = HashMap<Int, Int>()
         local.pendingCreateTags(uid).forEach { row ->
             runCatching {
-                val server = remote.createTag(row.name).toDomain()
+                val limit = row.monthlyLimit?.let { BigDecimal(it) }
+                val server = remote.createTag(row.name, limit).toDomain()
                 local.deleteTag(row.id)
-                local.upsertTag(server.toLocal(uid))
+                local.upsertTag(server.copy(monthlyLimit = server.monthlyLimit ?: limit).toLocal(uid))
                 tagIdMap[row.id] = server.id
             }
         }
         local.pendingUpdateTags(uid).forEach { row ->
             runCatching {
-                val server = remote.updateTag(row.id, row.name).toDomain()
-                local.upsertTag(server.toLocal(uid))
+                val limit = row.monthlyLimit?.let { BigDecimal(it) }
+                val server = remote.updateTag(row.id, row.name, limit).toDomain()
+                local.upsertTag(server.copy(monthlyLimit = server.monthlyLimit ?: limit).toLocal(uid))
             }
         }
         local.pendingDeleteTags(uid).forEach { row ->

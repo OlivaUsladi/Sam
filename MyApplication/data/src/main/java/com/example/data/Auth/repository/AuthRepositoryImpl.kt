@@ -83,9 +83,14 @@ class AuthRepositoryImpl(
 
     override fun markOnboardingCompleted() = onboardingStorage.markCompleted()
 
+    override fun currentUserName(): String? = tokenStorage.getUserName()
+
+    override fun currentUserEmail(): String? = tokenStorage.getUserEmail()
+
     private fun persist(access: String, refresh: String, user: MeResponseDto) {
         tokenStorage.saveTokens(access, refresh)
         tokenStorage.saveUserId(user.id)
+        tokenStorage.saveUserInfo(user.name, user.email)
     }
 
     private fun MeResponseDto.toDomain() = User(id = id, name = name, email = email)

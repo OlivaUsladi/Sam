@@ -86,14 +86,19 @@ fun RegisterScreen(
         AuthPasswordField(
             value = state.password,
             onValueChange = viewModel::onPasswordChange,
-            placeholder = "Пароль"
+            placeholder = "Пароль",
+            isVisible = state.passwordVisible,
+            onVisibilityToggle = viewModel::onPasswordVisibilityChange
         )
 
         Spacer(Modifier.height(12.dp))
+
         AuthPasswordField(
             value = state.passwordConfirm,
             onValueChange = viewModel::onPasswordConfirmChange,
-            placeholder = "Подтвердить пароль"
+            placeholder = "Подтвердить пароль",
+            isVisible = state.passwordConfirmVisible,
+            onVisibilityToggle = viewModel::onPasswordConfirmVisibilityChange
         )
 
         Spacer(Modifier.height(20.dp))

@@ -1,7 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val gigaChatAuthKey: String =
+    (localProperties.getProperty("GIGACHAT_AUTH_KEY")
+        ?: (project.findProperty("GIGACHAT_AUTH_KEY") as String?)
+        ?: "")
 
 android {
     namespace = "com.example.myapplication"
@@ -17,6 +28,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "GIGACHAT_AUTH_KEY", "\"$gigaChatAuthKey\"")
     }
 
     buildTypes {
@@ -34,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -69,6 +83,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 
     implementation("androidx.compose.material:material-icons-extended:1.7.5")
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     implementation(project(":data"))
     implementation(project(":domain"))

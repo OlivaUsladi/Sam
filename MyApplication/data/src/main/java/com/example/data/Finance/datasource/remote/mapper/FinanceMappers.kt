@@ -11,7 +11,7 @@ internal object FinanceMappers {
         Source(id = id, name = name, type = SourceType.fromRaw(type))
 
     fun TagDto.toDomain(): Tag =
-        Tag(id = id, name = name, totalAmountSpent = totalAmountSpent)
+        Tag(id = id, name = name, totalAmountSpent = totalAmountSpent, monthlyLimit = monthlyLimit)
 
     fun TransactionDto.toDomain(): Transaction = Transaction(
         id = id,

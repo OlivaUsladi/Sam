@@ -17,6 +17,8 @@ data class RegisterUiState(
     val email: String = "",
     val password: String = "",
     val passwordConfirm: String = "",
+    val passwordVisible: Boolean = false,
+    val passwordConfirmVisible: Boolean = false,
     val termsAccepted: Boolean = false,
     val consentVersion: String = DEFAULT_CONSENT_VERSION,
     val loading: Boolean = false,
@@ -44,6 +46,10 @@ class RegisterViewModel(
     fun onPasswordChange(v: String) = _state.update { it.copy(password = v, error = null) }
     fun onPasswordConfirmChange(v: String) =
         _state.update { it.copy(passwordConfirm = v, error = null) }
+    fun onPasswordVisibilityChange() =
+        _state.update { it.copy(passwordVisible = !it.passwordVisible) }
+    fun onPasswordConfirmVisibilityChange() =
+        _state.update { it.copy(passwordConfirmVisible = !it.passwordConfirmVisible) }
     fun onTermsChange(checked: Boolean) =
         _state.update { it.copy(termsAccepted = checked, error = null) }
 

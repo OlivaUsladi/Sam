@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -32,6 +33,7 @@ import com.example.myapplication.Finance.navigation.FinanceRoutes
 import com.example.myapplication.Finance.theme.FinanceColors
 import org.koin.androidx.compose.koinViewModel
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Composable
 fun TagsGoalsScreen(
@@ -155,9 +157,31 @@ private fun TagCard(tag: Tag, onEdit: () -> Unit, onDelete: () -> Unit) {
                 Text(tag.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                     color = FinanceColors.TextPrimary)
                 Text(
-                    "Всего потрачено: ${formatMoney(tag.totalAmountSpent)} ₽",
+                    "Всего потрачено: ${formatMoney(tag.totalAmountSpent)} Р",
                     color = FinanceColors.TextSecondary, fontSize = 12.sp,
                 )
+                val limit = tag.monthlyLimit
+                if (limit != null && limit.signum() > 0) {
+                    val ratio = (tag.totalAmountSpent.toDouble() / limit.toDouble())
+                        .coerceIn(0.0, 1.0).toFloat()
+                    val over = tag.totalAmountSpent > limit
+                    val barColor = if (over) FinanceColors.Expense else FinanceColors.Income
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Лимит: ${formatMoney(limit)} Р",
+                        color = barColor, fontSize = 12.sp,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = { ratio },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = barColor,
+                        trackColor = FinanceColors.Divider,
+                    )
+                }
             }
             IconButton(onClick = onEdit) {
                 Icon(Icons.Default.Edit, contentDescription = "Изменить",
@@ -177,6 +201,14 @@ private fun GoalCard(goal: Goal, onOpen: () -> Unit, onDelete: () -> Unit) {
         (goal.currentAmount.toDouble() / goal.targetAmount.toDouble())
             .coerceIn(0.0, 1.0).toFloat()
     else 0f
+    val isReached = goal.currentAmount >= goal.targetAmount
+    val isExpired = goal.targetDate != null && goal.targetDate!!.isBefore(LocalDate.now()) && !isReached
+    val progressColor = when {
+        isReached -> FinanceColors.Income
+        isExpired -> FinanceColors.Expense
+        else -> FinanceColors.PrimaryDark
+    }
+    val effectiveMonthly = if (isExpired) null else goal.monthlyAmount
 
     Column(
         modifier = Modifier
@@ -191,18 +223,31 @@ private fun GoalCard(goal: Goal, onOpen: () -> Unit, onDelete: () -> Unit) {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(FinanceColors.HeaderGradient),
+                    .background(if (isReached) Brush.linearGradient(
+                        listOf(Color(0xFF66BB6A), Color(0xFF2E7D32))
+                    ) else FinanceColors.HeaderGradient),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Default.Flag, contentDescription = null, tint =Color.White)
+                Icon(Icons.Default.Flag, contentDescription = null, tint = Color.White)
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(goal.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
-                    color = FinanceColors.TextPrimary)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(goal.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
+                        color = FinanceColors.TextPrimary)
+                    if (isReached) {
+                        Spacer(Modifier.width(6.dp))
+                        Text("Достигнута", fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                            color = FinanceColors.Income)
+                    } else if (isExpired) {
+                        Spacer(Modifier.width(6.dp))
+                        Text("Просрочена", fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                            color = FinanceColors.Expense)
+                    }
+                }
                 Text(
                     "Цель: ${formatMoney(goal.targetAmount)} Р" +
-                            (goal.monthlyAmount?.let { " · в месяц ${formatMoney(it)} Р" } ?: ""),
+                            (effectiveMonthly?.let { " · в месяц ${formatMoney(it)} Р" } ?: ""),
                     color = FinanceColors.TextSecondary, fontSize = 12.sp,
                 )
             }
@@ -214,7 +259,7 @@ private fun GoalCard(goal: Goal, onOpen: () -> Unit, onDelete: () -> Unit) {
         Spacer(Modifier.height(10.dp))
         LinearProgressIndicator(
             progress = { progress },
-            color = FinanceColors.PrimaryDark,
+            color = progressColor,
             trackColor = FinanceColors.Divider,
             modifier = Modifier
                 .fillMaxWidth()

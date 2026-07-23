@@ -48,6 +48,7 @@ public class AuthService {
     private final EmailCipherService emailCipher;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Value("${app.security.consent.current-version:1.0}")
     private String currentConsentVersion;
@@ -141,7 +142,7 @@ public class AuthService {
         if (user == null) {
             log.info("forgotPassword: user not found");
             return new ForgotPasswordResponseDto(
-                    "Если такой email зарегистрирован, на него отправлен код для смены пароля.",
+                    "Если такой email зарегистрирован, на него отправлена ссылка для смены пароля.",
                     null);
         }
 
@@ -156,11 +157,13 @@ public class AuthService {
                 .build();
         passwordResetTokenRepository.save(entity);
 
-        //SMTP бы
+        String decryptedEmail = emailCipher.decrypt(user.getEmailEncrypted());
+        emailService.sendPasswordResetEmail(decryptedEmail, rawToken);
+
         log.info("password reset issued for userId={}", user.getId());
         return new ForgotPasswordResponseDto(
-                "Код для смены пароля сгенерирован.",
-                rawToken);
+                "Если такой email зарегистрирован, на него отправлена ссылка для смены пароля.",
+                null);
     }
 
 

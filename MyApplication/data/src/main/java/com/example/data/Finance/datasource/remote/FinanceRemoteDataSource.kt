@@ -5,6 +5,7 @@ import com.example.data.Finance.datasource.remote.dto.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.math.BigDecimal
 
 class FinanceRemoteDataSource(private val api: FinanceApiService) {
 
@@ -18,9 +19,10 @@ class FinanceRemoteDataSource(private val api: FinanceApiService) {
     }
 
     suspend fun listTags(): List<TagDto> = api.listTags()
-    suspend fun createTag(name: String): TagDto = api.createTag(CreateTagRequestDto(name))
-    suspend fun updateTag(id: Int, name: String): TagDto =
-        api.updateTag(id, UpdateTagRequestDto(name))
+    suspend fun createTag(name: String, monthlyLimit: BigDecimal? = null): TagDto =
+        api.createTag(CreateTagRequestDto(name, monthlyLimit))
+    suspend fun updateTag(id: Int, name: String, monthlyLimit: BigDecimal? = null): TagDto =
+        api.updateTag(id, UpdateTagRequestDto(name, monthlyLimit))
     suspend fun deleteTag(id: Int) { api.deleteTag(id) }
     suspend fun listTagTransactions(id: Int): List<TransactionDto> = api.listTagTransactions(id)
     suspend fun assignTagToTransactions(id: Int, transactionIds: List<Int>) {

@@ -67,7 +67,9 @@ fun LoginScreen(
         AuthPasswordField(
             value = state.password,
             onValueChange = viewModel::onPasswordChange,
-            placeholder = "Пароль"
+            placeholder = "Пароль",
+            isVisible = state.passwordVisible,
+            onVisibilityToggle = viewModel::onPasswordVisibilityChange
         )
 
         Box(

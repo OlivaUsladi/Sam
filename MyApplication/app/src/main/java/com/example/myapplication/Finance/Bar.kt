@@ -34,6 +34,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.myapplication.Finance.navigation.FinanceRoutes
 import com.example.myapplication.Finance.theme.FinanceColors
 import com.example.myapplication.Hints.MainActivity
+import com.example.myapplication.Profile.ProfileActivity
 import com.example.myapplication.Recipes.RecipeActivity
 import kotlinx.coroutines.launch
 
@@ -105,7 +106,9 @@ fun FinanceTopAppBar(navController: NavController) {
                                 )
                             }
                         }
-                        Box() {
+                        Box(Modifier.padding(end = 5.dp).clickable {
+                            context.startActivity(Intent(context, ProfileActivity::class.java))
+                        }) {
                             Image(
                                 painter = painterResource(R.drawable.img),
                                 contentDescription = "man icon",

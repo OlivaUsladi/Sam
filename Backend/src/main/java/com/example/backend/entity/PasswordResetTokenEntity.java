@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-//Это для "Забыли пароль?". Дай Бог я доделаю это
+//Хранение одноразовых токенов для сброса пароля (TTL 15 мин)
 @Entity
 @Table(name = "password_reset_tokens")
 @Data

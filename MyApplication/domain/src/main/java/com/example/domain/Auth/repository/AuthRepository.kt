@@ -32,4 +32,8 @@ interface AuthRepository {
     fun isOnboardingCompleted(): Boolean
 
     fun markOnboardingCompleted()
+
+    fun currentUserName(): String?
+
+    fun currentUserEmail(): String?
 }
