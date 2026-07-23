@@ -52,9 +52,9 @@ class ForgotPasswordViewModel(
                             loading = false,
                             step = ForgotStep.EnterCode,
                             code = r.resetToken.orEmpty(),
-                            devHint = r.resetToken?.let { tok ->
-                                "DEV: код для отладки автоматически подставлен."
-                            }
+                            devHint = if (r.resetToken.isNullOrEmpty()) {
+                                "Проверьте почту — ссылка для сброса отправлена на ваш email."
+                            } else null
                         )
                     }
                 },

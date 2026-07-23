@@ -30,6 +30,7 @@ import com.example.myapplication.Recipes.ui.shoppinglist.ShoppingListViewModel
 import com.example.myapplication.Recipes.ui.smartmenu.SmartMenuViewModel
 import com.example.myapplication.ai.GigaChatService
 import com.example.myapplication.Profile.ProfileViewModel
+import com.example.myapplication.Profile.feedback.FeedbackViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -220,4 +221,5 @@ val appModule = module {
     viewModel { GoalEditViewModel(get(), get(), get()) }
 
     viewModel { ProfileViewModel(get(), get(), get()) }
+    viewModel { FeedbackViewModel(get()) }
 }

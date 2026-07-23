@@ -129,7 +129,7 @@ private fun EnterCodeStep(
 ) {
     Spacer(Modifier.height(40.dp))
     Text(
-        "Введите код из письма и новый пароль.",
+        "Мы отправили ссылку для сброса на ваш email.\nВведите код из письма и новый пароль.",
         color = AuthColors.TextSecondary,
         fontSize = 15.sp,
         textAlign = TextAlign.Center

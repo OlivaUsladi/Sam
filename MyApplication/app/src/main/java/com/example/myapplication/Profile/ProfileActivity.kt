@@ -18,8 +18,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -43,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.Auth.AuthActivity
+import com.example.myapplication.Profile.feedback.FeedbackScreen
 import com.example.myapplication.R
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -53,19 +58,29 @@ class ProfileActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ProfileScreen(vm) {
-                startActivity(
-                    Intent(this@ProfileActivity, AuthActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            var showFeedback by remember { mutableStateOf(false) }
+
+            if (showFeedback) {
+                FeedbackScreen(onBack = { showFeedback = false })
+            } else {
+                ProfileScreen(
+                    vm = vm,
+                    onLoggedOut = {
+                        startActivity(
+                            Intent(this@ProfileActivity, AuthActivity::class.java)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        )
+                        finish()
+                    },
+                    onFeedbackClick = { showFeedback = true }
                 )
-                finish()
             }
         }
     }
 }
 
 @Composable
-fun ProfileScreen(vm: ProfileViewModel, onLoggedOut: () -> Unit) {
+fun ProfileScreen(vm: ProfileViewModel, onLoggedOut: () -> Unit, onFeedbackClick: () -> Unit) {
     val name by vm.name.collectAsState()
     val email by vm.email.collectAsState()
     val loggedOut by vm.loggedOut.collectAsState()
@@ -111,6 +126,25 @@ fun ProfileScreen(vm: ProfileViewModel, onLoggedOut: () -> Unit) {
                 fontSize = 16.sp,
                 color = Color.Gray
             )
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            Button(
+                onClick = onFeedbackClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF6C00))
+            ) {
+                Icon(
+                    Icons.Default.Email,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text("Обратная связь", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            }
         }
     }
 }

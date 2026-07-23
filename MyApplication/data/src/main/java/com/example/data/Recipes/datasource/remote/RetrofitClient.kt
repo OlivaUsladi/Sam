@@ -4,6 +4,7 @@ import com.example.data.Auth.datasource.local.TokenStorage
 import com.example.data.Auth.datasource.remote.api.AuthApiService
 import com.example.data.Auth.security.AuthInterceptor
 import com.example.data.Auth.security.TokenAuthenticator
+import com.example.data.Feedback.datasource.remote.api.FeedbackApiService
 import com.example.data.Finance.datasource.remote.api.FinanceApiService
 import com.example.data.Hints.datasource.remote.api.ArticleApiService
 import com.example.data.Recipes.datasource.remote.api.RecipeApiService
@@ -17,10 +18,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    //Для эмулятора Android — 10.0.2.2:8080,
-    //для реального устройства — IP компьютера в локальной сети.
-
-    private const val BASE_URL = "https://alexandra-app.ru.tuna.am"
+    private const val BASE_URL = "https://api.sam-app.ru"
 
     private lateinit var okHttpClient: OkHttpClient
     private lateinit var retrofit: Retrofit
@@ -35,6 +33,8 @@ object RetrofitClient {
     lateinit var financeApiService: FinanceApiService
         private set
     lateinit var authApiService: AuthApiService
+        private set
+    lateinit var feedbackApiService: FeedbackApiService
         private set
 
     fun init(tokenStorage: TokenStorage) {
@@ -79,6 +79,7 @@ object RetrofitClient {
         shoppingListApiService = retrofit.create(ShoppingListApiService::class.java)
         articleApiService = retrofit.create(ArticleApiService::class.java)
         financeApiService = retrofit.create(FinanceApiService::class.java)
+        feedbackApiService = retrofit.create(FeedbackApiService::class.java)
 
     }
 }

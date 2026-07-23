@@ -8,14 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-//Хранение одноразовых токенов для сброса пароля (TTL 15 мин)
 @Entity
-@Table(name = "password_reset_tokens")
+@Table(name = "feedback")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PasswordResetTokenEntity {
+public class FeedbackEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,14 +23,11 @@ public class PasswordResetTokenEntity {
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
-    @Column(name = "token_hash", nullable = false, unique = true, length = 64)
-    private String tokenHash;
+    @Column(nullable = false, length = 100)
+    private String subject;
 
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
-
-    @Column(nullable = false)
-    private Boolean used;
+    @Column(nullable = false, length = 2000)
+    private String message;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -39,6 +35,5 @@ public class PasswordResetTokenEntity {
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) createdAt = LocalDateTime.now();
-        if (used == null) used = false;
     }
 }
