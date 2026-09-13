@@ -7,10 +7,11 @@ if [ -f .env ]; then
     exit 1
 fi
 
-DB_PASSWORD=$(openssl rand -base64 24)
-JWT_SECRET=$(openssl rand -hex 32)
-EMAIL_HMAC_KEY=$(openssl rand -hex 16)
-EMAIL_AES_KEY=$(openssl rand -hex 16)
+# Backend expects base64 values: JWT/HMAC >= 32 bytes, AES exactly 32 bytes after decode
+DB_PASSWORD=$(openssl rand -hex 24)
+JWT_SECRET=$(openssl rand -base64 48)
+EMAIL_HMAC_KEY=$(openssl rand -base64 32)
+EMAIL_AES_KEY=$(openssl rand -base64 32)
 
 cat > .env << EOF
 # Database
@@ -19,7 +20,7 @@ DB_PASSWORD=${DB_PASSWORD}
 # JWT
 JWT_SECRET=${JWT_SECRET}
 
-# Email encryption keys
+# Email encryption keys (base64; HMAC >= 32 bytes, AES exactly 32 bytes)
 EMAIL_HMAC_KEY=${EMAIL_HMAC_KEY}
 EMAIL_AES_KEY=${EMAIL_AES_KEY}
 
