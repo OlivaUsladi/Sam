@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sam – приложение для самостоятельной жизни</title>
+  <meta name="description" content="Sam – мобильное приложение для помощи молодым людям в организации самостоятельной жизни. Статьи по самоорганизации, рецепты и списки покупок с умным меню на базе ГигаЧат, учёт личных финансов. Проект реализован при поддержке Фонда содействия инновациям." />
+
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&amp;f[]=satoshi@300,400,500,700&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#hero" class="logo" aria-label="Sam – главная">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <rect width="36" height="36" rx="10" fill="url(#logo-g)"/>
+          <text x="18" y="25" text-anchor="middle" font-family="'Clash Display',sans-serif" font-size="18" font-weight="700" fill="white">S</text>
+          <defs>
+            <linearGradient id="logo-g" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#7C3AED"/><stop offset="1" stop-color="#06B6D4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo__text">Sam</span>
+      </a>
+
+      <nav class="nav" aria-label="Навигация">
+        <a href="#support" class="nav__link">О проекте</a>
+        <a href="#modules" class="nav__link">Модули</a>
+        <a href="#features" class="nav__link">Функции</a>
+        <a href="#screens" class="nav__link">Экраны</a>
+        <a href="#demo" class="nav__link">Видео</a>
+      </nav>
+
+      <div class="header__actions">
+        <button class="btn btn--ghost btn--sm" data-theme-toggle aria-label="Переключить тему">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <a href="#demo" class="btn btn--primary btn--sm">Смотреть демо</a>
+      </div>
+
+      <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+      <a href="#support" class="mobile-menu__link">О проекте</a>
+      <a href="#modules" class="mobile-menu__link">Модули</a>
+      <a href="#features" class="mobile-menu__link">Функции</a>
+      <a href="#screens" class="mobile-menu__link">Экраны</a>
+      <a href="#demo" class="mobile-menu__link">Видео</a>
+      <a href="#demo" class="btn btn--primary" style="margin-top:var(--space-4);text-align:center;">Смотреть демо</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="hero">
+      <div class="hero__bg-orbs" aria-hidden="true">
+        <div class="orb orb--1"></div>
+        <div class="orb orb--2"></div>
+        <div class="orb orb--3"></div>
+      </div>
+      <div class="container hero__inner">
+        <div class="hero__content">
+          <h1 class="hero__title">
+            Всё для<br />
+            <span class="gradient-text">самостоятельной</span><br />
+            жизни
+          </h1>
+          <p class="hero__desc">
+            Sam помогает тем, кто только начал жить отдельно. В одном приложении собраны статьи о быте и самоорганизации, рецепты со списками покупок и учёт личных финансов, а ГигаЧат подбирает меню на неделю под твой бюджет.
+          </p>
+          <div class="hero__cta">
+            <a href="#demo" class="btn btn--primary btn--lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4V8z"/></svg>
+              Смотреть демонстрацию
+            </a>
+            <a href="#support" class="btn btn--ghost btn--lg">О проекте</a>
+          </div>
+          <p class="hero__sub">Android 11 и новее · Без рекламы · Умное меню на базе ГигаЧат</p>
+        </div>
+        <div class="hero__phone-wrap">
+          <div class="phone-mockup">
+            <div class="phone-mockup__screen">
+              <img src="assets/screens/articles-feed.jpg" alt="Экран приложения Sam: лента статей модуля «Самоорганизация»" width="540" height="1206" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STATS BAR ===== -->
+    <section class="stats-bar" aria-label="Цифры">
+      <div class="container stats-bar__inner">
+        <div class="stat">
+          <div class="stat__num gradient-text">3</div>
+          <div class="stat__label">модуля</div>
+        </div>
+        <div class="stat__divider" aria-hidden="true"></div>
+        <div class="stat">
+          <div class="stat__num gradient-text">15+</div>
+          <div class="stat__label">функций</div>
+        </div>
+        <div class="stat__divider" aria-hidden="true"></div>
+        <div class="stat">
+          <div class="stat__num gradient-text">ГигаЧат</div>
+          <div class="stat__label">ИИ-помощник</div>
+        </div>
+        <div class="stat__divider" aria-hidden="true"></div>
+        <div class="stat">
+          <div class="stat__num gradient-text">Android</div>
+          <div class="stat__label">версия 11 и новее</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABOUT THE PROJECT + GRANT SUPPORT ===== -->
+    <section class="support" id="support" aria-labelledby="support-title">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-label">О проекте</div>
+          <h2 class="section-title" id="support-title">Зачем нужен Sam</h2>
+        </div>
+        <div class="support__grid">
+          <div class="support__story">
+            <p class="support__text">
+              Переезд в другой город, первая стипендия или зарплата, своя кухня и свой бюджет. Для студентов и молодых специалистов это первый опыт жизни без поддержки родителей, и даётся он непросто. Деньги заканчиваются раньше, чем планировалось, ужин заменяют перекусы, а полезные советы приходится собирать по десяткам сайтов и приложений.
+            </p>
+            <p class="support__text">
+              Sam придуман как одно приложение вместо пяти. Здесь можно вести учёт доходов и расходов, копить на цели, находить рецепты из тех продуктов, что уже лежат в холодильнике, собирать списки покупок и читать короткие понятные статьи о том, как наладить быт. Модули связаны между собой: остаток бюджета на продукты подсказывает умному меню, на какую сумму планировать неделю, а любой рецепт в одно нажатие превращается в список покупок.
+            </p>
+            <p class="support__text">
+              Сейчас Sam развивается как студенческий стартап, а команда готовит его к публичному выпуску.
+            </p>
+          </div>
+          <div class="support__card">
+            <p class="support__grant">
+              Проект реализован при поддержке Фонда содействия инновациям в рамках программы «Студенческий стартап» мероприятия «Платформа университетского технологического предпринимательства» федерального проекта «Технологии».
+            </p>
+            <div class="support__logos">
+              <a class="logo-plate logo-plate--light" href="https://fasie.ru/" target="_blank" rel="noopener" aria-label="Фонд содействия инновациям">
+                <img src="assets/img/fasie.svg" alt="Фонд содействия инновациям" loading="lazy" />
+              </a>
+              <a class="logo-plate logo-plate--light" href="https://univertechpred.ru/" target="_blank" rel="noopener" aria-label="Платформа университетского технологического предпринимательства">
+                <img src="assets/img/utp.svg" alt="Платформа университетского технологического предпринимательства" loading="lazy" />
+              </a>
+              <div class="logo-plate logo-plate--dark" aria-label="Федеральный проект «Технологии»">
+                <img src="assets/img/tech-federal-project.png" alt="Федеральный проект «Технологии»" loading="lazy" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MODULES OVERVIEW ===== -->
+    <section class="modules" id="modules" aria-labelledby="modules-title">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-label">Три модуля</div>
+          <h2 class="section-title" id="modules-title">Всё нужное в одном приложении</h2>
+          <p class="section-desc">Статьи, кулинария и финансы живут в одном месте и помогают друг другу. Переключаться между ними можно в любой момент через меню в левом верхнем углу экрана.</p>
+        </div>
+        <div class="modules__grid">
+
+          <!-- Module 1: Articles -->
+          <div class="module-card">
+            <div class="module-card__num gradient-text">01</div>
+            <div class="module-card__icon-wrap" style="--ic:#7C3AED;--ib:rgba(124,58,237,0.15)">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <h3 class="module-card__title">Статьи</h3>
+            <p class="module-card__desc">Короткие материалы о том, с чем сталкиваешься, когда начинаешь жить сам. Как управлять временем, как наладить режим, как прикрепиться к поликлинике в новом городе.</p>
+            <ul class="module-card__list">
+              <li>Лента статей с поиском по названию</li>
+              <li>Подборки по темам</li>
+              <li>Избранное и лайки</li>
+            </ul>
+          </div>
+
+          <!-- Module 2: Cooking -->
+          <div class="module-card">
+            <div class="module-card__num gradient-text">02</div>
+            <div class="module-card__icon-wrap" style="--ic:#10B981;--ib:rgba(16,185,129,0.15)">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            </div>
+            <h3 class="module-card__title">Кулинария</h3>
+            <p class="module-card__desc">Рецепты без длинных предисловий, подбор блюд из того, что уже есть дома, списки покупок и меню на неделю от ГигаЧат.</p>
+            <ul class="module-card__list">
+              <li>Поиск рецептов по продуктам и категориям</li>
+              <li>Ингредиенты рецепта попадают в список покупок одним нажатием</li>
+              <li>ГигаЧат составляет меню и список покупок под бюджет</li>
+              <li>Свои списки покупок и избранные рецепты</li>
+            </ul>
+          </div>
+
+          <!-- Module 3: Finance -->
+          <div class="module-card">
+            <div class="module-card__num gradient-text">03</div>
+            <div class="module-card__icon-wrap" style="--ic:#F59E0B;--ib:rgba(245,158,11,0.15)">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <h3 class="module-card__title">Финансы</h3>
+            <p class="module-card__desc">Простой учёт денег без перегруженных банковских графиков. Счета, доходы и расходы, загрузка выписки из банка, теги с лимитами, цели накопления и калькулятор вклада.</p>
+            <ul class="module-card__list">
+              <li>Доходы и расходы по счетам и источникам</li>
+              <li>Импорт операций из PDF-выписки банка</li>
+              <li>Аналитика по месяцам, дням и источникам</li>
+              <li>Теги расходов с лимитами</li>
+              <li>Цели накопления и калькулятор вклада</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FEATURES DEEP DIVE ===== -->
+    <section class="features" id="features" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-label">Подробнее</div>
+          <h2 class="section-title" id="features-title">Главные возможности</h2>
+        </div>
+
+        <!-- Cooking features -->
+        <div class="features__block">
+          <div class="features__block-header">
+            <div class="features__block-icon" style="--ic:#10B981;--ib:rgba(16,185,129,0.12)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            </div>
+            <div class="features__block-label">Кулинарный модуль</div>
+          </div>
+          <div class="features__cards">
+
+            <div class="feature-card">
+              <div class="feature-card__icon-wrap" style="--icon-color:#10B981;--icon-bg:rgba(16,185,129,0.12)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              </div>
+              <h3 class="feature-card__title">Поиск по продуктам</h3>
+              <p class="feature-card__desc">Отметь, что лежит в холодильнике, и Sam покажет рецепты, для которых не нужно идти в магазин. Есть режим «только эти продукты».</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-card__icon-wrap" style="--icon-color:#10B981;--icon-bg:rgba(16,185,129,0.12)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+              <h3 class="feature-card__title">Список из рецепта</h3>
+              <p class="feature-card__desc">Понравился рецепт? Одно нажатие, и все ингредиенты с количествами уже в списке покупок. Купленное отмечаешь галочками прямо в магазине.</p>
+            </div>
+
+            <div class="feature-card feature-card--highlight">
+              <div class="feature-card__ai-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/></svg>
+                ГигаЧат ИИ
+              </div>
+              <div class="feature-card__icon-wrap" style="--icon-color:#7C3AED;--icon-bg:rgba(124,58,237,0.15)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <h3 class="feature-card__title">Умное меню</h3>
+              <p class="feature-card__desc">ГигаЧат смотрит, сколько денег осталось на продукты до конца месяца, и собирает меню на каждую неделю вместе со списком покупок. Список сразу сохраняется рядом с остальными.</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-card__icon-wrap" style="--icon-color:#10B981;--icon-bg:rgba(16,185,129,0.12)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </div>
+              <h3 class="feature-card__title">Ручные списки</h3>
+              <p class="feature-card__desc">Нужен обычный список для похода в магазин? Создай свой с нуля, назови как удобно и дополняй в любой момент.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Finance features -->
+        <div class="features__block" style="margin-top: var(--space-16);">
+          <div class="features__block-header">
+            <div class="features__block-icon" style="--ic:#F59E0B;--ib:rgba(245,158,11,0.12)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="features__block-label">Финансовый модуль</div>
+          </div>
+          <div class="features__cards">
+
+            <div class="feature-card">
+              <div class="feature-card__icon-wrap" style="--icon-color:#F59E0B;--icon-bg:rgba(245,158,11,0.12)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <h3 class="feature-card__title">Транзакции</h3>
+              <p class="feature-card__desc">Записывай доходы и расходы вручную или загрузи PDF-выписку из банка. Операции разберутся автоматически, повторы не задвоятся, а сам файл никуда не сохраняется.</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-card__icon-wrap" style="--icon-color:#F59E0B;--icon-bg:rgba(245,158,11,0.12)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+              <h3 class="feature-card__title">Аналитика бюджета</h3>
+              <p class="feature-card__desc">Графики по дням и месяцам, диаграмма по источникам и сумма за месяц. Сразу видно, куда уходят деньги и откуда приходят.</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-card__icon-wrap" style="--icon-color:#F59E0B;--icon-bg:rgba(245,158,11,0.12)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              </div>
+              <h3 class="feature-card__title">Теги и лимиты</h3>
+              <p class="feature-card__desc">Заведи теги для расходов и поставь на них месячный лимит. Остаток по тегу «Продукты» потом подхватит умное меню.</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-card__icon-wrap" style="--icon-color:#F59E0B;--icon-bg:rgba(245,158,11,0.12)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <h3 class="feature-card__title">Цели накопления</h3>
+              <p class="feature-card__desc">Поездка, новый ноутбук или подушка безопасности. Укажи сумму и срок, Sam посчитает ежемесячный взнос и покажет, сколько уже накоплено.</p>
+            </div>
+
+            <div class="feature-card feature-card--wide">
+              <div class="feature-card__icon-wrap" style="--icon-color:#06B6D4;--icon-bg:rgba(6,182,212,0.12)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </div>
+              <h3 class="feature-card__title">Калькулятор вклада</h3>
+              <p class="feature-card__desc">Введи сумму, ставку и срок в месяцах, и Sam покажет, сколько принесёт вклад. Удобно, когда выбираешь между предложениями банков.</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SCREENS (real screenshots) ===== -->
+    <section class="screens" id="screens" aria-labelledby="screens-title">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-label">Экраны</div>
+          <h2 class="section-title" id="screens-title">Так выглядит Sam</h2>
+          <p class="section-desc">Настоящие скриншоты с телефона, без ретуши.</p>
+        </div>
+        <div class="screens__carousel">
+          <button class="screens__arrow screens__arrow--prev" type="button" id="screensPrev" aria-label="Предыдущий экран">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="screens__arrow screens__arrow--next" type="button" id="screensNext" aria-label="Следующий экран">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        <div class="screens__scroll-wrap">
+          <div class="screens__track" id="screensTrack">
+            <figure class="screen-card">
+              <div class="screen-card__phone">
+                <img src="assets/screens/articles-feed.jpg" alt="Лента статей модуля «Самоорганизация» с поиском" loading="lazy" width="540" height="1206" />
+              </div>
+              <figcaption class="screen-card__label">Лента статей</figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__phone">
+                <img src="assets/screens/article-time.jpg" alt="Открытая статья «Как управлять временем»" loading="lazy" width="540" height="1206" />
+              </div>
+              <figcaption class="screen-card__label">Статья о тайм-менеджменте</figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__phone">
+                <img src="assets/screens/recipes-products.jpg" alt="Выбор продуктов для подбора рецептов" loading="lazy" width="540" height="1206" />
+              </div>
+              <figcaption class="screen-card__label">Подбор рецептов по продуктам</figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__phone">
+                <img src="assets/screens/shopping-list.jpg" alt="Список покупок к рецепту «Борщ с пампушками»" loading="lazy" width="540" height="1206" />
+              </div>
+              <figcaption class="screen-card__label">Список покупок</figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__phone">
+                <img src="assets/screens/smart-menu-form.jpg" alt="Экран умного меню с бюджетом на продукты" loading="lazy" width="540" height="1206" />
+              </div>
+              <figcaption class="screen-card__label">Умное меню</figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__phone">
+                <img src="assets/screens/finance-accounts.jpg" alt="Главный экран финансового модуля" loading="lazy" width="540" height="1206" />
+              </div>
+              <figcaption class="screen-card__label">Счета</figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__phone">
+                <img src="assets/screens/finance-analytics-income.jpg" alt="Аналитика доходов по дням и по источникам за месяц" loading="lazy" width="540" height="1206" />
+              </div>
+              <figcaption class="screen-card__label">Аналитика доходов</figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__phone">
+                <img src="assets/screens/finance-categories.jpg" alt="Теги расходов и цели накопления" loading="lazy" width="540" height="1206" />
+              </div>
+              <figcaption class="screen-card__label">Теги расходов и цели</figcaption>
+            </figure>
+
+            <figure class="screen-card">
+              <div class="screen-card__phone">
+                <img src="assets/screens/finance-goal.jpg" alt="Карточка цели накопления с прогрессом" loading="lazy" width="540" height="1206" />
+              </div>
+              <figcaption class="screen-card__label">Цель накопления</figcaption>
+            </figure>
+
+          </div>
+        </div>
+        </div>
+        <div class="screens__dots" role="tablist" aria-label="Переключить экран">
+          <button class="dot dot--active" role="tab" aria-selected="true" data-slide="0" aria-label="Экран 1"></button>
+          <button class="dot" role="tab" aria-selected="false" data-slide="1" aria-label="Экран 2"></button>
+          <button class="dot" role="tab" aria-selected="false" data-slide="2" aria-label="Экран 3"></button>
+          <button class="dot" role="tab" aria-selected="false" data-slide="3" aria-label="Экран 4"></button>
+          <button class="dot" role="tab" aria-selected="false" data-slide="4" aria-label="Экран 5"></button>
+          <button class="dot" role="tab" aria-selected="false" data-slide="5" aria-label="Экран 6"></button>
+          <button class="dot" role="tab" aria-selected="false" data-slide="6" aria-label="Экран 7"></button>
+          <button class="dot" role="tab" aria-selected="false" data-slide="7" aria-label="Экран 8"></button>
+          <button class="dot" role="tab" aria-selected="false" data-slide="8" aria-label="Экран 9"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== AI HIGHLIGHT ===== -->
+    <section class="ai-section" aria-labelledby="ai-title">
+      <div class="container ai-section__inner">
+        <div class="ai-section__content">
+          <div class="section-label">Искусственный интеллект</div>
+          <h2 class="section-title" id="ai-title">Умное меню на базе ГигаЧат</h2>
+          <p class="about__text">В Sam встроен ГигаЧат, российская языковая модель от Сбера. Приложение само подставляет остаток бюджета по тегу «Продукты» до конца месяца, а если хочешь, сумму можно ввести руками. Дальше ГигаЧат расписывает завтраки, обеды, ужины и перекусы на каждую неделю и добавляет к ним список покупок.</p>
+          <p class="about__text">Готовый список сохраняется рядом с остальными списками покупок, так что в магазин идёшь уже с планом на неделю.</p>
+          <div class="ai-section__steps">
+            <div class="ai-step">
+              <div class="ai-step__num">1</div>
+              <div class="ai-step__text">Заведи в финансах тег «Продукты» и поставь лимит</div>
+            </div>
+            <div class="ai-step__arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            <div class="ai-step">
+              <div class="ai-step__num">2</div>
+              <div class="ai-step__text">Открой «Умное меню» в списках покупок</div>
+            </div>
+            <div class="ai-step__arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+            <div class="ai-step">
+              <div class="ai-step__num">3</div>
+              <div class="ai-step__text">Получи меню и список покупок под свой бюджет</div>
+            </div>
+          </div>
+        </div>
+        <div class="ai-section__visual" aria-hidden="true">
+          <div class="ai-card">
+            <div class="ai-card__header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/></svg>
+              Умное меню · Неделя 1
+            </div>
+            <div class="ai-card__budget">
+              Бюджет на продукты: <strong>остаток по тегу «Продукты»</strong>
+            </div>
+            <div class="ai-card__list">
+              <div class="ai-item"><span class="ai-item__check">День 1</span>Завтрак · Обед · Ужин · Перекус</div>
+              <div class="ai-item"><span class="ai-item__check">День 2</span>Завтрак · Обед · Ужин · Перекус</div>
+              <div class="ai-item ai-item--muted">и так до дня 7</div>
+              <div class="ai-item"><span class="ai-item__check">✓</span>Список покупок к меню</div>
+            </div>
+            <div class="ai-card__total">Добавить в списки покупок</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DEMO: VIDEO ===== -->
+    <section class="demo" id="demo" aria-labelledby="demo-title">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-label">Видео</div>
+          <h2 class="section-title" id="demo-title">Sam в работе</h2>
+          <p class="section-desc">Короткий обзор приложения в записи. Смотри, что умеет приложение, прямо здесь.</p>
+        </div>
+
+        <div class="demo__video" id="demoVideo" data-rutube="">
+          <div class="demo__video-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4V8z"/></svg>
+            <p>Видеообзор скоро появится</p>
+          </div>
+        </div>
+        <p class="demo__video-link" id="demoVideoLink" hidden>
+          <a href="#" target="_blank" rel="noopener">Открыть видео на RuTube</a>
+        </p>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container footer__inner">
+      <div class="footer__logo">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <rect width="36" height="36" rx="10" fill="url(#foot-g)"/>
+          <text x="18" y="25" text-anchor="middle" font-family="'Clash Display',sans-serif" font-size="18" font-weight="700" fill="white">S</text>
+          <defs>
+            <linearGradient id="foot-g" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#7C3AED"/><stop offset="1" stop-color="#06B6D4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span>Sam</span>
+      </div>
+      <p class="footer__copy">© 2026 Sam – приложение для самостоятельной жизни · <a href="mailto:support@sam-app.ru">support@sam-app.ru</a></p>
+      <nav class="footer__nav" aria-label="Ссылки футера">
+        <a href="#support">О проекте</a>
+        <a href="#modules">Модули</a>
+        <a href="#features">Функции</a>
+        <a href="#screens">Экраны</a>
+        <a href="#demo">Видео</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
