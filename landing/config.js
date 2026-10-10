@@ -5,7 +5,7 @@
 // Видео на RuTube. Чтобы заменить ролик, просто вставьте новую ссылку
 // между кавычками, например 'https://rutube.ru/video/<id>/'.
 // Если оставить строку пустой, вместо плеера покажется заглушка.
-window.SAM_RUTUBE_URL = 'https://rutube.ru/video/53af7704e12fbabaa38868ee03342c00/?r=wd';
+window.SAM_RUTUBE_URL = 'https://rutube.ru/video/4dfc8c47ea9cab14065c3d3afac0fbcc/?r=wd';
 
 // Скриншоты лежат в assets/screens/ и подключены прямо в index.html
 // (раздел «Экраны»). Чтобы заменить картинку, положите новый файл
